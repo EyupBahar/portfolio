@@ -5,6 +5,8 @@ Wege zu GitHub, LinkedIn und Lebenslauf. Ziel-Domain eyupbahar.com – noch nich
 
 ## Stand
 
+2026-11-09 (nachts) — Erster Commit und Push nach GitHub `EyupBahar/portfolio` (public, Joker) nach gitleaks- und
+Trivy-Prüfung; Trivy-CI-Workflow dazu (`.github/workflows/trivy.yml`, bis 2026-11-12 Warnung, danach rot).
 2026-11-09 (nachts) — Stack läuft von selbst (Joker „slider otomatik dönsün"): `Stack.astro` als CSS-Laufband (Technik
 `yorum--akis`, P13), Pause-Taste, Hover/Fokus hält, Reduce = Hand-Scroll; Block `slider.css` + Pfeile entfernt. Logos in Markenfarbe
 (simple-icons `hex`, in `Stack.astro`; schwarze Marken `--ink`).
@@ -22,7 +24,7 @@ nach Sicherheitsfix in beiden Repos (gepusht).
 JSON-LD, OG, GEO, Web-CV); Web-CVs in `public/cv/`; Projektliste mit iMac + iPhone 17 Pro Max (`DeviceFrames`);
 KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 2026-11-09 — Gebaut: Startseite, Fallstudien, Datenschutz/Privacy, 404 (DE+EN), OG-Bilder, GEO-Spiegel.
-`git init` + gitleaks, noch kein Commit. Ship blockiert durch die offenen Punkte unten.
+`git init` + gitleaks. Ship blockiert durch die offenen Punkte unten.
 
 ## Zuerst lesen
 
@@ -49,7 +51,7 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
   und `verify-security.sh` ohne Argument aus der Projektwurzel (Hook-Modus: geänderte Dateien).
 - SEO-Gate: `VERIFY_SEO_IGNORE="schema.organization"` – Person-Site, keine Organisation (bewusst).
 - Repo: GitHub `EyupBahar/portfolio`, **public** (Joker-Entscheid 2026-11-09, Ausnahme zur Private-Regel).
-- Deploy: geplant Vercel, Scope `eyupbahars-projects` (persönlich, nicht `matthaeus`); Repo noch nicht angelegt.
+- Deploy: geplant Vercel, Scope `eyupbahars-projects` (persönlich, nicht `matthaeus`); Repo angelegt und gepusht (2026-11-09).
 - i18n: DE ohne Präfix (`/`), EN unter `/en/`. Slugs der Projekte in beiden Sprachen gleich.
 - Eigene Projekte (`kind: own`, Link „Code auf GitHub"): Arbeitskopien `~/Desktop/arbeit/helvetia_machine` und
   `~/Desktop/arbeit/pinocchio_shop_fe`. Keine Live-Site → Screenshots lokal gebaut: Helvetia mit Seed-Daten des Repos
