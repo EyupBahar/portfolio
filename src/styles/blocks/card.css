@@ -1,0 +1,113 @@
+/* design-blocks: card--numarali (K0, kein JS)
+ * Quelle: ~/.claude/skills/design-blocks/blocks/card/card--numarali.css, unverändert übernommen.
+ * Projekt-Abweichungen (Nummernzeile weggelassen, kein Hover-Lift, dunkle Flächen) stehen in
+ * overrides.css §6 – die Blockdatei selbst bleibt die Kopie. */
+
+/* card--numarali — ikon kutusu + buyuk numara satiri → baslik → metin. Hover: ust cizgi soldan
+ * buyur, kutu dolar, kart kalkar, numara belirginlesir.
+ * Kaynak: tier_genetik index.astro ADVANTAGES (Tailwind, olculmus). Birebir: p-8 (2rem), gap-5,
+ * kutu 48px, ikon 24px stroke 1.7, numara 24px bold opacity .25→.6, cizgi 3px origin-left
+ * scale-x 0→1, hover -translate-y-1.5 (6px), baslik 18px/600, metin 14px lh 1.625.
+ * Cevrilen: hover golge → yok (cizgi + dolgu + kalkis yeter), --accent-soft → color-mix ile
+ * accent'ten turetilir (yeni token yok), kart basina 4 farkli accent → tek --accent (proje
+ * override eder), font-mono → tabular-nums. Numara `aria-hidden`: sira anlami tasimaz. */
+
+.db-card-num-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.db-card-num {
+  --db-soft: color-mix(in srgb, var(--accent, #16181a) 10%, var(--paper, #fbfaf8));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 2rem;
+  border: 1px solid var(--hairline, rgba(22, 24, 26, 0.16));
+  border-radius: 0;
+  background: var(--paper, #fbfaf8);
+  transition: transform var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+              border-color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+              background-color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+@supports not (color: color-mix(in srgb, red, red)) {
+  .db-card-num { --db-soft: rgb(228, 227, 226); }
+}
+
+/* Ust cizgi: 3px, soldan buyur */
+.db-card-num__bar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent, #16181a);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.db-card-num__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.db-card-num__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0;
+  background: var(--db-soft);
+  color: var(--accent, #16181a);
+  transition: background-color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+              color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.db-card-num__tile svg { width: 1.5rem; height: 1.5rem; }
+.db-card-num__no {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--accent, #16181a);
+  opacity: 0.35;
+  transition: opacity var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.db-card-num__title {
+  margin: 0;
+  font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink, #16181a);
+}
+.db-card-num__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.625;
+  color: var(--ink-soft, #5a6066);
+}
+
+@media (hover: hover) {
+  .db-card-num:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent, #16181a);
+    background: var(--db-soft);
+  }
+  .db-card-num:hover .db-card-num__bar { transform: scaleX(1); }
+  .db-card-num:hover .db-card-num__tile {
+    background: var(--accent, #16181a);
+    color: var(--accent-ink, #fbfaf8);
+  }
+  .db-card-num:hover .db-card-num__no { opacity: 0.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db-card-num,
+  .db-card-num__bar,
+  .db-card-num__tile,
+  .db-card-num__no { transition: none; }
+  .db-card-num:hover { transform: none; }
+}

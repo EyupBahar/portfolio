@@ -1,0 +1,45 @@
+---
+/** Schlichte Textseite (Datenschutz). Gleiches Plakatraster wie die Fallstudien. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { routes, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+}
+
+const { lang, title, description } = Astro.props;
+---
+
+<BaseLayout lang={lang} title={title} description={description} alternates={routes.privacy}>
+  <article class="legal container">
+    <h1 class="legal__title">{title.split(' | ')[0]}</h1>
+    <div class="legal__prose">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal { padding-block: clamp(2.5rem, 1.5rem + 4vw, 6rem) var(--section-y); }
+  .legal__title {
+    margin-bottom: clamp(2rem, 1rem + 3vw, 4rem);
+    font-size: var(--step-display);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .legal__prose {
+    display: grid;
+    gap: 1rem;
+    max-width: 65ch;
+  }
+  .legal__prose :global(h2) {
+    margin-top: 1.5rem;
+    font-size: var(--step-3);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .legal__prose :global(a) { overflow-wrap: anywhere; }
+  .legal__prose :global(.legal__stand) { color: var(--ink-soft); }
+</style>

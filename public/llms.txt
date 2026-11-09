@@ -1,0 +1,22 @@
+# Eyüp Bahar
+
+> Portfolio of Eyüp Bahar: websites and web applications with Astro, Next.js, Angular and React – AI-assisted with my own Claude skills, hooks and MCP servers.
+
+## Deutsch
+
+- [Eyüp Bahar – Softwareentwickler](https://eyupbahar.com/startseite.md)
+- [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin.md)
+- [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen.md)
+- [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita.md)
+- [Helvetia Machine](https://eyupbahar.com/projekte/helvetia-machine.md)
+- [Pinocchio Shop](https://eyupbahar.com/projekte/pinocchio-shop.md)
+
+## English
+
+- [Eyüp Bahar – Software Developer](https://eyupbahar.com/en.md)
+- [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin.md)
+- [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen.md)
+- [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita.md)
+- [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine.md)
+- [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop.md)
+- [Privacy](https://eyupbahar.com/en/privacy.md)

@@ -1,0 +1,69 @@
+/* Design-Tokens – Eyüp Bahar Portfolio
+ *
+ * Richtung: design-taste ③ Dark Tech mit ①-Swiss-Disziplin, Profil „harness" (Joker, 2026-11-09:
+ * Umbau „Schalttafel" – dunkle Panels, Porträt, Stack-Kacheln, Ablauf).
+ * Referenz-Triade (siehe DESIGN.md):
+ *   Jensen, B&O Beomaster 1900 (1976)      → Panels, Hairline-Teilungen, eine gefüllte Taste
+ *   Zumthor, Kunsthaus Bregenz (1997)      → matte Flächen mit Fugen, kühles Licht, kein Blur
+ *   Mann/Beebe, Collateral (2004)          → entsättigtes Stahlblau, eine Lichtquelle (das Foto)
+ *
+ * Kühles Dunkel (Joker, 2026-11-09): kein #000, kein reines Weiss – Text bewusst unter
+ * Maximalkontrast (13.05:1), damit lange Lesezeiten nicht blenden. Ein Akzent, kein Glow.
+ *
+ * Token-Namen = design-blocks-Vertrag (SKILL.md §1), damit Blöcke unverändert passen.
+ * Kein --radius: Ecken sind immer 0.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* — Fläche — kühles Graphit; Panels eine Stufe heller (1.07:1), getrennt durch Hairlines */
+  --paper: #14171d;
+  --band: #1a1e25;
+
+  /* — Tinte — kühles gebrochenes Weiss, kein #fff */
+  --ink: #d8dce3;      /* 13.05:1 auf --paper, 12.15:1 auf --band */
+  --ink-soft: #979dab; /* 6.60:1 auf --paper, 6.15:1 auf --band */
+
+  /* — Linien — Identität über Hairlines, nie über Schatten */
+  --hairline: rgba(216, 220, 227, 0.14);
+  --hairline-strong: rgba(216, 220, 227, 0.3);
+
+  /* — Aktion — das einzige Stahlblau (Indikator). Sättigung 35 %. 6.95:1 auf --paper:
+   *   Linie, Icon und kleine Zustandsfarbe sind erlaubt, Überschriften nie. */
+  --accent: #7fa6c2;
+  --accent-ink: #14171d; /* dunkler Text auf der gefüllten Taste: 6.95:1 */
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+
+  /* — Geräte (Projektliste: iMac + iPhone 17 Pro Max, Joker 2026-11-09) – flach, eloxiert, kühl */
+  --device-glass: #0b0c0f; /* schwarzer Glasrand um den Bildschirm */
+  --device-body: #262a32;  /* eloxiertes Gehäuse: iMac-Kinn, Standfuss, iPhone-Rahmen */
+
+  /* — Masse (frontend-design §2 „Responsive sizing") */
+  --container: 87.5rem;
+  --container-narrow: 52rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --gap: clamp(1rem, 3vw, 2.5rem);
+  --section-y: clamp(3.5rem, 9vw, 8.5rem);
+  /* Innenabstand der Panels: 20 → 40 px; Abstand zwischen Panels einer Gruppe: 12 → 24 px (Joker 2026-11-09) */
+  --panel-pad: clamp(1.25rem, 0.786rem + 1.905vw, 2.5rem);
+  --panel-gap: clamp(0.75rem, 0.471rem + 1.143vw, 1.5rem);
+
+  /* — Bewegung: stabil-präzise, kurz */
+  --dur: 220ms;
+  --dur-fast: 150ms;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* — Schrift: eine Grotesk für alles, eine Mono nur für Daten */
+  --font-body: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Fragment Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* — Typo-Skala 390 → 1440 px (frontend-design §2, rem-Term Pflicht) */
+  --step-display: clamp(2.5rem, 1.386rem + 4.571vw, 5.5rem);
+  --step-2: clamp(1.875rem, 1.271rem + 2.476vw, 3.5rem);
+  --step-3: clamp(1.375rem, 1.143rem + 0.952vw, 2rem);
+  --step-body: clamp(1rem, 0.954rem + 0.19vw, 1.125rem);
+  --step-caption: clamp(0.875rem, 0.852rem + 0.095vw, 0.938rem);
+}

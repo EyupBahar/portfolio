@@ -1,0 +1,168 @@
+---
+/**
+ * Ein Logbuch-Eintrag: Meta-Spalte (Jahr, Art) | Titel, Kontext, Text, Link, Stack | Bild.
+ * Hover/Fokus: die Hairline oben wird vom roten Sekundenzeiger überzeichnet (scaleX).
+ * Der Titel-Link deckt die ganze Zeile ab (::after); der externe Link liegt darüber.
+ */
+import { Icon } from 'astro-icon/components';
+import type { CollectionEntry } from 'astro:content';
+import DeviceFrames from './DeviceFrames.astro';
+import { t, routes, type Lang } from '../i18n/ui';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  lang: Lang;
+}
+
+const { project, lang } = Astro.props;
+const p = project.data;
+const link = p.liveUrl
+  ? { href: p.liveUrl, label: t(lang, 'projects.live') }
+  : p.repoUrl
+    ? { href: p.repoUrl, label: t(lang, 'projects.repo') }
+    : undefined;
+const kind = t(lang, p.kind === 'client' ? 'projects.kind.client' : 'projects.kind.own');
+const caseHref = routes.project(project.id.replace(`${lang}/`, ''))[lang];
+---
+
+<li class="project db-anim-reveal">
+  <p class="project__meta mono">
+    <span>{p.year}</span>
+    <span class="project__kind">{kind}</span>
+  </p>
+
+  <div class="project__body">
+    <h3 class="project__title"><a href={caseHref}>{p.title}</a></h3>
+    <p class="project__context">{p.context}</p>
+    <p class="project__summary">{p.summary}</p>
+    {link && (
+      <a class="db-btn db-btn--cizgi project__link" href={link.href} rel="noopener noreferrer">
+        {!p.liveUrl && <Icon name="ph:github-logo" class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />}
+        <span class="db-btn__label">{link.label}</span>
+        <Icon name="ph:arrow-up-right" class="db-btn__icon" aria-hidden="true" />
+      </a>
+    )}
+    <ul class="project__stack mono" role="list" aria-label={t(lang, 'projects.stack')}>
+      {p.stack.map((s) => <li>{s}</li>)}
+    </ul>
+  </div>
+
+  {p.cover && (
+    <div class="project__media">
+      <DeviceFrames
+        desktop={p.cover}
+        desktopAlt={p.coverAlt ?? ''}
+        mobile={p.coverMobile}
+        mobileAlt={t(lang, 'projects.mobileAlt')}
+      />
+    </div>
+  )}
+</li>
+
+<style>
+  .project {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    padding-block: clamp(1.75rem, 1rem + 2.5vw, 3.25rem);
+    border-top: 1px solid var(--hairline-strong);
+  }
+  /* Sekundenzeiger */
+  .project::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease); /* raus: schnell */
+  }
+  .project:focus-within::before { transform: scaleX(1); transition-duration: 240ms; }
+  @media (hover: hover) and (pointer: fine) {
+    .project:hover::before { transform: scaleX(1); transition-duration: 240ms; }
+  }
+
+  .project__meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--ink-soft);
+  }
+
+  .project__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+  .project__title {
+    font-size: var(--step-2);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .project__title a { text-decoration: none; }
+  .project__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .project__title a:focus-visible { outline: none; }
+  .project:has(.project__title a:focus-visible) { outline: 2px solid var(--accent); outline-offset: 4px; }
+  @media (hover: hover) and (pointer: fine) {
+    .project__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
+  }
+  .project__context { color: var(--ink-soft); }
+  .project__summary { max-width: 52ch; }
+  .project__link { --db-b: var(--ink); margin-top: 0.25rem; z-index: 1; }
+  @media (max-width: 767px), (any-pointer: coarse) {
+    .project__link { min-height: 2.75rem; }
+  }
+
+  .project__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  /* Geräte-Komposition (DeviceFrames). Sie ist positioniert und läge sonst über dem Zeilen-Link
+   * (::after) – Klicks auf iMac/iPhone sollen die Fallstudie öffnen wie früher das Bild. */
+  .project__media {
+    min-width: 0;
+    pointer-events: none;
+  }
+  .project__media :global(img) {
+    /* Helle Kunden-Screenshots auf dunklem Grund leicht zurücknehmen, beim Hover voll.
+     * Kein Zoom mehr: im Gerätebildschirm wirkte er wie ein Darstellungsfehler. */
+    opacity: 0.9;
+    transition: opacity 280ms var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .project:hover .project__media :global(img) { opacity: 1; }
+  }
+
+  @media (min-width: 768px) {
+    .project {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gap);
+    }
+    .project__meta {
+      grid-column: 1 / span 2;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .project__body { grid-column: 3 / span 5; }
+    .project__media { grid-column: 8 / -1; align-self: start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project::before,
+    .project__media :global(img) { transition: none; }
+  }
+</style>

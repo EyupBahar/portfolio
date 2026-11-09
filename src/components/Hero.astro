@@ -1,0 +1,145 @@
+---
+/**
+ * Eröffnung (Joker 2026-11-09, Umbau „Schalttafel"): Name + Rolle + Lead + Buttons links,
+ * rechts das Porträt als quadratisches Panel (Hairline-Rahmen, flach, kein Schatten).
+ * Fehlt die Porträtdatei (src/data/portrait.ts), steht der Name allein über die ganze Breite.
+ * Ladebewegung: design-blocks animasyon--giris (die direkten Kinder kommen gestaffelt).
+ * Das Kurzprofil steht seit dem Umbau in Facts.astro direkt darunter.
+ */
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import { t, type Lang } from '../i18n/ui';
+import { profile } from '../data/profile';
+import { portrait } from '../data/portrait';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class:list={['container', 'hero__grid', 'db-anim-giris', { 'hero__grid--portrait': !!portrait }]}>
+    <h1 class="hero__title" id="hero-title">
+      {profile.name}
+      <span class="hero__role">{t(lang, 'hero.role')}</span>
+    </h1>
+
+    {portrait && (
+      <figure class="hero__portrait panel">
+        <Image
+          src={portrait}
+          alt={t(lang, 'hero.portraitAlt')}
+          widths={[400, 560, 720, 1120]}
+          sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1279px) 40vw, 560px"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          quality={80}
+        />
+      </figure>
+    )}
+
+    <p class="hero__lead">{t(lang, 'hero.lead')}</p>
+
+    <div class="hero__actions">
+      <a class="db-btn db-btn--dolu" href={profile.cv[lang]} type="application/pdf">
+        <Icon name="ph:identification-card" class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />
+        <span class="db-btn__label">{t(lang, 'hero.cv')}</span>
+      </a>
+      <a class="db-btn db-btn--cerceveli" href={profile.github.url} rel="noopener noreferrer">
+        <Icon name="ph:github-logo" class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />
+        <span class="db-btn__label">GitHub</span>
+      </a>
+      <a class="db-btn db-btn--cerceveli" href={profile.linkedin.url} rel="noopener noreferrer">
+        <Icon name="ph:linkedin-logo" class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />
+        <span class="db-btn__label">LinkedIn</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 6rem) var(--section-y);
+  }
+
+  /* Blockbreite (52rem) aufheben – das Hero nutzt das ganze Raster. 0-2-0 > Block 0-1-0 */
+  .hero .db-anim-giris { max-width: none; }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+
+  .hero__title {
+    font-size: var(--step-display);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .hero__role {
+    display: block;
+    margin-top: 0.4em;
+    font-size: var(--step-3);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--ink-soft);
+  }
+
+  /* Porträt-Panel: quadratisch, das Bild füllt den Rahmen (CLS: Fläche steht vor dem Laden) */
+  .hero__portrait {
+    margin: 0;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+  .hero__portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__lead {
+    max-width: 38ch;
+    font-size: clamp(1.125rem, 1.009rem + 0.476vw, 1.438rem);
+    line-height: 1.5;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  /* Sekundär-Buttons in Tinte, nur der Lebenslauf trägt den Akzent (eine gefüllte Taste pro Viewport) */
+  .hero .db-btn--cerceveli { --db-b: var(--ink); --db-fg: var(--paper); }
+  @media (max-width: 767px), (any-pointer: coarse) {
+    .hero .db-btn { min-height: 2.75rem; }
+  }
+
+  @media (min-width: 768px) {
+    .hero__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gap);
+      row-gap: clamp(1.75rem, 1rem + 1.5vw, 2.75rem);
+      align-items: start;
+    }
+    .hero__title { grid-column: 1 / -1; }
+    .hero__lead { grid-column: 1 / span 7; }
+    .hero__actions { grid-column: 1 / span 7; }
+    /* Mit Porträt: Titel über alles, darunter Text links, Bild rechts über zwei Zeilen */
+    .hero__grid--portrait .hero__portrait { grid-column: 8 / -1; grid-row: 2 / span 2; }
+  }
+  @media (min-width: 1280px) {
+    .hero__lead { grid-column: 1 / span 6; }
+    .hero__actions { grid-column: 1 / span 6; }
+    /* Mit Porträt: Bild steht neben dem Titel; Titel oben, Buttons unten bündig mit dem Bild */
+    .hero__grid--portrait { grid-template-rows: auto auto 1fr; }
+    .hero__grid--portrait .hero__title { grid-column: 1 / span 7; grid-row: 1; }
+    .hero__grid--portrait .hero__portrait { grid-column: 8 / -1; grid-row: 1 / span 3; }
+    .hero__grid--portrait .hero__lead { grid-row: 2; }
+    .hero__grid--portrait .hero__actions { grid-row: 3; align-self: end; }
+  }
+</style>

@@ -1,0 +1,116 @@
+/* Basis – Reset, Satz, Raster. Komponenten stylen sich scoped. */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  font-size: var(--step-body);
+  line-height: 1.6;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-wrap: balance;
+}
+p { margin: 0; text-wrap: pretty; }
+ul, ol, dl, dd { margin: 0; padding: 0; }
+ul[role="list"], ol[role="list"] { list-style: none; }
+
+img, svg { display: block; max-width: 100%; height: auto; }
+
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+::selection { background: var(--ink); color: var(--paper); }
+
+/* Seitenwechsel ohne JS (Cross-Document View Transitions) */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+
+/* — Raster — */
+.container {
+  width: min(100% - 2 * var(--gutter), var(--container));
+  margin-inline: auto;
+}
+
+/* Daten-Schrift: nur für Werte, Jahreszahlen, Stack, Pfade */
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--step-caption);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: 0.75rem;
+  z-index: 10;
+  padding: 0.75rem 1rem;
+  background: var(--ink);
+  color: var(--paper);
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible { transform: none; }
+
+/* Icon + Beschriftung (Phosphor light, Inline-SVG via astro-icon). Ein Mass für alle Tafeln. */
+.label-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.label-icon > svg {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* Eigene Icons (Joker, src/icons/): 512er-Zeichnungen mit feinen Linien – unter 1.5rem
+ * verschwimmen sie (gleiche Messung wie _ikon/email.svg). Slot 1.75rem. */
+.label-icon--lg > svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* — Schalttafel — eine Sektion = ein Panel: Fläche eine Stufe heller, Hairline-Rahmen, kein Schatten,
+ * kein Radius (DESIGN.md → Signatur 1). Innenabstand --panel-pad. */
+.panel {
+  background: var(--band);
+  border: 1px solid var(--hairline);
+}
+
+/* Sektionen der Startseite: gleicher Abstand nach unten, gleiche Überschrift. */
+.section { padding-bottom: var(--section-y); }
+.section-title {
+  margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  font-size: var(--step-2);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}

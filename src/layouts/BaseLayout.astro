@@ -1,0 +1,109 @@
+---
+/**
+ * Grundgerüst jeder Seite: SEO-Kopf (title, description, canonical, hreflang, OG/Twitter,
+ * JSON-LD), Schriften, Skip-Link, Header und Footer.
+ */
+import '@fontsource-variable/schibsted-grotesk';
+import '@fontsource/fragment-mono/400.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import '../styles/blocks/buton.css';
+import '../styles/blocks/animasyon.css';
+import '../styles/blocks/card.css';
+import '../styles/blocks/zeitstrahl.css';
+import '../styles/overrides.css';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { t, type Lang, type Alternates } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Pfade der gleichen Seite in beiden Sprachen – für hreflang und den Sprachwechsel */
+  alternates: Alternates;
+  /** Zusätzliche JSON-LD-Objekte dieser Seite (z. B. CreativeWork) */
+  schema?: Record<string, unknown>[];
+  /** Absolute URL des Porträts für Person.image (nur Startseite, nur wenn die Datei da ist) */
+  personImage?: string;
+}
+
+const { lang, title, description, alternates, schema = [], personImage } = Astro.props;
+const site = Astro.site ?? new URL('https://eyupbahar.com');
+const canonical = new URL(alternates[lang], site).href;
+const ogImage = new URL(`/og/og-${lang}.png`, site).href;
+const locale = lang === 'de' ? 'de_CH' : 'en_GB';
+
+const personId = new URL('/#person', site).href;
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': personId,
+  name: profile.name,
+  jobTitle: t(lang, 'hero.role'),
+  url: new URL('/', site).href,
+  email: `mailto:${profile.email}`,
+  sameAs: [profile.github.url, profile.linkedin.url],
+  address: { '@type': 'PostalAddress', addressRegion: profile.addressRegion, addressCountry: 'CH' },
+  knowsLanguage: ['de', 'en', 'tr'],
+  ...(personImage ? { image: personImage } : {}),
+};
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': new URL('/#website', site).href,
+  name: profile.name,
+  url: new URL('/', site).href,
+  inLanguage: ['de-CH', 'en'],
+  author: { '@id': personId },
+};
+
+// JSON-LD ist Datenblock, kein Skript; "<" trotzdem maskieren, damit kein "</script>" entstehen kann.
+const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang={lang === 'de' ? 'de-CH' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="de-CH" href={new URL(alternates.de, site).href} />
+    <link rel="alternate" hreflang="en" href={new URL(alternates.en, site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(alternates.de, site).href} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#14171d" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={profile.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${profile.name} – ${t(lang, 'hero.role')}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={jsonLd(person)} />
+    <script type="application/ld+json" set:html={jsonLd(website)} />
+    {schema.map((s) => <script type="application/ld+json" set:html={jsonLd(s)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t(lang, 'skip')}</a>
+    <Header lang={lang} alternates={alternates} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

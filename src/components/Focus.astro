@@ -1,0 +1,63 @@
+---
+/**
+ * Schwerpunkte: drei statische Panels auf dem Block card--numarali (ohne Nummernzeile – die drei
+ * Punkte haben keine Reihenfolge, siehe card README). Raster asymmetrisch 2fr 1fr 1fr, damit keine
+ * Reihe aus drei gleichen Karten entsteht (frontend-design §1); Panels mit Abstand (Joker 2026-11-09:
+ * „gap ver" – vorher Fugen-Raster). Keine Links, deshalb kein Hover-Lift (overrides.css §6) – nur die
+ * Indikatorlinie oben, das Icon wechselt in den Akzent.
+ */
+import { Icon } from 'astro-icon/components';
+import { t, type Lang, type UiKey } from '../i18n/ui';
+import { focus } from '../data/focus';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="focus section" aria-labelledby="focus-title">
+  <div class="container">
+    <h2 class="section-title" id="focus-title">{t(lang, 'focus.title')}</h2>
+    <div class="db-card-num-grid focus__grid">
+      {focus.map((f) => (
+        <article class="db-card-num">
+          <span class="db-card-num__bar" aria-hidden="true"></span>
+          <div class="db-card-num__head">
+            <span class="db-card-num__tile" aria-hidden="true"><Icon name={f.icon} /></span>
+          </div>
+          <h3 class="db-card-num__title">{t(lang, `focus.${f.key}.title` as UiKey)}</h3>
+          <p class="db-card-num__desc">{t(lang, `focus.${f.key}.text` as UiKey)}</p>
+          <ul class="mono focus__stack" role="list" aria-label={t(lang, 'stack.title')}>
+            {f.stack.map((s) => <li>{s}</li>)}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .focus__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--panel-gap);
+  }
+  .focus__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: auto; /* Stack-Zeile sitzt am unteren Rand, auch wenn der Text kürzer ist */
+    padding-top: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 768px) {
+    .focus__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .focus__grid > :first-child { grid-column: 1 / -1; }
+  }
+  @media (min-width: 1280px) {
+    .focus__grid { grid-template-columns: 2fr 1fr 1fr; }
+    .focus__grid > :first-child { grid-column: auto; }
+  }
+</style>

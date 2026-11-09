@@ -1,0 +1,108 @@
+/* design-blocks: zeitstrahl--yatay-ray (K0, kein JS)
+ * Quelle: ~/.claude/skills/design-blocks/blocks/zeitstrahl/zeitstrahl--yatay-ray.css, Werte unverändert.
+ * Nicht übernommen: die Regel für das kleine Etikett über dem Titel (Eyebrow-Verbot, gleicher
+ * Grund wie in animasyon.css). Abweichungen in overrides.css §7. */
+
+/* zeitstrahl--yatay-ray — yatay ray, numarali/yilli kare dugum, dugumler arasi
+ * baglanti; dar ekranda dikeye doner. Kaynak: sbm Zeitstrahl.astro `.zs`
+ * (olculmus). Olculer birebir: --node clamp(3.25rem,…,4.75rem), gap
+ * clamp(1rem,…,2.5rem), ust bosluk node+1.5rem, kirilma 56rem.
+ * Cevrilen: celik gradient baglanti → duz hairline; Etikett uppercase+0.14em → normal-case (Regel nicht übernommen);
+ * data-reveal/data-grow/data-draw (K1) bloga alinmadi — animasyon elementinden eklenir.
+ * Kolon sayisi iceriktenden gelir (grid-auto-flow) — inline style yok (P9). */
+
+.db-zs-ray {
+  --db-node: clamp(3.25rem, 2.4rem + 2.4vw, 4.75rem);
+  --db-gap: clamp(1rem, 0.4rem + 1.6vw, 2.5rem);
+  --db-lift: 1.5rem;
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: calc(var(--db-node) + var(--db-lift)) 0 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  column-gap: var(--db-gap);
+}
+
+.db-zs-ray__step {
+  position: relative;
+  display: grid;
+  justify-items: start;
+}
+
+/* Baglanti: BU dugumun merkezinden SONRAKI dugumun merkezine. */
+.db-zs-ray__step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: calc((var(--db-node) + var(--db-lift)) * -1 + var(--db-node) / 2);
+  left: calc(var(--db-node) / 2);
+  width: calc(100% + var(--db-gap));
+  height: 1px;
+  background: var(--hairline-strong, rgba(22, 24, 26, 0.32));
+}
+
+/* Dugum kolonunda SOLA hizali → ilk dugum metnin sol kenarina oturur. */
+.db-zs-ray__node {
+  position: absolute;
+  top: calc((var(--db-node) + var(--db-lift)) * -1);
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--db-node);
+  height: var(--db-node);
+  border: 1px solid var(--ink, #16181a);
+  border-radius: 0;
+  background: var(--paper, #fbfaf8);
+}
+.db-zs-ray__num {
+  font-family: var(--font-display, ui-serif, Georgia, serif);
+  font-weight: 700;
+  font-size: calc(var(--db-node) * 0.42);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink-soft, #5a6066);
+}
+/* 4 haneli yil daha genis → kutuya rahat otursun diye kucuk */
+.db-zs-ray__num--year { font-size: calc(var(--db-node) * 0.35); }
+
+.db-zs-ray__title {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  font-size: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink, #16181a);
+}
+.db-zs-ray__text {
+  margin: 0;
+  max-width: 34ch;
+  line-height: 1.6;
+  color: var(--ink-soft, #5a6066);
+}
+
+/* Dar ekran → dikey: dugum + metin ayni satirda, baglanti asagi iner. */
+@media (max-width: 56rem) {
+  .db-zs-ray {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    padding-top: 0;
+    row-gap: 1.5rem;
+  }
+  .db-zs-ray__step {
+    grid-template-columns: var(--db-node) 1fr;
+    column-gap: 1.5rem;
+    align-items: center;
+  }
+  .db-zs-ray__node { position: relative; top: 0; left: 0; }
+  .db-zs-ray__step:not(:last-child)::before {
+    top: calc(var(--db-node) / 2);
+    left: calc(var(--db-node) / 2);
+    width: 1px;
+    height: calc(100% + 1.5rem);
+  }
+  .db-zs-ray__body { padding-block: 0.5rem; }
+  .db-zs-ray__text { max-width: 60ch; }
+}

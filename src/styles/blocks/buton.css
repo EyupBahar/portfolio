@@ -1,0 +1,105 @@
+/* design-blocks: buton--dolu + buton--cerceveli + buton--cizgi (K0, kein JS)
+ * Quelle: ~/.claude/skills/design-blocks/blocks/buton/*.css, unverändert übernommen.
+ * Die gemeinsame Basis (.db-btn, __icon, :hover-Pfeil, :focus-visible, --koyu) ist in allen
+ * drei Blockdateien identisch (P11) und steht hier deshalb einmal. Nicht übernommen:
+ * Demo-Gerüst (.db-btn-demo). */
+
+.db-btn {
+  --db-b: var(--accent, #16181a);
+  --db-fg: var(--accent-ink, #fbfaf8);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+              background-color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+              border-color var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.db-btn__icon {
+  width: 1.05em;
+  height: 1.05em;
+  flex-shrink: 0;
+  transition: transform var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.db-btn:hover .db-btn__icon { transform: translateX(0.28em); }
+.db-btn:focus-visible { outline: 2px solid var(--db-b, #16181a); outline-offset: 3px; }
+
+/* — buton--dolu — */
+.db-btn--dolu {
+  padding: 0.85em 1.5em;
+  border: 1px solid var(--db-b);
+  border-radius: 0;
+  background: var(--db-b);
+  color: var(--db-fg);
+}
+.db-btn--dolu:hover { background: transparent; color: var(--db-b); }
+.db-btn--dolu:disabled,
+.db-btn--dolu[aria-disabled="true"] {
+  background: transparent;
+  border-color: var(--hairline-strong, rgba(22, 24, 26, 0.32));
+  color: var(--ink-soft, #5a6066);
+  cursor: not-allowed;
+}
+.db-btn--dolu:disabled .db-btn__icon { transform: none; }
+
+/* — buton--cerceveli — Füllung schiebt sich beim Hover von unten herein (transform) */
+.db-btn--cerceveli {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0.85em 1.4em;
+  border: 1px solid var(--db-b);
+  border-radius: 0;
+  background: transparent;
+  color: var(--db-b);
+}
+.db-btn--cerceveli::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--db-b);
+  transform: translateY(101%);
+  transition: transform var(--dur, 220ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.db-btn--cerceveli:hover { color: var(--db-fg); }
+.db-btn--cerceveli:hover::before { transform: translateY(0); }
+
+/* — buton--cizgi — 1px-Linie wird von links gezeichnet */
+.db-btn--cizgi {
+  position: relative;
+  padding-block: 0.35em;
+  color: var(--db-b);
+}
+.db-btn--cizgi .db-btn__label { position: relative; }
+.db-btn--cizgi .db-btn__label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.22em;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-fast, 150ms) var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.db-btn--cizgi:hover .db-btn__label::after,
+.db-btn--cizgi:focus-visible .db-btn__label::after { transform: scaleX(1); }
+
+.db-btn--koyu { --db-b: var(--paper, #fbfaf8); --db-fg: var(--ink, #16181a); }
+
+@media (prefers-reduced-motion: reduce) {
+  .db-btn,
+  .db-btn__icon,
+  .db-btn--cerceveli::before,
+  .db-btn--cizgi .db-btn__label::after { transition: none; }
+  .db-btn:hover .db-btn__icon { transform: none; }
+}

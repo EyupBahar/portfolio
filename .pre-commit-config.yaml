@@ -1,0 +1,12 @@
+# .pre-commit-config.yaml — proje koku. Kaynak: ~/.claude/templates/gitleaks/
+#
+# DIKKAT (bu makine): global `core.hooksPath = ~/.git-hooks` ayarli oldugu icin
+# `pre-commit install`in yazdigi .git/hooks/pre-commit git tarafindan HIC calistirilmaz.
+# Bu dosya burada ekip arkadaslari ve pre-commit kullanan CI icin durur; senin
+# makinende zaten ~/.git-hooks/pre-commit gitleaks'i kosuyor.
+# Yine de bu repo'da pre-commit'i etkin istersen: install.sh --pre-commit-install
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1 # yerel `gitleaks version` ile ayni tutulur
+    hooks:
+      - id: gitleaks

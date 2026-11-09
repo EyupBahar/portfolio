@@ -1,0 +1,41 @@
+---
+/** Eine 404 für beide Sprachen – Vercel liefert dist/404.html für jede unbekannte Adresse. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { routes } from '../i18n/ui';
+---
+
+<BaseLayout
+  lang="de"
+  title="Seite nicht gefunden | Eyüp Bahar"
+  description="Diese Seite gibt es nicht. Zur Startseite von Eyüp Bahar."
+  alternates={routes.home}
+>
+  <section class="nf container">
+    <h1 class="nf__title">Seite nicht gefunden</h1>
+    <p lang="en" class="nf__en">Page not found</p>
+    <ul class="nf__links" role="list">
+      <li>
+        <a class="db-btn db-btn--dolu" href={routes.home.de}><span class="db-btn__label">Zur Startseite</span></a>
+      </li>
+      <li>
+        <a class="db-btn db-btn--cerceveli nf__ink" href={routes.home.en} lang="en"><span class="db-btn__label">English home</span></a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    display: grid;
+    gap: 1.25rem;
+    padding-block: clamp(3rem, 2rem + 6vw, 8rem) var(--section-y);
+  }
+  .nf__title {
+    font-size: var(--step-display);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .nf__en { color: var(--ink-soft); font-size: var(--step-3); }
+  .nf__links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+  .nf .nf__ink { --db-b: var(--ink); --db-fg: var(--paper); }
+</style>

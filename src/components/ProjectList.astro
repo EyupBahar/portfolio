@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectRow from './ProjectRow.astro';
+import { t, anchors, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const projects = (await getCollection('projects', (p) => p.id.startsWith(`${lang}/`))).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<section class="projects" id={anchors[lang].projects} aria-labelledby="projects-title">
+  <div class="container">
+    <h2 class="projects__title" id="projects-title">{t(lang, 'projects.title')}</h2>
+    <ul class="projects__list" role="list">
+      {projects.map((project) => <ProjectRow project={project} lang={lang} />)}
+    </ul>
+  </div>
+</section>
+
+<script>
+  // design-blocks animasyon--reveal.js (K1), unverändert. Einziger Scroll-Moment der Seite.
+  // Reduced-Motion oder kein IntersectionObserver: Klasse wird nie gesetzt, alles bleibt sichtbar.
+  (() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) return;
+    document.documentElement.classList.add('db-anim-js');
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add('is-visible');
+        io.unobserve(e.target);
+      }
+    }, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.db-anim-reveal').forEach((el) => io.observe(el));
+  })();
+</script>
+
+<style>
+  .projects { padding-bottom: var(--section-y); }
+  .projects__title {
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+    font-size: var(--step-2);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .projects__list { border-bottom: 1px solid var(--hairline-strong); }
+</style>

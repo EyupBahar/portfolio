@@ -1,0 +1,22 @@
+# .gitleaks.toml — proje koku. Kaynak: ~/.claude/templates/gitleaks/
+#
+# [extend] SATIRINI SILME. Gitleaks bu dosyayi bulunca kendi varsayilan config'inin
+# YERINE koyar, ustune degil. useDefault olmadan geriye SIFIR kural kalir: tarayici
+# sessizce her seyi temiz gorur. (Olculdu, gitleaks 8.30.1 — bkz. secret-audit §0.5)
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Gitleaks tarafından göz ardı edilecek veri ve yollar"
+paths = [
+  '''gitleaks\.toml''',
+  '''package-lock\.json''',
+  '''node_modules''',
+]
+regexes = [
+  '''EXAMPLE_KEY_123456789''', # Test verileri/örnekler
+]
+stopwords = [
+  "dummy_secret",
+  "mock_token",
+]

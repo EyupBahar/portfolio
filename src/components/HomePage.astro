@@ -1,0 +1,48 @@
+---
+/**
+ * Startseite – gleiche Struktur für DE und EN, nur die Sprache wechselt.
+ * Reihenfolge aus DESIGN.md → opening_ritual: Hero (Name, Porträt, Buttons) → Kurzprofil →
+ * Schwerpunkte → Stack → Projekte → Ablauf → CTA-Band → Kontakt.
+ */
+import { getImage } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from './Hero.astro';
+import Facts from './Facts.astro';
+import Focus from './Focus.astro';
+import Stack from './Stack.astro';
+import ProjectList from './ProjectList.astro';
+import Process from './Process.astro';
+import CtaBand from './CtaBand.astro';
+import Contact from './Contact.astro';
+import { t, routes, type Lang } from '../i18n/ui';
+import { portrait } from '../data/portrait';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+// Porträt auch in JSON-LD (Person.image), als absolute URL – nur wenn die Datei da ist.
+const site = Astro.site ?? new URL('https://eyupbahar.com');
+const personImage = portrait
+  ? new URL((await getImage({ src: portrait, width: 800, format: 'jpg' })).src, site).href
+  : undefined;
+---
+
+<BaseLayout
+  lang={lang}
+  title={t(lang, 'meta.title')}
+  description={t(lang, 'meta.description')}
+  alternates={routes.home}
+  personImage={personImage}
+>
+  <Hero lang={lang} />
+  <Facts lang={lang} />
+  <Focus lang={lang} />
+  <Stack lang={lang} />
+  <ProjectList lang={lang} />
+  <Process lang={lang} />
+  <CtaBand lang={lang} />
+  <Contact lang={lang} />
+</BaseLayout>

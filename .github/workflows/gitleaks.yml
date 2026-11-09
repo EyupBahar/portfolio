@@ -1,0 +1,29 @@
+# .github/workflows/gitleaks.yml — Kaynak: ~/.claude/templates/gitleaks/
+# Lokal hook `--no-verify` ile atlanabilir ve yalniz staged degisiklige bakar. CI atlanamaz.
+name: gitleaks
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+# gitleaks-action PR'da commit listesini API'den okur; izin yoksa 403 ile duser.
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      # Action'lar commit SHA'sina sabit (etiket kaydirilabilir); guncelleme Dependabot 'github-actions' ile.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # tam history sart — yoksa eski commit'teki sir gorunmez
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0 (Node 24; v2 = Node 20, deprecated)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Lisans yalniz GitHub ORGANIZASYON repo'lari icin gerekli.
+          # EyupBahar kisisel hesabi -> bos kalabilir.
+          GITLEAKS_LICENSE: ""

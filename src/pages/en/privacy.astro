@@ -1,0 +1,45 @@
+---
+import LegalPage from '../../components/LegalPage.astro';
+import { profile } from '../../data/profile';
+import { t } from '../../i18n/ui';
+---
+
+<LegalPage
+  lang="en"
+  title={`Privacy | ${profile.name} – ${t('en', 'hero.role')}`}
+  description="Privacy notice for eyupbahar.com: hosted on Vercel, no cookies, no tracking, no forms."
+>
+  <h2>Controller</h2>
+  <p>{profile.name}, {profile.region.en}<br /><a href={`mailto:${profile.email}`}>{profile.email}</a></p>
+
+  <h2>What this website stores</h2>
+  <p>
+    This website sets no cookies, uses no tracking or analytics tools and contains no forms. Fonts
+    and all other files are served by this website itself, not by third parties.
+  </p>
+
+  <h2>Hosting</h2>
+  <p>
+    The website is hosted by Vercel Inc., USA. When you visit, Vercel processes technically
+    necessary data such as IP address, time, requested page and browser identifier to deliver the
+    site and protect it from abuse. Data may be transferred to the USA in the process. Details:
+    <a href="https://vercel.com/legal/privacy-policy" rel="noopener noreferrer">Vercel's privacy policy</a>.
+  </p>
+
+  <h2>Contact by email</h2>
+  <p>If you email me, I only use your details to answer your enquiry.</p>
+
+  <h2>Links to other websites</h2>
+  <p>
+    Links to GitHub, LinkedIn and client projects lead to websites run by other providers. Their
+    privacy policies apply there.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    Under the Swiss Federal Act on Data Protection (FADP) you can request access to your data, as
+    well as its correction or deletion. An email to the address above is enough.
+  </p>
+
+  <p class="legal__stand">Last updated: November 2026</p>
+</LegalPage>

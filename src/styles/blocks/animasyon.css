@@ -1,0 +1,40 @@
+/* design-blocks: animasyon--giris (K0) + animasyon--reveal (K1)
+ * Quelle: ~/.claude/skills/design-blocks/blocks/animasyon/, Werte unverändert.
+ * Global statt scoped: die html-Klasse .db-anim-js würde in Astro-scoped CSS mitgescopt
+ * (Memory astro-child-root-scope-tuzagi). Nicht übernommen: Demo-Gerüst, __kicker
+ * (Eyebrow-Verbot), __hint (endlose Scroll-Animation, auf dieser Seite ohne Zweck).
+ *
+ * Choreografie (frontend-design §4.3): genau EIN Lade-Moment (Hero, giris) und EIN
+ * Scroll-Moment (Projektliste, reveal). Sonst bewegt sich nichts ungefragt. */
+
+/* — animasyon--giris: einmal beim Laden, gestaffelt — */
+.db-anim-giris > * {
+  animation: db-anim-giris-drop 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.db-anim-giris > :nth-child(1) { animation-duration: 0.9s; }
+.db-anim-giris > :nth-child(2) { animation-delay: 0.1s; }
+.db-anim-giris > :nth-child(3) { animation-delay: 0.25s; }
+.db-anim-giris > :nth-child(4) { animation-delay: 0.4s; }
+.db-anim-giris > :nth-child(5) { animation-delay: 0.55s; }
+.db-anim-giris > :nth-child(6) { animation-delay: 0.75s; }
+@keyframes db-anim-giris-drop {
+  from { opacity: 0; transform: translateY(-32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* — animasyon--reveal: Standard sichtbar; erst wenn JS läuft, gilt „noch nicht gesehen" — */
+.db-anim-js .db-anim-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+              transform 0.8s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+.db-anim-js .db-anim-reveal.is-visible { opacity: 1; transform: none; }
+
+.db-anim-reveal--gecikme-1 { transition-delay: 0.1s; }
+.db-anim-reveal--gecikme-2 { transition-delay: 0.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .db-anim-giris > * { animation: none; }
+  .db-anim-js .db-anim-reveal { opacity: 1; transform: none; transition: none; }
+}

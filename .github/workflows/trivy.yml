@@ -1,0 +1,69 @@
+# .github/workflows/trivy.yml — Kaynak: ~/.claude/templates/trivy/
+# Sunucu tarafi bagimlilik taramasi. Yerel kapilar (pre-commit, pre-push, guard-trivy) yalniz kurulu
+# makinelerde kosar; bu job her branch push'unda, her PR'da ve haftalik (degismeyen lockfile'a yeni CVE) kosar.
+# Kural yerel kapilarla ayni: yamasi cikmis HIGH/CRITICAL, npm/yarn dev-deps sayilmaz, repo kokundeki
+# COMMIT'LI .trivyignore gecerli (CVE basina, ustune `# gerekce`).
+# Mod (Joker karari 2026-10-29): TRIVY_STRICT_FROM'a kadar bulgu = uyari (job yesil, Summary + annotation),
+# o gunden itibaren job kirmizi. Trivy'nin kendi hatasi (DB indirilemedi vb.) her zaman kirmizi.
+# Kirmizi job merge'i ancak branch protection'da "required check" ise durdurur; deploy'u (or. Vercel Git
+# entegrasyonu) kendiligindan durdurmaz — README "CI neyi durdurur".
+name: trivy
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "23 5 * * 1" # pazartesi 05:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deps:
+    name: trivy (bagimliliklar)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TRIVY_STRICT_FROM: "2026-11-12"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Ucuncu taraf action yok: resmi imaj digest'e sabit (etiket kaydirilamaz), repo salt-okunur bagli,
+      # token konteynere girmez. 0.76.1 = 14-gun kuralina bilincli istisna: eMudhra ara-CA mitigasyonu
+      # (DB indirmesinin TLS guveni). Guncelleme: README "Imaj guncelleme".
+      # --exit-code 3 = bulgu var; baska sifir-disi kod = Trivy hatasi.
+      - name: Trivy — yamasi olan HIGH/CRITICAL
+        run: |
+          set +e
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -w /src \
+            aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c \
+            fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 3 \
+            --skip-dirs '**/node_modules' --format table . > "$RUNNER_TEMP/trivy.txt" 2> "$RUNNER_TEMP/trivy.err"
+          rc=$?
+          set -e
+          cat "$RUNNER_TEMP/trivy.err" >&2
+          cat "$RUNNER_TEMP/trivy.txt"
+          # Bulgu/temiz: tablo; Trivy hatasi: log'un sonu
+          [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ] || tail -n 20 "$RUNNER_TEMP/trivy.err" > "$RUNNER_TEMP/trivy.txt"
+          today="$(date -u +%Y%m%d)"
+          from="$(printf '%s' "$TRIVY_STRICT_FROM" | tr -d '-')"
+          {
+            echo "## Trivy (bagimliliklar)"
+            echo ""
+            if [ "$rc" -eq 0 ]; then echo "✅ Yamasi olan HIGH/CRITICAL acik yok."; fi
+            if [ "$rc" -eq 3 ] && [ "$today" -lt "$from" ]; then
+              echo "⚠️ Yamasi olan HIGH/CRITICAL acik var — **$TRIVY_STRICT_FROM'den itibaren bu job kirmizi olur.**"
+            fi
+            if [ "$rc" -eq 3 ] && [ "$today" -ge "$from" ]; then echo "❌ Yamasi olan HIGH/CRITICAL acik var."; fi
+            if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ]; then echo "❌ Trivy hata verdi (kod $rc) — tarama yapilamadi."; fi
+            echo ""
+            echo '```'
+            cat "$RUNNER_TEMP/trivy.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" -eq 3 ] && [ "$today" -lt "$from" ]; then
+            echo "::warning title=Trivy::Yamasi olan HIGH/CRITICAL acik var — $TRIVY_STRICT_FROM'den itibaren bu job kirmizi olur. Ayrinti: job Summary."
+            exit 0
+          fi
+          exit "$rc"

@@ -1,0 +1,91 @@
+/* Projekt-Abweichungen von den design-blocks – an EINER Stelle, jeweils mit Grund.
+ * Wird nach den Block-Dateien geladen; die Block-CSS selbst bleibt unverändert.
+ * Quelle der Werte: emil-design-eng Review (2026-11-09) + Bewegungscharakter
+ * „stabil-präzise" (DESIGN.md). */
+
+/* 1 · Druck-Feedback auf Buttons (fehlt in den Blöcken).
+ *     a.db-btn (0-1-1) schlägt die Block-Basis .db-btn (0-1-0) unabhängig von der Ladereihenfolge. */
+a.db-btn,
+button.db-btn {
+  transition-property: color, background-color, border-color, transform;
+  transition-duration: var(--dur), var(--dur), var(--dur), 140ms;
+  transition-timing-function: var(--ease);
+}
+a.db-btn:active,
+button.db-btn:active { transform: scale(0.97); }
+
+/* 2 · Lade-Moment im Hero: gleiche Staffel wie animasyon--giris, aber leiser.
+ *     Block: −32px / 1s → hier −12px / 0.7s. Ein Panel „fällt" nicht, es sitzt. */
+.hero .db-anim-giris > * {
+  animation-name: hero-settle;
+  animation-duration: 0.7s;
+}
+@keyframes hero-settle {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 3 · Scroll-Moment Projektliste: Block 40px / 0.8s → 24px / 0.6s */
+.db-anim-js .db-anim-reveal {
+  transform: translateY(24px);
+  transition-duration: 0.6s;
+}
+.db-anim-js .db-anim-reveal.is-visible { transform: none; }
+
+/* 4 · Führendes Icon im Button (Marke/Dokumenttyp): etwas grösser, ohne Hover-Verschiebung.
+ *     Gewicht folgt der Schrift: Buttons (600) → Phosphor regular, Tafeln/Footer (400) → light.
+ *     Der Block kennt nur das nachgestellte Pfeil-Icon, das beim Hover nach rechts gleitet –
+ *     ein vorangestelltes Icon würde dabei in den Text rutschen. */
+.db-btn__icon--lead { width: 1.35em; height: 1.35em; }
+.db-btn:hover .db-btn__icon--lead { transform: none; }
+
+/* 5 · Gefüllte Taste (buton--dolu) auf dunklem Grund: Hover kehrt um – Fläche weg, Text und Rahmen
+ *     in Stahlblau (6.95:1, lesbar). Der Block macht genau das; die frühere Override für Rot
+ *     (Text hell statt rot, 3.46:1) ist mit dem Akzentwechsel überflüssig und entfernt. */
+
+/* 6 · Schwerpunkte (card--numarali) als statische Panels: keine Links, also kein Hover-Lift
+ *     (ein Element, das sich hebt, verspricht einen Klick). Nummernzeile fehlt im Markup, weil
+ *     die drei Punkte keine Reihenfolge haben (card README). Flächen: Panel --band, Icon-Kachel
+ *     --paper (eine Stufe tiefer, wie ein eingelassener Schalter) – ersetzt den color-mix-Ton
+ *     des Blocks, deshalb braucht es hier keinen @supports-Fallback. */
+.db-card-num {
+  --db-soft: var(--paper);
+  background: var(--band);
+}
+/* Icon frei statt in der Kachel (Joker 2026-11-09 nachts: „büyüt, çerçeve ve bg yok"): kein Grund, kein
+ * Rahmen, Icon 3.25rem – Jokers 512er-Zeichnungen stehen direkt auf dem Panel. Hover füllt deshalb nichts
+ * mehr, das Icon wechselt nur in den Akzent (Indikator-Logik). */
+.db-card-num__tile { width: auto; height: auto; background: transparent; }
+.db-card-num__tile svg { width: 3.25rem; height: 3.25rem; }
+@media (hover: hover) {
+  .db-card-num:hover {
+    transform: none;
+    background: var(--band);
+  }
+  .db-card-num:hover .db-card-num__tile { background: transparent; color: var(--accent); }
+}
+
+/* 7 · Ablauf (zeitstrahl--yatay-ray): Der Knoten trägt Jokers eigenes Icon statt der Zahl (2026-11-09);
+ *     die Zahl steht als Mono-Präfix im Titel (Process.astro), damit die Reihenfolge sichtbar bleibt.
+ *     Knoten ohne Rahmen und ohne Grund (Joker: „çerçeve ve bg yok") – deshalb endet die Verbindungslinie am
+ *     Knotenrand statt in der Knotenmitte, sonst liefe sie durch die Zeichnung. Icon-Mass in Process.astro. */
+.db-zs-ray__node { background: transparent; border: 0; }
+.db-zs-ray__step:not(:last-child)::before {
+  left: var(--db-node);
+  width: calc(100% + var(--db-gap) - var(--db-node));
+}
+@media (max-width: 56rem) {
+  .db-zs-ray__step:not(:last-child)::before {
+    top: var(--db-node);
+    left: calc(var(--db-node) / 2);
+    width: 1px;
+    height: calc(100% + 1.5rem - var(--db-node));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.db-btn:active,
+  button.db-btn:active { transform: none; }
+  .hero .db-anim-giris > * { animation: none; }
+  .db-anim-js .db-anim-reveal { transform: none; transition: none; }
+}

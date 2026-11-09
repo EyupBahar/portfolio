@@ -1,0 +1,282 @@
+---
+/**
+ * Fallstudie: Kopf (Titel, Kontext, Kurztext, Link) | Projektdaten als Fahrplan-Tafel,
+ * dann das Titelbild über die volle Breite, dann der Text im Plakatraster:
+ * H2 links in der Spalte, Absätze und Listen rechts daneben.
+ */
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { t, routes, anchors, type Lang } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  lang: Lang;
+  project: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+
+const { lang, project, next } = Astro.props;
+const p = project.data;
+const slug = project.id.replace(`${lang}/`, '');
+const nextSlug = next.id.replace(`${lang}/`, '');
+const nextHref = routes.project(nextSlug)[lang];
+const { Content } = await render(project);
+
+const link = p.liveUrl
+  ? { href: p.liveUrl, label: t(lang, 'projects.live') }
+  : p.repoUrl
+    ? { href: p.repoUrl, label: t(lang, 'projects.repo') }
+    : undefined;
+
+const facts = [
+  { icon: 'ph:tag-light', label: t(lang, 'case.kind'), value: t(lang, p.kind === 'client' ? 'projects.kind.client' : 'projects.kind.own') },
+  { icon: 'ph:calendar-blank-light', label: t(lang, 'case.period'), value: p.period },
+  { icon: 'ph:user-light', label: t(lang, 'case.role'), value: p.role },
+  { icon: 'ph:stack-light', label: t(lang, 'case.stack'), value: p.stack.join(', ') },
+];
+
+const site = Astro.site ?? new URL('https://eyupbahar.com');
+const pageUrl = new URL(routes.project(slug)[lang], site).href;
+// Meta-Description ≤ 160 Zeichen: lange Kurztexte bis zum Gedankenstrich kürzen, Stack anhängen
+const description =
+  p.summary.length <= 155 ? p.summary : `${p.summary.split(' – ')[0]} (${p.stack.slice(0, 3).join(', ')}).`;
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    '@id': `${pageUrl}#work`,
+    name: p.title,
+    description: p.summary,
+    url: pageUrl,
+    inLanguage: lang === 'de' ? 'de-CH' : 'en',
+    dateCreated: String(p.year),
+    keywords: p.stack.join(', '),
+    author: { '@id': new URL('/#person', site).href },
+    ...(link ? { sameAs: link.href } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: profile.name, item: new URL(routes.home[lang], site).href },
+      { '@type': 'ListItem', position: 2, name: t(lang, 'nav.projects'), item: new URL(`${routes.home[lang]}#${anchors[lang].projects}`, site).href },
+      { '@type': 'ListItem', position: 3, name: p.title, item: pageUrl },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${p.title} – ${t(lang, 'case.titleSuffix')} | ${profile.name}`}
+  description={description}
+  alternates={routes.project(slug)}
+  schema={schema}
+>
+  <article class="case">
+    <div class="container">
+      <a class="db-btn db-btn--cizgi case__back" href={`${routes.home[lang]}#${anchors[lang].projects}`}>
+        <Icon name="ph:arrow-left" class="db-btn__icon db-btn__icon--lead case__back-icon" aria-hidden="true" />
+        <span class="db-btn__label">{t(lang, 'case.back')}</span>
+      </a>
+
+      <header class="case__head">
+        <div class="case__intro">
+          <h1 class="case__title">{p.title}</h1>
+          <p class="case__context">{p.context}</p>
+          <p class="case__summary">{p.summary}</p>
+          {link && (
+            <a class="db-btn db-btn--cerceveli case__link" href={link.href} rel="noopener noreferrer">
+              <Icon name={p.liveUrl ? 'ph:globe-simple' : 'ph:github-logo'} class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />
+              <span class="db-btn__label">{link.label}</span>
+              <Icon name="ph:arrow-up-right" class="db-btn__icon" aria-hidden="true" />
+            </a>
+          )}
+        </div>
+        <dl class="case__facts panel" aria-label={t(lang, 'case.facts')}>
+          {facts.map((f) => (
+            <div class="case__fact">
+              <dt class="mono label-icon"><Icon name={f.icon} aria-hidden="true" />{f.label}</dt>
+              <dd>{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </header>
+
+      {p.cover && (
+        <figure class="case__cover">
+          <Image
+            src={p.cover}
+            alt={p.coverAlt ?? ''}
+            widths={[640, 960, 1280, 1440]}
+            sizes="(max-width: 1439px) calc(100vw - 2rem), 1400px"
+            loading="eager"
+            fetchpriority="high"
+            quality={80}
+          />
+        </figure>
+      )}
+
+      <div class="case__prose">
+        <Content />
+      </div>
+
+      <nav class="case__next" aria-label={t(lang, 'case.next')}>
+        <a href={nextHref}>
+          <span class="mono case__next-label">{t(lang, 'case.next')}</span>
+          <span class="case__next-title">{next.data.title}</span>
+        </a>
+      </nav>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .case { padding-block: clamp(1.5rem, 1rem + 2vw, 3rem) 0; }
+
+  .case__back { --db-b: var(--ink); }
+  .case__back:hover .case__back-icon { transform: translateX(-0.28em); }
+  @media (max-width: 767px), (any-pointer: coarse) {
+    .case__back { min-height: 2.75rem; }
+  }
+
+  .case__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(2rem, 1rem + 3vw, 4rem);
+  }
+  .case__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    min-width: 0;
+  }
+  .case__title {
+    font-size: var(--step-display);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .case__context { color: var(--ink-soft); font-size: var(--step-3); line-height: 1.25; }
+  .case__summary { max-width: 52ch; }
+  .case__link { --db-b: var(--ink); --db-fg: var(--paper); margin-top: 0.5rem; }
+
+  .case__facts { padding-inline: var(--panel-pad); align-self: end; }
+  .case__fact:last-child { border-bottom: 0; }
+  .case__fact {
+    display: grid;
+    grid-template-columns: 8.25rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .case__fact dt { color: var(--ink-soft); }
+  .case__fact dd { font-size: var(--step-caption); line-height: 1.45; }
+
+  .case__cover {
+    margin: 0;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+    background: var(--band);
+  }
+  .case__cover :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  /* Text im Plakatraster */
+  .case__prose {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1rem;
+    padding-block: var(--section-y);
+  }
+  .case__prose :global(h2) {
+    margin-top: 1.5rem;
+    font-size: var(--step-3);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .case__prose :global(h2:first-child) { margin-top: 0; }
+  .case__prose :global(p),
+  .case__prose :global(ul) { max-width: 65ch; }
+  .case__prose :global(ul) { list-style: none; display: grid; gap: 0.5rem; }
+  .case__prose :global(li) {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+  /* Spiegelstrich wie im Lebenslauf: kurze Hairline statt Punkt */
+  .case__prose :global(li)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.8em;
+    width: 0.6rem;
+    height: 1px;
+    background: var(--ink-soft);
+  }
+
+  .case__next {
+    border-top: 1px solid var(--hairline-strong);
+    margin-bottom: var(--section-y);
+  }
+  .case__next a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-block: clamp(1.5rem, 1rem + 2vw, 3rem);
+    text-decoration: none;
+  }
+  .case__next a::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+  .case__next a:focus-visible::before { transform: scaleX(1); transition-duration: 240ms; }
+  @media (hover: hover) and (pointer: fine) {
+    .case__next a:hover::before { transform: scaleX(1); transition-duration: 240ms; }
+  }
+  .case__next-label { color: var(--ink-soft); }
+  .case__next-title {
+    font-size: var(--step-2);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  @media (min-width: 768px) {
+    .case__head,
+    .case__prose {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gap);
+    }
+    .case__intro { grid-column: 1 / span 7; }
+    .case__facts { grid-column: 8 / -1; }
+    .case__prose :global(h2) { grid-column: 1 / span 4; }
+    .case__prose > :global(:not(h2)) { grid-column: 5 / -1; }
+    /* H2 und erster Absatz stehen in derselben Rasterzeile → gleicher Abstand nach oben */
+    .case__prose :global(h2:not(:first-child) + *) { margin-top: 1.5rem; }
+  }
+  @media (min-width: 1280px) {
+    .case__prose > :global(:not(h2)) { grid-column: 5 / span 7; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case__next a::before { transition: none; }
+    .case__back:hover .case__back-icon { transform: none; }
+  }
+</style>

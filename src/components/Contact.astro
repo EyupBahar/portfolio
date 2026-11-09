@@ -1,0 +1,121 @@
+---
+/**
+ * Seitenende: alle Kanäle als eine Tafel – gleiche Sprache wie die Fahrplan-Tafel im Hero.
+ * E-Mail steht als erste Zeile in gleicher Grösse wie die übrigen (Joker, 2026-11-09);
+ * Icon = kanonisches _ikon/email.svg, eingefärbt wie die anderen Icons.
+ * Kein Formular (nicht verlangt) → keine Angriffsfläche.
+ */
+import { Icon } from 'astro-icon/components';
+import { t, anchors, type Lang } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const channels = [
+  { icon: 'email', label: t(lang, 'contact.email'), value: profile.email, href: `mailto:${profile.email}`, kind: 'mail' },
+  { icon: 'ph:linkedin-logo-light', label: 'LinkedIn', value: profile.linkedin.handle, href: profile.linkedin.url, kind: 'external' },
+  { icon: 'ph:github-logo-light', label: 'GitHub', value: profile.github.handle, href: profile.github.url, kind: 'external' },
+  { icon: 'pdf', label: 'PDF', value: t(lang, 'contact.cvDe'), href: profile.cv.de, kind: 'pdf' },
+  { icon: 'pdf', label: 'PDF', value: t(lang, 'contact.cvEn'), href: profile.cv.en, kind: 'pdf' },
+] as const;
+---
+
+<section class="contact" id={anchors[lang].contact} aria-labelledby="contact-title">
+  <div class="container contact__grid">
+    <h2 class="contact__title" id="contact-title">{t(lang, 'contact.title')}</h2>
+
+    <div class="contact__body">
+      <p class="contact__lead">{t(lang, 'contact.lead')}</p>
+
+      <ul class="contact__channels" role="list">
+        {channels.map((c) => (
+          <li>
+            <a
+              href={c.href}
+              rel={c.kind === 'external' ? 'noopener noreferrer' : undefined}
+              type={c.kind === 'pdf' ? 'application/pdf' : undefined}
+            >
+              <span class="mono contact__label label-icon label-icon--lg"><Icon name={c.icon} aria-hidden="true" />{c.label}</span>
+              <span class="contact__value">{c.value}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-block: var(--section-y);
+    background: var(--band);
+    border-top: 1px solid var(--hairline);
+  }
+  .contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+  .contact__title {
+    font-size: var(--step-2);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .contact__body {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 1rem + 1vw, 2rem);
+    min-width: 0;
+  }
+  .contact__lead { color: var(--ink-soft); }
+
+  .contact__channels { border-top: 1px solid var(--ink); }
+  .contact__channels a {
+    position: relative;
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--hairline-strong);
+    text-decoration: none;
+  }
+  .contact__label { color: var(--ink-soft); }
+  .contact__value { min-width: 0; overflow-wrap: anywhere; }
+
+  /* Sekundenzeiger auf der Zeile, wie in der Projektliste */
+  .contact__channels a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+  .contact__channels a:focus-visible::after { transform: scaleX(1); transition-duration: 240ms; }
+  @media (hover: hover) and (pointer: fine) {
+    .contact__channels a:hover::after { transform: scaleX(1); transition-duration: 240ms; }
+  }
+
+  @media (min-width: 768px) {
+    .contact__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gap);
+    }
+    .contact__title { grid-column: 1 / span 4; }
+    .contact__body { grid-column: 5 / -1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact__channels a::after { transition: none; }
+  }
+</style>

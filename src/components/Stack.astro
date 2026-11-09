@@ -1,0 +1,179 @@
+---
+/**
+ * Stack als Laufband (DESIGN.md → Signatur 4): die zwölf Markenzeichen laufen von selbst (Joker 2026-11-09:
+ * „slider otomatik dönsün"). Technik aus design-blocks `yorum--akis` (gemessen, P13): Spur `width: max-content`
+ * + `translateX(0 → -50%)` linear endlos, zweite Kopie `aria-hidden` für die nahtlose Schleife, Ränder per Mask
+ * ausgeblendet. Hält bei Hover und Fokus; dazu eine Pause-Taste (slider README: Autoplay nur mit Pause-Kontrolle,
+ * WCAG 2.2.2) – ohne JS bleibt die Taste `hidden`, das Band läuft und hält bei Hover/Fokus. `prefers-reduced-motion`:
+ * keine Bewegung, Kopie weg, das Band scrollt von Hand. Marken in ihrer Originalfarbe (Joker 2026-11-09, simple-icons `hex`;
+ * schwarze Marken in --ink), gross und frei: kein Panel, kein Rahmen, kein Grund.
+ */
+import { Icon } from 'astro-icon/components';
+import { t, type Lang } from '../i18n/ui';
+import { stack } from '../data/stack';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="stack section" aria-labelledby="stack-title">
+  <div class="container">
+    <div class="stack__head">
+      <h2 class="section-title" id="stack-title">{t(lang, 'stack.title')}</h2>
+      <button class="stack__pause" type="button" aria-pressed="false" aria-label={t(lang, 'stack.pause')} hidden>
+        <Icon name="ph:pause" class="stack__ico stack__ico--pause" aria-hidden="true" />
+        <Icon name="ph:play" class="stack__ico stack__ico--play" aria-hidden="true" />
+      </button>
+    </div>
+    <div class="stack__band" role="group" tabindex="0" aria-label={t(lang, 'stack.bandLabel')}>
+      <ul class="stack__track">
+        {[false, true].map((dup) =>
+          stack.map((s) => (
+            <li class="stack__tile" aria-hidden={dup ? 'true' : undefined} data-dup={dup ? '' : undefined}>
+              <Icon name={s.icon} class={`stack__mark stack__mark--${s.icon.split(':')[1]}`} aria-hidden="true" />
+              <span class="mono stack__label">
+                {s.label}
+                {'note' in s && <span class="stack__note">{t(lang, s.note)}</span>}
+              </span>
+            </li>
+          )),
+        )}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  // K1, ~10 Zeilen: die Pause-Taste wird erst mit JS sichtbar und schaltet `is-paused` am Abschnitt;
+  // der Zustand steht in `aria-pressed`, der Name der Taste bleibt gleich (Toggle-Button).
+  for (const root of document.querySelectorAll<HTMLElement>('.stack')) {
+    const btn = root.querySelector<HTMLButtonElement>('.stack__pause');
+    if (!btn) continue;
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      const paused = root.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', String(paused));
+    });
+  }
+</script>
+
+<style>
+  .stack {
+    /* Slot pro Marke 136 → 208 px (frontend-design §2, rem-Term Pflicht); feste Breite statt Anzahl pro Seite,
+     * weil das Band kontinuierlich läuft – der Mask-Rand blendet die angeschnittene Marke aus. */
+    --stack-kart: clamp(8.5rem, 6.829rem + 6.857vw, 13rem);
+    /* Eine Runde (12 Slots) in 50 s: ~50 px/s am Desktop, ~33 px/s am Telefon – ruhig, aber sichtbar. */
+    --stack-dauer: 50s;
+  }
+
+  .stack__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+  .stack__head .section-title { margin-bottom: 0; }
+
+  /* Pause-Taste: Hairline-Quadrat ≥ 44 px, kein Grund, Hover = Fläche eine Stufe heller */
+  .stack__pause {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--hairline-strong);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+  .stack__pause[hidden] { display: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .stack__pause:hover { background: var(--band); }
+  }
+  .stack__ico { width: 1.25rem; height: 1.25rem; }
+  .stack__ico--play { display: none; }
+  .stack.is-paused .stack__ico--pause { display: none; }
+  .stack.is-paused .stack__ico--play { display: block; }
+
+  /* Band: Ränder lösen sich auf, die Spur läuft darunter durch */
+  .stack__band {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .stack__track {
+    display: flex;
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    animation: stack-drift var(--stack-dauer) linear infinite;
+    will-change: transform;
+  }
+  @keyframes stack-drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  /* P13 / marquee-width: Slot-Breite als `width` am Kind der Spur, nie nur flex-basis – WebKit misst die
+   * max-content-Spur sonst aus dem einzeiligen Text und das Band liefe in Safari 2–4x zu schnell. */
+  .stack__track > * {
+    flex: none;
+    width: var(--stack-kart);
+  }
+
+  /* Halten: Hover (nur echte Zeiger, sonst klebt :hover nach dem Tippen), Fokus im Band, Pause-Taste */
+  @media (hover: hover) and (pointer: fine) {
+    .stack__band:hover .stack__track { animation-play-state: paused; }
+  }
+  .stack__band:focus-within .stack__track,
+  .stack.is-paused .stack__track { animation-play-state: paused; }
+
+  .stack__tile {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+    text-align: center;
+  }
+  .stack__mark {
+    width: clamp(3rem, 2.5rem + 1.5vw, 4rem);
+    height: clamp(3rem, 2.5rem + 1.5vw, 4rem);
+    color: var(--ink);
+  }
+  /* Markenfarben (Joker 2026-11-09: „logolar orijinal renginde") – `hex` aus simple-icons 16.37, bewusst ausserhalb
+   * tokens.css (Fremdmarken, keine Projektfarben). Schwarze Marken bleiben --ink: Next.js und Vercel (#000000) und
+   * Angular (#0F0F11) wären auf --paper unsichtbar (1.1:1); diese Marken zeigen sich auf Dunkel selbst in Weiss.
+   * Kontrast auf --paper: Astro 4.8 · React 11.1 · TypeScript 4.0 · Node.js 5.7 · Supabase 9.0 · Firebase 3.8 ·
+   * PostgreSQL 3.7 · .NET 2.3 (Original behalten, Label darunter trägt die Information) · Claude 5.8. */
+  .stack__mark--astro { color: #bc52ee; }
+  .stack__mark--react { color: #61dafb; }
+  .stack__mark--typescript { color: #3178c6; }
+  .stack__mark--nodedotjs { color: #5fa04e; }
+  .stack__mark--supabase { color: #3fcf8e; }
+  .stack__mark--firebase { color: #dd2c00; }
+  .stack__mark--postgresql { color: #4169e1; }
+  .stack__mark--dotnet { color: #512bd4; }
+  .stack__mark--claude { color: #d97757; }
+  .stack__label {
+    display: grid;
+    justify-items: center;
+    gap: 0.15rem;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+  }
+  .stack__note { color: var(--ink-soft); }
+
+  /* Reduce: keine Bewegung – das Band steht, die Kopie ist weg, es scrollt von Hand (Fokus per tabindex) */
+  @media (prefers-reduced-motion: reduce) {
+    .stack__band { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+    .stack__track { animation: none; will-change: auto; }
+    .stack__track > [data-dup] { display: none; }
+    .stack__pause { display: none; }
+  }
+</style>

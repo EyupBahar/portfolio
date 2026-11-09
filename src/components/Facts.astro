@@ -1,0 +1,86 @@
+---
+/**
+ * Kurzprofil als Fahrplan-Tafel (DESIGN.md → Signatur 3): <dl>, jede Zeile ein eigenes Panel mit Abstand
+ * (Joker 2026-11-09: „gap ver" – vorher Fugen-Raster), Label in Mono mit eigenem Icon (src/icons/),
+ * Wert in Grotesk. Ab 768 px zwei Spalten.
+ * Bis zum Umbau stand die Tafel im Hero; seit dem Porträt hat sie ihr eigenes Panel.
+ */
+import { Icon } from 'astro-icon/components';
+import { t, type Lang } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const facts = [
+  { icon: 'location', label: t(lang, 'facts.location'), value: profile.region[lang] },
+  { icon: 'now', label: t(lang, 'facts.now'), value: t(lang, 'facts.nowValue') },
+  { icon: 'frontend', label: t(lang, 'facts.frontend'), value: t(lang, 'facts.frontendValue') },
+  { icon: 'backend', label: t(lang, 'facts.backend'), value: t(lang, 'facts.backendValue') },
+  // Kein eigenes KI-Icon vorhanden – Phosphor light als Platzhalter, bis Joker eines liefert.
+  // Mehrere Punkte: als Liste, damit die Zelle lesbar bleibt (Quelle bleibt ein String in ui.ts).
+  { icon: 'ph:sparkle-light', label: t(lang, 'facts.ai'), value: t(lang, 'facts.aiValue').split(' · ') },
+  { icon: 'sprache', label: t(lang, 'facts.languages'), value: t(lang, 'facts.languagesValue') },
+];
+---
+
+<section class="facts section" aria-labelledby="facts-title">
+  <div class="container">
+    <h2 class="section-title" id="facts-title">{t(lang, 'facts.label')}</h2>
+    <dl class="facts__list">
+      {facts.map((f) => (
+        <div class="facts__item panel">
+          <dt class="mono label-icon label-icon--lg"><Icon name={f.icon} aria-hidden="true" />{f.label}</dt>
+          <dd>
+            {Array.isArray(f.value)
+              ? <ul class="facts__sublist">{f.value.map((v) => <li>{v}</li>)}</ul>
+              : f.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .facts__list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--panel-gap);
+  }
+  .facts__item {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding: 0.9rem var(--panel-pad);
+  }
+  .facts__item dt { color: var(--ink-soft); }
+  /* Kurzprofil-Icons grösser als der gemeinsame Slot (Joker 2026-11-09); Kontakt bleibt 1.75rem.
+   * :global, weil das SVG aus astro-icon stammt; schlägt global.css .label-icon--lg > svg (0-1-1). */
+  .facts__item dt > :global(svg) {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  .facts__item dd {
+    font-size: var(--step-caption);
+    line-height: 1.45;
+  }
+  .facts__sublist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .facts__sublist li + li { margin-top: 0.35rem; }
+
+  @media (max-width: 479px) {
+    /* Schmale Telefone: Label über dem Wert, sonst bleibt dem Wert zu wenig Breite */
+    .facts__item { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; }
+  }
+  @media (min-width: 768px) {
+    .facts__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>

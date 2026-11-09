@@ -1,0 +1,52 @@
+---
+import { Icon } from 'astro-icon/components';
+import { t, routes, type Lang } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner mono">
+    <p>© {year} {profile.name}</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href={routes.privacy[lang]}>{t(lang, 'footer.privacy')}</a></li>
+      <li><a class="label-icon" href={profile.github.url} rel="noopener noreferrer"><Icon name="ph:github-logo-light" aria-hidden="true" />GitHub</a></li>
+      <li><a class="label-icon" href={profile.linkedin.url} rel="noopener noreferrer"><Icon name="ph:linkedin-logo-light" aria-hidden="true" />LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--hairline);
+    color: var(--ink-soft);
+  }
+  .site-footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem var(--gap);
+    padding-block: 1.5rem;
+  }
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+  }
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    text-decoration: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__links a:hover { color: var(--ink); text-decoration: underline; }
+  }
+</style>

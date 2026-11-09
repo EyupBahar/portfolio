@@ -1,0 +1,136 @@
+---
+/**
+ * Kopfzeile ohne JS: Logo + Wortmarke links, wenige Ziele rechts.
+ * Bei vier Zielen braucht es kein Burger-Menü; unter 768 px fallen die beiden
+ * Sprungmarken weg (Struktur, nicht Grösse), Lebenslauf und Sprache bleiben.
+ * Logo (Joker, 2026-11-09): Zeichnung mit transparentem Grund (src/assets/logo.png) – sitzt randlos
+ * auf --paper, kein Rahmen. Dekorativ (alt=""), der Name im selben Link benennt das Ziel.
+ */
+import { Image } from 'astro:assets';
+import { t, routes, anchors, type Lang, type Alternates } from '../i18n/ui';
+import { profile } from '../data/profile';
+import logo from '../assets/logo.png';
+
+interface Props {
+  lang: Lang;
+  alternates: Alternates;
+}
+
+const { lang, alternates } = Astro.props;
+const other: Lang = lang === 'de' ? 'en' : 'de';
+const home = routes.home[lang];
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__mark" href={home}>
+      <Image
+        class="site-header__logo"
+        src={logo}
+        alt=""
+        width={44}
+        height={44}
+        densities={[1, 2, 3]}
+        loading="eager"
+        decoding="async"
+        quality={82}
+      />
+      <span>{profile.name}</span>
+    </a>
+    <nav aria-label={t(lang, 'nav.label')}>
+      <ul class="site-header__nav" role="list">
+        <li class="site-header__anchor"><a href={`${home}#${anchors[lang].projects}`}>{t(lang, 'nav.projects')}</a></li>
+        <li class="site-header__anchor"><a href={`${home}#${anchors[lang].contact}`}>{t(lang, 'nav.contact')}</a></li>
+        <li><a href={profile.cv[lang]} type="application/pdf">{t(lang, 'nav.cv')}</a></li>
+        <li>
+          <a
+            class="site-header__lang"
+            href={alternates[other]}
+            hreflang={other === 'de' ? 'de-CH' : 'en'}
+            lang={other === 'de' ? 'de-CH' : 'en'}
+            aria-label={t(lang, 'nav.switchLabel')}
+          >{t(lang, 'nav.switch')}</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--paper);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap);
+    min-height: 4rem;
+  }
+  .site-header__mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-header__logo {
+    display: block;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .site-header__nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.25rem, 0.1rem + 1vw, 1.75rem);
+  }
+  .site-header__nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding-inline: 0.5rem;
+    font-size: var(--step-caption);
+    text-decoration: none;
+  }
+  /* Sekundenzeiger: rote 2px-Linie springt von links ein */
+  .site-header__nav a::after {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.55rem;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease); /* raus: schnell */
+  }
+  .site-header__nav a:focus-visible::after { transform: scaleX(1); transition-duration: var(--dur); }
+  @media (hover: hover) and (pointer: fine) {
+    .site-header__nav a:hover::after { transform: scaleX(1); transition-duration: var(--dur); }
+  }
+  .site-header__lang {
+    font-family: var(--font-mono);
+    border: 1px solid var(--hairline-strong);
+  }
+
+  .site-header__anchor { display: none; }
+  @media (min-width: 768px) {
+    .site-header__anchor { display: list-item; list-style: none; }
+  }
+  @media (any-pointer: coarse) {
+    .site-header__nav a { min-height: 3rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .site-header__nav a::after { transition: none; }
+  }
+</style>

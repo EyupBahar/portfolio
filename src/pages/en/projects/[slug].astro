@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import CasePage from '../../../components/CasePage.astro';
+
+export async function getStaticPaths() {
+  const list = (await getCollection('projects', (p) => p.id.startsWith('en/'))).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+  return list.map((project, i) => ({
+    params: { slug: project.id.replace('en/', '') },
+    props: { project, next: list[(i + 1) % list.length] },
+  }));
+}
+
+const { project, next } = Astro.props;
+---
+
+<CasePage lang="en" project={project} next={next} />

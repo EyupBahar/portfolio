@@ -1,0 +1,447 @@
+# Eyüp Bahar – Softwareentwickler
+
+Ich entwickle Websites und Web-Applikationen mit Astro, Next.js, Angular und React, KI-gestützt mit Claude Code. Praxis aus vier Unternehmen – von Micro-Frontends für eine Super-App mit Millionen Nutzern bis zu Kundenprojekten mit eigenem CMS.
+
+## Kurzprofil
+
+- Standort: Raum Bern, Schweiz
+- Aktuell: Praktikum Webentwicklung, Antigravity GmbH
+- Frontend: Astro, Next.js, Angular, React, TypeScript
+- Backend: Node.js, Supabase, Firebase, PostgreSQL, ASP.NET Core (im Aufbau)
+- KI: Eigene Skills, Hooks und MCP-Server für Claude Code, die den Entwicklungsprozess deutlich effizienter machen · Security-Audits und ein eigenes Cybersecurity-Tool · Automatisierung für ausgelieferte Produkte · Werkzeuge für manuelle Tests
+- Sprachen: Deutsch B2 (Prüfung in Vorbereitung), Englisch B2, Türkisch (Muttersprache)
+
+## Schwerpunkte
+
+- Websites: Statisch gebaute Seiten mit Astro: schnell, ohne unnötiges JavaScript, mit SEO und Sicherheits-Headern – und mit eigenem CMS, wenn Kunden Inhalte selbst pflegen. (Astro, TypeScript, Postgres, Vercel)
+- Web-Applikationen: Micro-Frontends für eine Super-App mit Millionen Nutzern, Admin-Oberflächen und Formulare mit eigenem Backend. (Next.js, Angular, React, Node.js, Supabase, Firebase)
+- KI-gestützte Entwicklung: Eigene Skills, Hooks und MCP-Server für Claude Code; automatisierte Prüfungen vor jeder Auslieferung; Security-Audits mit eigenem Werkzeug. (Claude Code, Vitest, Playwright)
+
+## Stack
+
+Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, PostgreSQL, ASP.NET Core (im Aufbau), Claude Code, Vercel
+
+## Wie ich arbeite
+
+1. Analyse: Ziel, Inhalte und bestehende Daten klären. Was fehlt, wird markiert, nicht erfunden.
+2. Umsetzung: Kleine Komponenten, Inhalte aus einer Quelle, TypeScript strict. Astro für Websites, Next.js, Angular oder React für Applikationen.
+3. Prüfung: Build, Typen, Sicherheits-Header, Performance-Budget und Tests laufen automatisch vor jeder Auslieferung; dazu ein Security-Audit mit eigenem Werkzeug.
+4. Auslieferung: Deployment auf Vercel, Dokumentation für die Übergabe.
+
+## Ausgewählte Projekte
+
+- [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin/): Neubau der Website eines Fachgeschäfts für Velos, E-Bikes und Motorräder – mit eigenem Produkt-CMS, in dem das Geschäft Fahrzeuge, Bilder und Ankündigungen selbst pflegt.
+- [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen/): Website mit Selbstverwaltung für ein Tenniscenter – Turniere veröffentlichen, Online-Anmeldungen für Turniere und Tennisschule, alle Texte und Bilder im Admin bearbeitbar.
+- [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita/): Neubau einer Sprachschul-Website mit schlankem Datei-CMS – die Schule pflegt Bilder, Kurse, Preise und Kontaktdaten selbst, ohne Datenbank.
+- [Helvetia Machine](https://eyupbahar.com/projekte/helvetia-machine/): Full-Stack-Katalog für Maschinen, Ersatzteile und Service – eine ASP.NET-Core-API mit Next.js-Frontend und einem Admin-Bereich, in dem Kategorien, Unterkategorien und Bildergalerien gepflegt werden.
+- [Pinocchio Shop](https://eyupbahar.com/projekte/pinocchio-shop/): Mehrsprachiger Online-Shop als React-App – Produktkatalog, Warenkorb, Checkout, Kundenkonto mit Google-Login und Admin-Seiten für Produkte und Bestellungen.
+
+## Kontakt
+
+- E-Mail: eyupbhr24@gmail.com
+- LinkedIn: https://www.linkedin.com/in/eyup-bahar/
+- GitHub: https://github.com/EyupBahar
+
+Quelle/Source: https://eyupbahar.com/
+
+---
+
+# Zweirad Gisin
+
+Zweiradgeschäft, Roggwil BE. Neubau der Website eines Fachgeschäfts für Velos, E-Bikes und Motorräder – mit eigenem Produkt-CMS, in dem das Geschäft Fahrzeuge, Bilder und Ankündigungen selbst pflegt.
+
+- Art: Kundenprojekt
+- Zeitraum: 06/2026 – 10/2026
+- Rolle: Hauptentwickler: Frontend, Admin-CMS, Datenbank und API – im Rahmen meiner Arbeit bei Antigravity
+- Stack: Astro, TypeScript, Neon Postgres, Drizzle, Vercel Blob, Resend, Vitest
+- Website: https://www.zweiradgisin.ch
+
+## Ausgangslage
+
+Die bisherige Website lief auf einem Baukasten-System. Texte und Bilder wurden vollständig übernommen, Struktur und Technik neu aufgebaut – mit dem Ziel, dass das Geschäft Fahrzeuge und Aktionen ohne Entwickler selbst pflegen kann.
+
+## Umsetzung
+
+- Produktverwaltung im Admin mit Schalter zum Veröffentlichen
+- Austauschbare Bild- und Video-Plätze für Logo und Hero, mit Upload-Hinweisen pro Platz
+- Ankündigungsband mit Enddatum und Laufschrift, im Admin bearbeitbar
+- Kontaktformular mit Versand über Resend, Google-Maps-Einbindung und Bewertungsband
+- Rund zehn öffentliche Seiten, zusammengelegte Seiten per Weiterleitung erhalten
+
+## Technische Details
+
+- Astro mit hybridem Rendering, Neon Postgres mit Drizzle, Medien in Vercel Blob, eigenes Login (scrypt und Session-Cookie)
+- Migration der Datenschicht von Supabase auf Neon und Vercel Blob im laufenden Betrieb
+- Eigene Same-Origin-Prüfung gegen CSRF, weil die eingebaute Prüfung hinter dem Vercel-Proxy scheitert
+- Jede schreibende Route verlangt Admin-Rechte – ein Test stellt das für alle Routen sicher
+- Öffentliches Formular mit Honeypot, Zod-Validierung und Rate-Limit pro IP
+- CDN-Cache mit stale-while-revalidate und gezielter Invalidierung bei jeder Admin-Änderung
+- Uploads gehen über kurzlebige signierte URLs direkt in den Speicher und umgehen so das Grössenlimit der Serverfunktionen
+
+Quelle/Source: https://eyupbahar.com/projekte/zweirad-gisin/
+
+---
+
+# SMASH Münsingen
+
+Tennis- und Padelcenter, Münsingen BE. Website mit Selbstverwaltung für ein Tenniscenter – Turniere veröffentlichen, Online-Anmeldungen für Turniere und Tennisschule, alle Texte und Bilder im Admin bearbeitbar.
+
+- Art: Kundenprojekt
+- Zeitraum: 09/2026 – 11/2026
+- Rolle: Hauptentwickler: Frontend, Admin-CMS, Turnier- und Anmeldesystem – im Rahmen meiner Arbeit bei Antigravity
+- Stack: Astro, TypeScript, Vercel Blob, Resend, Vitest
+- Website: https://smash-muensingen.vercel.app
+
+## Ausgangslage
+
+Neubau der Website eines Tenniscenters mit Tennisschule, Bistro und Shop. Die bisherige Website mit 27 Seiten wurde übernommen und neu gegliedert. Das Team sollte Turniere, Anmeldungen und Inhalte selbst verwalten können.
+
+## Umsetzung
+
+- Turniersystem: Turniere im Admin veröffentlichen, Online-Anmeldung, Turnierkalender, CSV-Export der Anmeldungen
+- Online-Anmeldung für die Tennisschule mit Zustimmung zu den AGB
+- Alle Texte und Bilder im Admin bearbeitbar, mit Screenshot-Vorschau neben jedem Abschnitt
+- PDF-Uploads für Ausschreibungen und Newsletter
+- Seiten für Platzbuchung, Shop und Bistro
+
+## Technische Details
+
+- Astro 7 mit serverseitigem Rendering, Inhalte und Medien in Vercel Blob – getrennt nach Staging und Produktion
+- Jede schreibende Route prüft Herkunft und Admin-Rechte und hat einen eigenen Test (Vitest)
+- Ein Lasttest mit 20 parallelen Schreibvorgängen deckte einen Fehlerfall des Speichers bei gleichzeitigen Zugriffen auf – behoben
+- Rate-Limit pro IP, damit öffentliche Formulare keine Fehlerflut erzeugen
+- Content-Security-Policy und Sicherheits-Header
+
+Quelle/Source: https://eyupbahar.com/projekte/smash-muensingen/
+
+---
+
+# Norsk med Rita
+
+Sprachschule für Norwegisch. Neubau einer Sprachschul-Website mit schlankem Datei-CMS – die Schule pflegt Bilder, Kurse, Preise und Kontaktdaten selbst, ohne Datenbank.
+
+- Art: Kundenprojekt
+- Zeitraum: 07/2026 – 10/2026
+- Rolle: Hauptentwickler: Frontend, Datei-CMS und Formular-Endpunkte – im Rahmen meiner Arbeit bei Antigravity
+- Stack: Astro, TypeScript, Vercel Blob, Zod, Vitest
+- Website: https://www.norskmedrita.ch
+
+## Ausgangslage
+
+Neubau einer WordPress-Website für eine Sprachschule. Die Schule sollte Kurse, Preise und Bilder selbst pflegen können – ohne Datenbank und ohne laufende Kosten für ein schweres CMS.
+
+## Umsetzung
+
+- Admin für Bilder, Preise, Kurspakete, Kursliste und Kontaktdaten
+- Kontakt- und Empfehlungsformular als serverseitige Endpunkte
+- FAQ, Stimmen von Lernenden und Standortbereich
+
+## Technische Details
+
+- Astro 7 mit Rendering auf Abruf und 60 Sekunden CDN-Cache
+- Datei-CMS in Vercel Blob: privater Speicher für Inhalte, öffentlicher für Medien, Zugriff über OIDC statt statischem Token
+- Migration von Supabase Storage auf Vercel Blob
+- Schreibvorgänge sind nebenläufigkeitssicher über ETag-Prüfung
+- Admin-Endpunkte nur über einen gemeinsamen Wrapper – ein Test erzwingt das
+- Content-Security-Policy mit Script-Hash statt unsafe-inline
+- CSS-Fallbacks für ältere Safari-Versionen auf dem iPad
+- Strukturierte Daten: EducationalOrganization, OfferCatalog, FAQPage
+
+Quelle/Source: https://eyupbahar.com/projekte/norskmedrita/
+
+---
+
+# Helvetia Machine
+
+Produktkatalog mit Admin-CMS, Demo. Full-Stack-Katalog für Maschinen, Ersatzteile und Service – eine ASP.NET-Core-API mit Next.js-Frontend und einem Admin-Bereich, in dem Kategorien, Unterkategorien und Bildergalerien gepflegt werden.
+
+- Art: Eigenes Projekt
+- Zeitraum: 06/2026
+- Rolle: Alleinentwickler: API, Frontend, Datenbank und Deployment
+- Stack: ASP.NET Core 9, C#, Entity Framework Core, PostgreSQL, Next.js 16, TypeScript, Tailwind CSS, Docker, Cloudinary
+- Repository: https://github.com/EyupBahar/helvetia_machine
+
+## Ausgangslage
+
+Eigenes Projekt ohne realen Kunden: ein türkischsprachiger Produktkatalog für Maschinen, Ersatzteile und Servicedienstleistungen. Backend und Frontend sind getrennt – eine REST-API in ASP.NET Core und ein Next.js-Frontend. Sämtliche Katalog-Inhalte werden im Admin-Bereich gepflegt.
+
+## Umsetzung
+
+- Öffentlicher Katalog mit Kategorien, Unterkategorien und Bildergalerien, je Bild mit Titel und Beschreibung
+- Admin-Bereich mit Login: Kategorien und Unterkategorien anlegen, bearbeiten und löschen
+- Mehrere Bilder pro Unterkategorie – einzeln hochladen, beschriften und entfernen
+- Uploads von Bildern und PDFs bis 10 MB, gespeichert in Cloudinary oder auf dem Server-Volume
+- Seiten für Unternehmen und Kontakt
+
+## Technische Details
+
+- REST-API mit ASP.NET Core 9 und Entity Framework Core auf PostgreSQL; jede schreibende Route verlangt die Rolle Admin (JWT)
+- Passwörter mit BCrypt gehasht; Admin-Zugang und JWT-Schlüssel kommen nur aus Umgebungsvariablen und werden bei jedem Start abgeglichen – ein Passwortwechsel greift mit dem nächsten Deploy
+- Wird ein Eintrag gelöscht oder ein Bild ersetzt, entfernt die API die zugehörige Datei auch aus dem Speicher
+- Next.js 16 mit App Router, Katalogseiten serverseitig gerendert
+- Docker-Image in zwei Stufen und Render-Blueprint; die API übernimmt die Datenbank-URL von Render und aktiviert für Render-Hosts SSL
+- Health-Endpunkte für API und Datenbank zur Fehlersuche im Betrieb
+
+Quelle/Source: https://eyupbahar.com/projekte/helvetia-machine/
+
+---
+
+# Pinocchio Shop
+
+Online-Shop für Saucen und Feinkost, Frontend. Mehrsprachiger Online-Shop als React-App – Produktkatalog, Warenkorb, Checkout, Kundenkonto mit Google-Login und Admin-Seiten für Produkte und Bestellungen.
+
+- Art: Eigenes Projekt
+- Zeitraum: 11/2025 – 01/2026
+- Rolle: Alleinentwickler des Frontends: Shop, Checkout, Kundenkonto und Admin-Seiten
+- Stack: React 19, Vite, React Router, TanStack Query, Axios, Tailwind CSS, Google OAuth
+- Repository: https://github.com/EyupBahar/pinocchio_shop_fe
+
+## Ausgangslage
+
+Eigenes Projekt: das Frontend eines Online-Shops für Saucen und Feinkost, angebunden an eine REST-API für Produkte, Bestellungen und Benutzer. Die API ist nicht mehr in Betrieb.
+
+## Umsetzung
+
+- Shop mit Kategoriefilter, Sortierung und Seitennavigation, dazu Produktseiten
+- Warenkorb mit Mini-Warenkorb und Checkout mit Liefer- und Rechnungsadresse
+- Kundenkonto: Registrierung, Login per E-Mail oder Google, eigene Bestellungen und Profil
+- Admin-Seiten: Produkte mit Grunddaten, Kategorie, Merkmalen, Bildern und Grössen anlegen; Bestellungen filtern und bearbeiten
+- Oberfläche in Deutsch, Englisch, Französisch und Italienisch; Produkttexte lassen sich über die Google-Translate-API automatisch übersetzen
+- Impressum, Datenschutz, Kontakt und Über uns
+
+## Technische Details
+
+- React 19 mit Vite und React Router 7; Serverdaten über TanStack Query, API-Zugriff über einen Axios-Client, der das Token mitsendet
+- Abgelaufene Tokens werden erkannt; Admin-Seiten nur für die Rolle Admin
+- Eingaben im Checkout werden vor dem Absenden bereinigt; in Produktion leitet die App auf HTTPS um
+- Eigene Kontexte für Anmeldung, Warenkorb und Sprache
+
+Quelle/Source: https://eyupbahar.com/projekte/pinocchio-shop/
+
+---
+
+# Eyüp Bahar – Software Developer
+
+I build websites and web applications with Astro, Next.js, Angular and React, AI-assisted with Claude Code. Experience from four companies – from micro-frontends for a super-app with millions of users to client projects with their own CMS.
+
+## At a glance
+
+- Location: Bern area, Switzerland
+- Currently: Web development internship, Antigravity GmbH
+- Front end: Astro, Next.js, Angular, React, TypeScript
+- Back end: Node.js, Supabase, Firebase, PostgreSQL, ASP.NET Core (learning)
+- AI: Own skills, hooks and MCP servers for Claude Code that make the development process far more efficient · Security audits and a dedicated cybersecurity tool · Automation for shipped products · Tools for manual testing
+- Languages: German B2 (exam in preparation), English B2, Turkish (native)
+
+## Focus areas
+
+- Websites: Statically built sites with Astro: fast, without unnecessary JavaScript, with SEO and security headers – and a custom CMS when clients maintain content themselves. (Astro, TypeScript, Postgres, Vercel)
+- Web applications: Micro-frontends for a super-app with millions of users, admin interfaces and forms with their own backend. (Next.js, Angular, React, Node.js, Supabase, Firebase)
+- AI-assisted development: My own skills, hooks and MCP servers for Claude Code; automated checks before every release; security audits with a dedicated tool. (Claude Code, Vitest, Playwright)
+
+## Stack
+
+Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, PostgreSQL, ASP.NET Core (learning), Claude Code, Vercel
+
+## How I work
+
+1. Analysis: Clarify the goal, the content and the existing data. Whatever is missing gets flagged, not invented.
+2. Implementation: Small components, content from a single source, strict TypeScript. Astro for websites; Next.js, Angular or React for applications.
+3. Review: Build, types, security headers, performance budget and tests run automatically before every release, plus a security audit with a dedicated tool.
+4. Delivery: Deployment on Vercel, documentation for the handover.
+
+## Selected work
+
+- [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin/): Rebuild of the website for a bicycle, e-bike and motorbike shop – with a custom product CMS where the shop manages vehicles, images and announcements on its own.
+- [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen/): Self-managed website for a tennis centre – publish tournaments, take online registrations for tournaments and the tennis school, edit every text and image in the admin.
+- [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita/): Rebuild of a language school website with a lean file-based CMS – the school manages images, courses, prices and contact details on its own, without a database.
+- [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine/): Full-stack catalogue for machinery, spare parts and service – an ASP.NET Core API with a Next.js front end and an admin area for managing categories, subcategories and image galleries.
+- [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop/): Multilingual online shop as a React app – product catalogue, cart, checkout, customer account with Google sign-in and admin pages for products and orders.
+
+## Contact
+
+- Email: eyupbhr24@gmail.com
+- LinkedIn: https://www.linkedin.com/in/eyup-bahar/
+- GitHub: https://github.com/EyupBahar
+
+Quelle/Source: https://eyupbahar.com/en/
+
+---
+
+# Zweirad Gisin
+
+Bicycle and motorbike shop, Roggwil BE. Rebuild of the website for a bicycle, e-bike and motorbike shop – with a custom product CMS where the shop manages vehicles, images and announcements on its own.
+
+- Type: Client project
+- Period: 06/2026 – 10/2026
+- Role: Lead developer: front end, admin CMS, database and API – as part of my work at Antigravity
+- Stack: Astro, TypeScript, Neon Postgres, Drizzle, Vercel Blob, Resend, Vitest
+- Website: https://www.zweiradgisin.ch
+
+## Starting point
+
+The previous website ran on a site builder. All texts and images were carried over, while structure and technology were rebuilt – so that the shop can manage vehicles and promotions without a developer.
+
+## What I built
+
+- Product management in the admin, with a publish toggle
+- Replaceable image and video slots for logo and hero, with upload guidance per slot
+- Announcement bar with an end date and scrolling text, editable in the admin
+- Contact form sending via Resend, Google Maps embed and a reviews band
+- Around ten public pages, with redirects for merged pages
+
+## Technical details
+
+- Astro with hybrid rendering, Neon Postgres with Drizzle, media in Vercel Blob, custom login (scrypt and session cookie)
+- Migrated the data layer from Supabase to Neon and Vercel Blob while the site was live
+- Custom same-origin check against CSRF, because the built-in check fails behind the Vercel proxy
+- Every write route requires admin rights – a test enforces this for all routes
+- Public form with honeypot, Zod validation and a per-IP rate limit
+- CDN cache with stale-while-revalidate and targeted invalidation on every admin change
+- Uploads go straight to storage through short-lived signed URLs, avoiding the function body size limit
+
+Quelle/Source: https://eyupbahar.com/en/projects/zweirad-gisin/
+
+---
+
+# SMASH Münsingen
+
+Tennis and padel centre, Münsingen BE. Self-managed website for a tennis centre – publish tournaments, take online registrations for tournaments and the tennis school, edit every text and image in the admin.
+
+- Type: Client project
+- Period: 09/2026 – 11/2026
+- Role: Lead developer: front end, admin CMS, tournament and registration system – as part of my work at Antigravity
+- Stack: Astro, TypeScript, Vercel Blob, Resend, Vitest
+- Website: https://smash-muensingen.vercel.app
+
+## Starting point
+
+Rebuild of the website for a tennis centre with a tennis school, bistro and shop. The previous 27-page site was carried over and restructured. The team needed to manage tournaments, registrations and content on its own.
+
+## What I built
+
+- Tournament system: publish tournaments in the admin, online registration, tournament calendar, CSV export of registrations
+- Online registration for the tennis school, including consent to the terms
+- Every text and image editable in the admin, with a screenshot preview next to each section
+- PDF uploads for tournament announcements and newsletters
+- Pages for court booking, shop and bistro
+
+## Technical details
+
+- Astro 7 with server rendering, content and media in Vercel Blob – separated into staging and production
+- Every write route checks origin and admin rights and has its own test (Vitest)
+- A load test with 20 parallel writes uncovered a storage failure mode under concurrent access – fixed
+- Per-IP rate limit so public forms do not produce a flood of errors
+- Content Security Policy and security headers
+
+Quelle/Source: https://eyupbahar.com/en/projects/smash-muensingen/
+
+---
+
+# Norsk med Rita
+
+Norwegian language school. Rebuild of a language school website with a lean file-based CMS – the school manages images, courses, prices and contact details on its own, without a database.
+
+- Type: Client project
+- Period: 07/2026 – 10/2026
+- Role: Lead developer: front end, file-based CMS and form endpoints – as part of my work at Antigravity
+- Stack: Astro, TypeScript, Vercel Blob, Zod, Vitest
+- Website: https://www.norskmedrita.ch
+
+## Starting point
+
+Rebuild of a WordPress website for a language school. The school needed to manage courses, prices and images on its own – without a database and without the running costs of a heavy CMS.
+
+## What I built
+
+- Admin for images, prices, course packages, course list and contact details
+- Contact and referral forms as server-side endpoints
+- FAQ, learner testimonials and a location section
+
+## Technical details
+
+- Astro 7 with on-demand rendering and a 60-second CDN cache
+- File-based CMS in Vercel Blob: private store for content, public store for media, access via OIDC instead of a static token
+- Migrated from Supabase Storage to Vercel Blob
+- Writes are safe under concurrency through ETag checks
+- Admin endpoints only through a shared wrapper – a test enforces it
+- Content Security Policy with a script hash instead of unsafe-inline
+- CSS fallbacks for older Safari versions on the iPad
+- Structured data: EducationalOrganization, OfferCatalog, FAQPage
+
+Quelle/Source: https://eyupbahar.com/en/projects/norskmedrita/
+
+---
+
+# Helvetia Machine
+
+Product catalogue with admin CMS, demo. Full-stack catalogue for machinery, spare parts and service – an ASP.NET Core API with a Next.js front end and an admin area for managing categories, subcategories and image galleries.
+
+- Type: Own project
+- Period: 06/2026
+- Role: Sole developer: API, front end, database and deployment
+- Stack: ASP.NET Core 9, C#, Entity Framework Core, PostgreSQL, Next.js 16, TypeScript, Tailwind CSS, Docker, Cloudinary
+- Repository: https://github.com/EyupBahar/helvetia_machine
+
+## Starting point
+
+An own project without a real client: a Turkish-language product catalogue for machinery, spare parts and services. Back end and front end are separate – a REST API in ASP.NET Core and a Next.js front end. All catalogue content is managed in the admin area.
+
+## What I built
+
+- Public catalogue with categories, subcategories and image galleries, each image with a title and description
+- Admin area with login: create, edit and delete categories and subcategories
+- Several images per subcategory – upload, caption and remove each one
+- Uploads of images and PDFs up to 10 MB, stored in Cloudinary or on the server volume
+- Company and contact pages
+
+## Technical details
+
+- REST API with ASP.NET Core 9 and Entity Framework Core on PostgreSQL; every write route requires the Admin role (JWT)
+- Passwords hashed with BCrypt; admin credentials and the JWT key come only from environment variables and are reconciled on every start – a password change takes effect with the next deploy
+- When an entry is deleted or an image replaced, the API also removes the file from storage
+- Next.js 16 with the App Router, catalogue pages rendered on the server
+- Two-stage Docker image and a Render blueprint; the API reads Render's database URL and enables SSL for Render hosts
+- Health endpoints for the API and the database to troubleshoot in production
+
+Quelle/Source: https://eyupbahar.com/en/projects/helvetia-machine/
+
+---
+
+# Pinocchio Shop
+
+Online shop for sauces and delicacies, front end. Multilingual online shop as a React app – product catalogue, cart, checkout, customer account with Google sign-in and admin pages for products and orders.
+
+- Type: Own project
+- Period: 11/2025 – 01/2026
+- Role: Sole front-end developer: shop, checkout, customer account and admin pages
+- Stack: React 19, Vite, React Router, TanStack Query, Axios, Tailwind CSS, Google OAuth
+- Repository: https://github.com/EyupBahar/pinocchio_shop_fe
+
+## Starting point
+
+An own project: the front end of an online shop for sauces and delicacies, connected to a REST API for products, orders and users. The API is no longer running.
+
+## What I built
+
+- Shop with category filter, sorting and pagination, plus product pages
+- Cart with a mini cart and a checkout with shipping and billing address
+- Customer account: sign-up, sign-in by email or Google, own orders and profile
+- Admin pages: create products with basic data, category, features, images and sizes; filter and edit orders
+- Interface in German, English, French and Italian; product texts can be translated automatically through the Google Translate API
+- Legal notice, privacy policy, contact and about pages
+
+## Technical details
+
+- React 19 with Vite and React Router 7; server data through TanStack Query, API access through an Axios client that attaches the token
+- Expired tokens are detected; admin pages only for the Admin role
+- Checkout input is sanitised before it is sent; in production the app redirects to HTTPS
+- Dedicated contexts for authentication, cart and language
+
+Quelle/Source: https://eyupbahar.com/en/projects/pinocchio-shop/
+
+---
+
+# Privacy
+
+No cookies, no tracking, no forms. Hosted by Vercel Inc. Full text: https://eyupbahar.com/en/privacy/

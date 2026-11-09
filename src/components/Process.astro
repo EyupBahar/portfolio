@@ -1,0 +1,59 @@
+---
+/**
+ * Ablauf „Wie ich arbeite" (DESIGN.md → Signatur 5): design-blocks zeitstrahl--yatay-ray, vier Knoten.
+ * Der Knoten trägt Jokers eigenes Icon (src/icons/, 2026-11-09); die Nummer steht als Mono-Präfix im
+ * Titel – echte Reihenfolge, deshalb nummeriert, und das <ol> zählt ohnehin. Unter 56 rem kippt der
+ * Block selbst in die Vertikale.
+ */
+import { Icon } from 'astro-icon/components';
+import { t, type Lang, type UiKey } from '../i18n/ui';
+import { process } from '../data/process';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="process section" aria-labelledby="process-title">
+  <div class="container">
+    <h2 class="section-title" id="process-title">{t(lang, 'process.title')}</h2>
+    <div class="panel process__panel">
+      <ol class="db-zs-ray">
+        {process.map((step, i) => (
+          <li class="db-zs-ray__step">
+            <div class="db-zs-ray__node process__node" aria-hidden="true">
+              <Icon name={step.icon} />
+            </div>
+            <div class="db-zs-ray__body">
+              <h3 class="db-zs-ray__title">
+                <span class="mono process__num">{String(i + 1).padStart(2, '0')}</span>
+                {t(lang, `process.${step.key}.title` as UiKey)}
+              </h3>
+              <p class="db-zs-ray__text">{t(lang, `process.${step.key}.text` as UiKey)}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .process__panel {
+    padding: var(--panel-pad);
+  }
+  /* Eigene 512er-Zeichnungen frei im Knoten (ohne Rahmen/Grund, overrides §7): 85 % des Knotenmasses,
+   * also 2.75–4 rem – nie unter 1.5rem (DESIGN.md → Icons) */
+  .process__node :global(svg) {
+    width: calc(var(--db-node) * 0.85);
+    height: calc(var(--db-node) * 0.85);
+    color: var(--ink);
+  }
+  .process__num {
+    margin-right: 0.6rem;
+    color: var(--ink-soft);
+    vertical-align: 0.15em;
+  }
+</style>
