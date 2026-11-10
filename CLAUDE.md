@@ -5,6 +5,10 @@ Wege zu GitHub, LinkedIn und Lebenslauf. Ziel-Domain eyupbahar.com – noch nich
 
 ## Stand
 
+2026-11-10 — Erster Produktions-Deploy auf Vercel, Scope `eyupbahars-projects` (Joker: eigenes Konto, nicht Antigravity),
+Projekt `portfolio`: https://portfolio-nu-inky-94.vercel.app (öffentlich, alle Routen 200, Header wie `vercel.json`).
+`portfolio-eyupbahars-projects.vercel.app` ist durch Vercel-Authentifizierung geschützt (Standard Protection). Deploy per
+CLI; Git-Integration nicht verbunden.
 2026-11-09 (nachts) — Erster Commit und Push nach GitHub `EyupBahar/portfolio` (public, Joker) nach gitleaks- und
 Trivy-Prüfung; Trivy-CI-Workflow dazu (`.github/workflows/trivy.yml`, bis 2026-11-12 Warnung, danach rot).
 2026-11-09 (nachts) — Stack läuft von selbst (Joker „slider otomatik dönsün"): `Stack.astro` als CSS-Laufband (Technik
@@ -51,7 +55,10 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
   und `verify-security.sh` ohne Argument aus der Projektwurzel (Hook-Modus: geänderte Dateien).
 - SEO-Gate: `VERIFY_SEO_IGNORE="schema.organization"` – Person-Site, keine Organisation (bewusst).
 - Repo: GitHub `EyupBahar/portfolio`, **public** (Joker-Entscheid 2026-11-09, Ausnahme zur Private-Regel).
-- Deploy: geplant Vercel, Scope `eyupbahars-projects` (persönlich, nicht `matthaeus`); Repo angelegt und gepusht (2026-11-09).
+- Deploy: Vercel, Scope `eyupbahars-projects` (persönlich, nicht `matthaeus`), Projekt `portfolio`, verlinkt (`.vercel/`,
+  gitignored). Prod: `vercel deploy --prod --scope eyupbahars-projects` → https://portfolio-nu-inky-94.vercel.app.
+  Keine Git-Integration (Vercel-GitHub-App nicht installiert). `vercel link` legt `.env.local` mit einem OIDC-Token an –
+  nie committen (gitignored), nach dem Link löschen.
 - i18n: DE ohne Präfix (`/`), EN unter `/en/`. Slugs der Projekte in beiden Sprachen gleich.
 - Eigene Projekte (`kind: own`, Link „Code auf GitHub"): Arbeitskopien `~/Desktop/arbeit/helvetia_machine` und
   `~/Desktop/arbeit/pinocchio_shop_fe`. Keine Live-Site → Screenshots lokal gebaut: Helvetia mit Seed-Daten des Repos
