@@ -5,6 +5,9 @@ Wege zu GitHub, LinkedIn und Lebenslauf. Ziel-Domain eyupbahar.com – noch nich
 
 ## Stand
 
+2026-11-10 — Eigenes KI-Icon (`src/icons/ki.svg`, Strich-Icon, Vorlage Joker als SVG; die PNG-Vorlage vom Vormittag ist
+ersetzt) im Schwerpunkt „KI-gestützte Entwicklung"; Schwerpunkt-Icons 4rem statt 3.25rem (Joker). Kurzprofil-Zeile KI
+weiter `ph:sparkle-light`. Deployt (Vercel, CLI).
 2026-11-10 — Erster Produktions-Deploy auf Vercel, Scope `eyupbahars-projects` (Joker: eigenes Konto, nicht Antigravity).
 Projekt danach umbenannt in `eyupbaharportfolio` (Joker) und Domain `eyupbaharportfolio.vercel.app` angehängt:
 https://eyupbaharportfolio.vercel.app (öffentlich, alle Routen 200, Header wie `vercel.json`). Die automatische
@@ -77,7 +80,7 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 | `src/pages/` | `index`, `projekte/[slug]`, `datenschutz`, `404` (DE) · `en/index`, `en/projects/[slug]`, `en/privacy` |
 | `src/components/` | Header, Footer, Hero (Porträt), Facts, Focus, Stack, ProjectList/ProjectRow (+ DeviceFrames), Process, CtaBand, Contact, CasePage, LegalPage; Reihenfolge in `HomePage` |
 | `src/data/` | `profile.ts` (Name, E-Mail, Links, CV-Pfade), `portrait.ts` (Glob auf `assets/portrait.*`), `stack.ts`, `focus.ts`, `process.ts` – einzige Quellen, auch für GEO |
-| `src/icons/` | eigene Icons (location, now, frontend, backend, sprache, pdf, webseite, mobile-applikation, monitor, implementierung, testen) + kanonisches email |
+| `src/icons/` | eigene Icons (location, now, frontend, backend, sprache, pdf, webseite, mobile-applikation, monitor, implementierung, testen, ki) + kanonisches email; Originale `docs/icons-original/` |
 | `scripts/geo.mjs` | erzeugt `public/llms*.txt` + `.md`-Spiegel (Startseite = `startseite.md`, nie `index.md`); leert Projekt-Spiegel vorher |
 | `public/og/` | OG-Bilder 1200×630 (DE/EN), aus Seiten-Fonts und Tokens gerendert |
 | `public/cv/` | `Eyup_Bahar_CV_DE.pdf`, `Eyup_Bahar_CV_EN.pdf` – erzeugt von `scripts/cv-web.mjs`, nie von Hand |

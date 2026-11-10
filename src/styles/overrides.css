@@ -56,7 +56,7 @@ button.db-btn:active { transform: scale(0.97); }
  * Rahmen, Icon 3.25rem – Jokers 512er-Zeichnungen stehen direkt auf dem Panel. Hover füllt deshalb nichts
  * mehr, das Icon wechselt nur in den Akzent (Indikator-Logik). */
 .db-card-num__tile { width: auto; height: auto; background: transparent; }
-.db-card-num__tile svg { width: 3.25rem; height: 3.25rem; }
+.db-card-num__tile svg { width: 4rem; height: 4rem; } /* 4rem statt 3.25rem: Joker 2026-11-10 „boyutunu büyüt" */
 @media (hover: hover) {
   .db-card-num:hover {
     transform: none;
