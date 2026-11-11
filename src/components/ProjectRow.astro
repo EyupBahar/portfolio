@@ -47,13 +47,15 @@ const caseHref = routes.project(project.id.replace(`${lang}/`, ''))[lang];
     </ul>
   </div>
 
-  {p.cover && (
+  {(p.cover || p.screens) && (
     <div class="project__media">
       <DeviceFrames
         desktop={p.cover}
         desktopAlt={p.coverAlt ?? ''}
         mobile={p.coverMobile}
         mobileAlt={t(lang, 'projects.mobileAlt')}
+        screens={p.screens}
+        screensAlt={p.screensAlt}
       />
     </div>
   )}

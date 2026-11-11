@@ -8,6 +8,8 @@
 - [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin.md)
 - [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen.md)
 - [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita.md)
+- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/projekte/kent-ormani.md)
+- [Euphrat Reinigung](https://eyupbahar.com/projekte/euphrat-reinigung.md)
 - [Helvetia Machine](https://eyupbahar.com/projekte/helvetia-machine.md)
 - [Pinocchio Shop](https://eyupbahar.com/projekte/pinocchio-shop.md)
 
@@ -17,6 +19,8 @@
 - [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin.md)
 - [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen.md)
 - [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita.md)
+- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/en/projects/kent-ormani.md)
+- [Euphrat Reinigung](https://eyupbahar.com/en/projects/euphrat-reinigung.md)
 - [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine.md)
 - [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop.md)
 - [Privacy](https://eyupbahar.com/en/privacy.md)

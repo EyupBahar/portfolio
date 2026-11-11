@@ -33,6 +33,8 @@ Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, Postgre
 - [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin/): Neubau der Website eines Fachgeschäfts für Velos, E-Bikes und Motorräder – mit eigenem Produkt-CMS, in dem das Geschäft Fahrzeuge, Bilder und Ankündigungen selbst pflegt.
 - [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen/): Website mit Selbstverwaltung für ein Tenniscenter – Turniere veröffentlichen, Online-Anmeldungen für Turniere und Tennisschule, alle Texte und Bilder im Admin bearbeitbar.
 - [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita/): Neubau einer Sprachschul-Website mit schlankem Datei-CMS – die Schule pflegt Bilder, Kurse, Preise und Kontaktdaten selbst, ohne Datenbank.
+- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/projekte/kent-ormani/): Mini-App für den Stadtwald Kemerburgaz in «İstanbul Senin», der Super-App der Stadt Istanbul: interaktive Karte mit Orten nach Kategorie, Suche, Veranstaltungen, Zahlungen und Kontakt – als Micro-Frontend in der nativen App.
+- [Euphrat Reinigung](https://eyupbahar.com/projekte/euphrat-reinigung/): Website einer Reinigungsfirma für die Region Bern – fünf Leistungsseiten, acht Ortsseiten für die lokale Suche, Offertanfrage per Formular und Schnellkontakt über WhatsApp und Telefon auf dem Handy.
 - [Helvetia Machine](https://eyupbahar.com/projekte/helvetia-machine/): Full-Stack-Katalog für Maschinen, Ersatzteile und Service – eine ASP.NET-Core-API mit Next.js-Frontend und einem Admin-Bereich, in dem Kategorien, Unterkategorien und Bildergalerien gepflegt werden.
 - [Pinocchio Shop](https://eyupbahar.com/projekte/pinocchio-shop/): Mehrsprachiger Online-Shop als React-App – Produktkatalog, Warenkorb, Checkout, Kundenkonto mit Google-Login und Admin-Seiten für Produkte und Bestellungen.
 
@@ -151,6 +153,72 @@ Quelle/Source: https://eyupbahar.com/projekte/norskmedrita/
 
 ---
 
+# Kemerburgaz Kent Ormanı
+
+Mini-App in «İstanbul Senin», der Super-App der Stadt Istanbul. Mini-App für den Stadtwald Kemerburgaz in «İstanbul Senin», der Super-App der Stadt Istanbul: interaktive Karte mit Orten nach Kategorie, Suche, Veranstaltungen, Zahlungen und Kontakt – als Micro-Frontend in der nativen App.
+
+- Art: Kundenprojekt
+- Zeitraum: 10/2021 – 10/2022
+- Rolle: Eigenverantwortliche Umsetzung des Frontends – als Frontend Developer bei KOBIL / Westerops, Istanbul
+- Stack: React, React Leaflet, Material UI, Figma, Nifty
+
+## Ausgangslage
+
+«İstanbul Senin» ist die Super-App der Stadt Istanbul (İstanbul Büyükşehir Belediyesi) – die erste Super-App der Türkei, mit Millionen Nutzern. Städtische Dienste laufen darin als Mini-Apps. Für den Stadtwald Kemerburgaz Kent Ormanı entstand eine eigene Mini-App: ein Micro-Frontend, das in der nativen Super-App geladen wird.
+
+## Umsetzung
+
+- Interaktive Karte des Waldes mit React Leaflet: Orte als Marker, nach Kategorie eingefärbt
+- Kategorien «Ormanda Ne Var?» – Kultur & Kunst, Sport, Restaurant & Café, Unterhaltung, Veranstaltungsflächen, Gebetsraum – als Filter, dazu eine Suche
+- Ausgewählte Orte als Kartenstapel über der Karte: Bild, Name, Kategorie
+- Bereiche Veranstaltungen, Zahlungen, Karte und Kontakt in der unteren Navigation
+- Umsetzung der Figma-Prototypen in enger Zusammenarbeit mit dem Design-Team; Aufgaben und Abstimmung im Team über Nifty
+
+## Technische Details
+
+- React mit React Leaflet für die Karte und Material UI für die Komponenten
+- Responsive Oberfläche für alle Bildschirmgrössen
+- Anbindung der REST-APIs der Super-App-Infrastruktur
+- Läuft als Micro-Frontend innerhalb der nativen Super-App
+
+Quelle/Source: https://eyupbahar.com/projekte/kent-ormani/
+
+---
+
+# Euphrat Reinigung
+
+Reinigungsfirma, Kaufdorf BE. Website einer Reinigungsfirma für die Region Bern – fünf Leistungsseiten, acht Ortsseiten für die lokale Suche, Offertanfrage per Formular und Schnellkontakt über WhatsApp und Telefon auf dem Handy.
+
+- Art: Kundenprojekt
+- Zeitraum: 09/2026 – 11/2026
+- Rolle: Alleinentwickler: Website, Domain-Anbindung und Hosting – eigener Kunde
+- Stack: Astro, TypeScript, Web3Forms, Vercel
+- Website: https://euphratreinigung.ch
+
+## Ausgangslage
+
+Website für eine Reinigungsfirma aus Kaufdorf, die Privathaushalte, Büros und Gewerberäume in Bern und Umgebung reinigt. Die Website stellt die Leistungen vor und nimmt Offertanfragen entgegen.
+
+## Umsetzung
+
+- Fünf Leistungsseiten: Wohnungs-, Umzugs-, Fenster-, Büro- und Grundreinigung
+- Acht Ortsseiten (Bern, Belp, Toffen, Kaufdorf, Thurnen, Rubigen, Worb, Konolfingen) für die lokale Suche
+- Kontaktformular für Offertanfragen über Web3Forms, mit Honeypot und Kontrollfrage gegen Spam
+- Auf Handy und Tablet feste Schnellkontakt-Buttons: WhatsApp mit vorbereiteter Nachricht und Anruf
+- Eigene Domain euphratreinigung.ch auf Vercel; DNS und E-Mail bleiben beim Domain-Anbieter
+
+## Technische Details
+
+- Astro, statisch erzeugt (SSG), TypeScript im strikten Modus
+- Strukturierte Daten (JSON-LD): die Firma mit Einzugsgebiet, dazu Leistung und Breadcrumbs auf jeder Leistungs- und Ortsseite; Sitemap
+- Content-Security-Policy mit Hashes, die der Build erzeugt, dazu HSTS und weitere Sicherheits-Header
+- Schrift selbst gehostet, Bilder von Astro als WebP ausgeliefert
+- Einblend-Animationen lassen den Inhalt sichtbar, wenn JavaScript nicht läuft
+
+Quelle/Source: https://eyupbahar.com/projekte/euphrat-reinigung/
+
+---
+
 # Helvetia Machine
 
 Produktkatalog mit Admin-CMS, Demo. Full-Stack-Katalog für Maschinen, Ersatzteile und Service – eine ASP.NET-Core-API mit Next.js-Frontend und einem Admin-Bereich, in dem Kategorien, Unterkategorien und Bildergalerien gepflegt werden.
@@ -255,6 +323,8 @@ Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, Postgre
 - [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin/): Rebuild of the website for a bicycle, e-bike and motorbike shop – with a custom product CMS where the shop manages vehicles, images and announcements on its own.
 - [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen/): Self-managed website for a tennis centre – publish tournaments, take online registrations for tournaments and the tennis school, edit every text and image in the admin.
 - [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita/): Rebuild of a language school website with a lean file-based CMS – the school manages images, courses, prices and contact details on its own, without a database.
+- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/en/projects/kent-ormani/): Mini app for the Kemerburgaz urban forest inside «İstanbul Senin», the super-app of the City of Istanbul: interactive map with places by category, search, events, payments and contact – a micro-frontend in the native app.
+- [Euphrat Reinigung](https://eyupbahar.com/en/projects/euphrat-reinigung/): Website for a cleaning company in the Bern region – five service pages, eight local pages for local search, quote requests through a form and quick contact via WhatsApp and phone on mobile.
 - [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine/): Full-stack catalogue for machinery, spare parts and service – an ASP.NET Core API with a Next.js front end and an admin area for managing categories, subcategories and image galleries.
 - [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop/): Multilingual online shop as a React app – product catalogue, cart, checkout, customer account with Google sign-in and admin pages for products and orders.
 
@@ -370,6 +440,72 @@ Rebuild of a WordPress website for a language school. The school needed to manag
 - Structured data: EducationalOrganization, OfferCatalog, FAQPage
 
 Quelle/Source: https://eyupbahar.com/en/projects/norskmedrita/
+
+---
+
+# Kemerburgaz Kent Ormanı
+
+Mini app in «İstanbul Senin», the super-app of the City of Istanbul. Mini app for the Kemerburgaz urban forest inside «İstanbul Senin», the super-app of the City of Istanbul: interactive map with places by category, search, events, payments and contact – a micro-frontend in the native app.
+
+- Type: Client project
+- Period: 10/2021 – 10/2022
+- Role: Sole front-end developer of the mini app – as Frontend Developer at KOBIL / Westerops, Istanbul
+- Stack: React, React Leaflet, Material UI, Figma, Nifty
+
+## Starting point
+
+«İstanbul Senin» is the super-app of the City of Istanbul (İstanbul Büyükşehir Belediyesi) – the first super-app in Türkiye, with millions of users. Municipal services run inside it as mini apps. The Kemerburgaz urban forest got its own mini app: a micro-frontend that is loaded inside the native super-app.
+
+## What I built
+
+- Interactive map of the forest with React Leaflet: places as markers, coloured by category
+- Categories «Ormanda Ne Var?» (What's in the forest?) – culture & arts, sports, restaurants & cafés, entertainment, event areas, prayer room – as filters, plus search
+- Selected places as a card stack above the map: image, name, category
+- Events, payments, map and contact in the bottom navigation
+- Implementation of the Figma prototypes in close collaboration with the design team; tasks and coordination in Nifty
+
+## Technical details
+
+- React with React Leaflet for the map and Material UI for the components
+- Responsive interface for all screen sizes
+- Integration of the REST APIs of the super-app infrastructure
+- Runs as a micro-frontend inside the native super-app
+
+Quelle/Source: https://eyupbahar.com/en/projects/kent-ormani/
+
+---
+
+# Euphrat Reinigung
+
+Cleaning company, Kaufdorf BE. Website for a cleaning company in the Bern region – five service pages, eight local pages for local search, quote requests through a form and quick contact via WhatsApp and phone on mobile.
+
+- Type: Client project
+- Period: 09/2026 – 11/2026
+- Role: Sole developer: website, domain setup and hosting – my own client
+- Stack: Astro, TypeScript, Web3Forms, Vercel
+- Website: https://euphratreinigung.ch
+
+## Starting point
+
+Website for a cleaning company from Kaufdorf that cleans homes, offices and commercial spaces in and around Bern. The site presents the services and takes quote requests.
+
+## What I built
+
+- Five service pages: flat, move-out, window, office and deep cleaning
+- Eight local pages (Bern, Belp, Toffen, Kaufdorf, Thurnen, Rubigen, Worb, Konolfingen) for local search
+- Contact form for quote requests via Web3Forms, with a honeypot and a check question against spam
+- Fixed quick-contact buttons on phones and tablets: WhatsApp with a prepared message, and call
+- Own domain euphratreinigung.ch on Vercel; DNS and email stay with the domain provider
+
+## Technical details
+
+- Astro, statically generated (SSG), TypeScript in strict mode
+- Structured data (JSON-LD): the company with its service area, plus service and breadcrumbs on every service and local page; sitemap
+- Content Security Policy with hashes generated at build time, plus HSTS and further security headers
+- Self-hosted font, images delivered as WebP by Astro
+- Reveal animations leave content visible when JavaScript does not run
+
+Quelle/Source: https://eyupbahar.com/en/projects/euphrat-reinigung/
 
 ---
 

@@ -11,7 +11,7 @@ repoUrl: https://github.com/EyupBahar/helvetia_machine
 cover: ../../../assets/projects/helvetia-machine.webp
 coverAlt: Helvetia Machine home page with hero and product categories
 coverMobile: ../../../assets/projects/helvetia-machine-mobile.webp
-order: 4
+order: 6
 ---
 
 ## Starting point

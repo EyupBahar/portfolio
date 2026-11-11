@@ -5,6 +5,7 @@
  * H2 links in der Spalte, Absätze und Listen rechts daneben.
  */
 import { Image } from 'astro:assets';
+import DeviceFrames from './DeviceFrames.astro';
 import { Icon } from 'astro-icon/components';
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -118,6 +119,16 @@ const schema = [
           />
         </figure>
       )}
+      {!p.cover && p.screens && (
+        <div class="case__screens">
+          <DeviceFrames
+            screens={p.screens}
+            screensAlt={p.screensAlt}
+            screenSizes="(max-width: 767px) calc((100vw - 2rem) * 0.3), 220px"
+            priority
+          />
+        </div>
+      )}
 
       <div class="case__prose">
         <Content />
@@ -190,6 +201,8 @@ const schema = [
     object-fit: cover;
     object-position: top center;
   }
+  /* Mini-App ohne Desktop-Ansicht: iPhone-Reihe statt Titelbild, links im Raster, begrenzt */
+  .case__screens { max-width: 44rem; }
   /* Text im Plakatraster */
   .case__prose {
     display: grid;

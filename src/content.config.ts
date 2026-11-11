@@ -31,6 +31,11 @@ const projects = defineCollection({
       coverAlt: z.string().optional(),
       /** Mobile Startseite, 440 × 956 pt (iPhone 17 Pro Max) inkl. 62-pt-Statusleiste – für den iPhone-Rahmen */
       coverMobile: image().optional(),
+      /** Nur Projekte ohne Desktop-Ansicht (Mini-App in einer nativen App): 1–3 iPhone-Screens im Hochformat
+       *  (≈ 440 × 956 pt inkl. Statusleiste). Ohne `cover` zeigen Projektliste und Fallstudie die Screens
+       *  als Reihe von iPhones (DeviceFrames). `screensAlt` beschreibt jeden Screen, gleiche Reihenfolge. */
+      screens: z.array(image()).min(1).max(3).optional(),
+      screensAlt: z.array(z.string()).optional(),
       order: z.number().int(),
     }),
 });

@@ -1,10 +1,23 @@
 # CLAUDE.md — eyupbahar-portfolio
 
 Persönliches Portfolio von Eyüp Bahar (Softwareentwickler, Raum Bern): Projekte als Fallstudien,
-Wege zu GitHub, LinkedIn und Lebenslauf. Ziel-Domain eyupbahar.com – noch nicht live.
+Wege zu GitHub, LinkedIn und Lebenslauf. Live unter eyupbahar.com.
 
 ## Stand
 
+2026-11-11 — Fallstudie 5 «Euphrat Reinigung» (eigener Kunde, Joker): DE+EN, Live https://euphratreinigung.ch;
+Helvetia/Pinocchio auf 6/7. Screenshots per Chrome-Headless (Desktop) bzw. `chrome-headless-shell` (Mobil – Chrome
+headless=new rendert nie unter 500 px Breite), Ablauf sonst wie `DESIGN.md` → Geräte. Zusammen mit Kent Ormanı
+(Fallstudie 4) committet und deployt (Joker). `eyupbahar.com` antwortet inzwischen vom Vercel-Projekt (200).
+Gates: GEO ok, SEO 0 fail, Perf ok; `verify-build` nicht gelaufen (Playwright ausgelassen, Joker).
+2026-11-10 (16:51) — Vercel-Projekt umbenannt in `eyupbahar` (Joker), Domain `eyupbahar.vercel.app` angehängt:
+https://eyupbahar.vercel.app (200, Header wie `vercel.json`). Parallel im Dashboard (Joker): `eyupbahar.com` am
+Projekt (DNS bei Infomaniak noch nicht auf Vercel → „misconfigured"), `eyupbaharportfolio.vercel.app` entfernt,
+`portfolio-nu-inky-94.vercel.app` leitet auf `eyupbahar.com`. Git-Verbindung zu `EyupBahar/portfolio` gescheitert:
+Vercel-GitHub-App hat keinen Zugriff auf das Repo (Joker, siehe Offen).
+2026-11-10 — Fallstudie 6 «Kemerburgaz Kent Ormanı» (Mini-App in der Super-App «İstanbul Senin» der Stadt Istanbul;
+Joker): DE+EN, Reihenfolge 4 (eigene Projekte rücken auf 5/6). Schema `screens`/`screensAlt` für Projekte ohne
+Desktop-Ansicht; `DeviceFrames` zeigt dann 1–3 iPhones (Projektliste und Fallstudie). Committet/deployt 2026-11-11.
 2026-11-10 — Eigenes KI-Icon (`src/icons/ki.svg`, Strich-Icon, Vorlage Joker als SVG; die PNG-Vorlage vom Vormittag ist
 ersetzt) im Schwerpunkt „KI-gestützte Entwicklung"; Schwerpunkt-Icons 4rem statt 3.25rem (Joker). Kurzprofil-Zeile KI
 weiter `ph:sparkle-light`. Deployt (Vercel, CLI).
@@ -60,15 +73,16 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
   und `verify-security.sh` ohne Argument aus der Projektwurzel (Hook-Modus: geänderte Dateien).
 - SEO-Gate: `VERIFY_SEO_IGNORE="schema.organization"` – Person-Site, keine Organisation (bewusst).
 - Repo: GitHub `EyupBahar/portfolio`, **public** (Joker-Entscheid 2026-11-09, Ausnahme zur Private-Regel).
-- Deploy: Vercel, Scope `eyupbahars-projects` (persönlich, nicht `matthaeus`), Projekt `eyupbaharportfolio`, verlinkt
-  (`.vercel/`, gitignored). Prod: `vercel deploy --prod --scope eyupbahars-projects` → https://eyupbaharportfolio.vercel.app.
-  Keine Git-Integration (Vercel-GitHub-App nicht installiert). `vercel link` legt `.env.local` mit einem OIDC-Token an –
+- Deploy: Vercel, Scope `eyupbahars-projects` (persönlich, nicht `matthaeus`), Projekt `eyupbahar`, verlinkt
+  (`.vercel/`, gitignored). Prod: `vercel deploy --prod --scope eyupbahars-projects` → https://eyupbahar.vercel.app
+  und `eyupbahar.com`. Keine Git-Integration (Vercel-GitHub-App ohne Zugriff auf `EyupBahar/portfolio`). `vercel link` legt `.env.local` mit einem OIDC-Token an –
   nie committen (gitignored), nach dem Link löschen.
 - i18n: DE ohne Präfix (`/`), EN unter `/en/`. Slugs der Projekte in beiden Sprachen gleich.
 - Eigene Projekte (`kind: own`, Link „Code auf GitHub"): Arbeitskopien `~/Desktop/arbeit/helvetia_machine` und
   `~/Desktop/arbeit/pinocchio_shop_fe`. Keine Live-Site → Screenshots lokal gebaut: Helvetia mit Seed-Daten des Repos
   (API + Docker-Postgres), Pinocchio Startseite (statisch, Shop-API offline).
-- Inhalte nie erfinden: jede Projektaussage stammt aus dem jeweiligen Projekt-Repo; Schwerpunkte/Ablauf/CTA nur aus
+- Inhalte nie erfinden: jede Projektaussage stammt aus dem jeweiligen Projekt-Repo (Kent Ormanı hat keins: Quellen
+  sind der Lebenslauf, Jokers Angaben vom 2026-11-10 und die Screenshots); Schwerpunkte/Ablauf/CTA nur aus
   Kurzprofil, Lead und Fallstudien abgeleitet. Keine Lighthouse-Zahlen (nirgends gemessen). Kundenpronomen neutral.
 - Öffentlich NICHT: Strasse, Telefon, Jahrgang, Aufenthaltsstatus (Joker-Entscheid 2026-11-09).
 - CSP in `vercel.json` erlaubt nur `'self'` → `inlineStylesheets: 'never'`, `assetsInlineLimit: 0`.
@@ -84,8 +98,8 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 | `scripts/geo.mjs` | erzeugt `public/llms*.txt` + `.md`-Spiegel (Startseite = `startseite.md`, nie `index.md`); leert Projekt-Spiegel vorher |
 | `public/og/` | OG-Bilder 1200×630 (DE/EN), aus Seiten-Fonts und Tokens gerendert |
 | `public/cv/` | `Eyup_Bahar_CV_DE.pdf`, `Eyup_Bahar_CV_EN.pdf` – erzeugt von `scripts/cv-web.mjs`, nie von Hand |
-| `src/content/projects/{de,en}/` | ein Markdown pro Projekt, Schema in `src/content.config.ts` |
-| `src/assets/projects/` | Screenshots (Kundenprojekte live, eigene lokal), WebP: Desktop 1440×900, `-mobile` 880×1912 (Ablauf: `DESIGN.md` → Geräte) |
+| `src/content/projects/{de,en}/` | ein Markdown pro Projekt, Schema in `src/content.config.ts`; ohne Desktop-Ansicht `screens` (1–3 iPhone-Screens) statt `cover` |
+| `src/assets/projects/` | Screenshots (Kundenprojekte live, eigene lokal), WebP: Desktop 1440×900, `-mobile` 880×1912 (Ablauf: `DESIGN.md` → Geräte); Kent Ormanı `kent-ormani-{1,2,3}.webp` 738×1600 aus Jokers App-Screenshots, Statusleiste geflutet |
 | `src/assets/logo.png` · `portrait.jpg` | Logo der Kopfzeile (Original `docs/logo-original.jpg`) · Porträt 1254² (Original `docs/portrait-original.jpg`) |
 | `src/i18n/ui.ts` | UI-Texte DE/EN (auch Schwerpunkte, Ablauf, CTA), Routen-Paare, Sprungmarken |
 | `src/styles/` | `tokens.css`, `global.css` (+ `.panel`, `.section`, `.section-title`), `blocks/` (buton, animasyon, card, zeitstrahl – design-blocks unverändert), `overrides.css` (Abweichungen) |
@@ -103,8 +117,13 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 - [offen] Kundenfreigaben zweirad-gisin, smash-muensingen, norskmedrita — Joker (Go-live-Blocker)
 - [offen] Site ↔ CV abgleichen — Joker: Backend-Zeile der Site nennt Firebase, CV nicht (CV: Node.js, ASP.NET Core,
   MongoDB); Hero „vier Unternehmen", CV-Profil „drei Unternehmen" (+ Praktikum); CV-Profil beginnt mit „Frontend Developer mit …"
+- [offen] Kent Ormanı: Zeitraum = Anstellung KOBIL / Westerops (10/2021 – 10/2022), genaue Projektmonate unbekannt;
+  Nennung von İBB und KOBIL / Westerops sowie Nutzung der App-Screenshots — Joker
 - [offen] Datenschutztext rechtlich nicht geprüft — Joker
-- [offen] eyupbahar.com in Registry/Vercel nicht sichtbar (2026-11-09) — Joker
+- [offen] Euphrat Reinigung: Herkunft und Nutzungsrechte von Texten und Bildern der Kundensite klären — Joker
+- [offen] Git-Integration: Vercel-GitHub-App braucht Zugriff auf `EyupBahar/portfolio` (github.com/settings/installations
+  → Vercel → Repository access, oder Vercel-Dashboard → Projekt → Settings → Git), danach
+  `vercel git connect https://github.com/EyupBahar/portfolio.git --yes --scope eyupbahars-projects` — Joker
 - [offen] Helvetia auf Render: neue `Jwt__Key`, `Admin__Username`, `Admin__Password` setzen (alte stehen in der
   Git-Historie); Render-Postgres nicht erreichbar, `/health/db` 503 — Joker
 - [offen] Pinocchio-Screenshots zeigen Logo und Glas „Pinocchio Ristorante-Pizzeria" — Nutzungsrecht klären — Joker

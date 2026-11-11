@@ -126,6 +126,11 @@ iPhone-UA, Touch; Cookie-Hinweis abgelehnt; oben 62 pt Statusleiste in der häuf
 Seitenzeile (wie Safari 26, nicht `theme-color`), dann auf 880 px verkleinert. Desktop-Screenshot (16:10)
 füllt den 16:9-Bildschirm oben bündig, unten fallen ~10 % weg.
 
+iPhone-Reihe (Joker 2026-11-10, Kent Ormanı): Projekte ohne Desktop-Ansicht (`screens` statt `cover`) zeigen 1–3
+iPhones nebeneinander – gleiche Zeichnung, statisch im Raster (`.phones`), in der Fallstudie auf 44 rem begrenzt.
+Screens aus echten App-Screenshots (738 × 1600, nicht hochskaliert): die obersten 62 pt (Statusleiste) in der
+häufigsten Farbe der Leiste geflutet – Uhrzeit, Netz, Akku und Musik-Pille weg; die Dynamic Island zeichnet der Rahmen.
+
 ## Tokens
 
 `src/styles/tokens.css` – einzige Quelle. Einzige Ausnahme: die Markenfarben der Stack-Logos (Fremdmarken, in `Stack.astro`). Kühles Dunkel, gemessen (WCAG):

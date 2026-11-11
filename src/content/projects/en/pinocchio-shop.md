@@ -11,7 +11,7 @@ repoUrl: https://github.com/EyupBahar/pinocchio_shop_fe
 cover: ../../../assets/projects/pinocchio-shop.webp
 coverAlt: Pinocchio Shop home page with video hero and shop button
 coverMobile: ../../../assets/projects/pinocchio-shop-mobile.webp
-order: 5
+order: 7
 ---
 
 ## Starting point

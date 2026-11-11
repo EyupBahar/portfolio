@@ -1,0 +1,38 @@
+---
+title: Kemerburgaz Kent Ormanı
+kind: client
+context: Mini-App in «İstanbul Senin», der Super-App der Stadt Istanbul
+year: 2022
+period: "10/2021 – 10/2022"
+role: "Eigenverantwortliche Umsetzung des Frontends – als Frontend Developer bei KOBIL / Westerops, Istanbul"
+summary: "Mini-App für den Stadtwald Kemerburgaz in «İstanbul Senin», der Super-App der Stadt Istanbul: interaktive Karte mit Orten nach Kategorie, Suche, Veranstaltungen, Zahlungen und Kontakt – als Micro-Frontend in der nativen App."
+stack: [React, React Leaflet, Material UI, Figma, Nifty]
+screens:
+  - ../../../assets/projects/kent-ormani-1.webp
+  - ../../../assets/projects/kent-ormani-2.webp
+  - ../../../assets/projects/kent-ormani-3.webp
+screensAlt:
+  - Startseite der Super-App «İstanbul Senin» mit den Mini-Apps der Stadt Istanbul
+  - Startseite der Mini-App Kent Ormanı mit der Einstiegskarte «Kent Ormanını Keşfet»
+  - Karte des Stadtwalds mit farbigen Orts-Markern, Kategorie-Filter «Ormanda Ne Var?» und Suche
+order: 4
+---
+
+## Ausgangslage
+
+«İstanbul Senin» ist die Super-App der Stadt Istanbul (İstanbul Büyükşehir Belediyesi) – die erste Super-App der Türkei, mit Millionen Nutzern. Städtische Dienste laufen darin als Mini-Apps. Für den Stadtwald Kemerburgaz Kent Ormanı entstand eine eigene Mini-App: ein Micro-Frontend, das in der nativen Super-App geladen wird.
+
+## Umsetzung
+
+- Interaktive Karte des Waldes mit React Leaflet: Orte als Marker, nach Kategorie eingefärbt
+- Kategorien «Ormanda Ne Var?» – Kultur & Kunst, Sport, Restaurant & Café, Unterhaltung, Veranstaltungsflächen, Gebetsraum – als Filter, dazu eine Suche
+- Ausgewählte Orte als Kartenstapel über der Karte: Bild, Name, Kategorie
+- Bereiche Veranstaltungen, Zahlungen, Karte und Kontakt in der unteren Navigation
+- Umsetzung der Figma-Prototypen in enger Zusammenarbeit mit dem Design-Team; Aufgaben und Abstimmung im Team über Nifty
+
+## Technische Details
+
+- React mit React Leaflet für die Karte und Material UI für die Komponenten
+- Responsive Oberfläche für alle Bildschirmgrössen
+- Anbindung der REST-APIs der Super-App-Infrastruktur
+- Läuft als Micro-Frontend innerhalb der nativen Super-App
