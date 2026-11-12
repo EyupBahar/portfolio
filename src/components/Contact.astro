@@ -1,12 +1,17 @@
 ---
 /**
- * Seitenende: alle Kanäle als eine Tafel – gleiche Sprache wie die Fahrplan-Tafel im Hero.
- * E-Mail steht als erste Zeile in gleicher Grösse wie die übrigen (Joker, 2026-11-09);
- * Icon = kanonisches _ikon/email.svg, eingefärbt wie die anderen Icons.
- * Kein Formular (nicht verlangt) → keine Angriffsfläche.
+ * Seitenende (Joker 2026-11-12, Krom-Umbau, Referenz „Digital Designer"): CTA-Band und Kontakt-Tafel sind
+ * EIN Glas-Panel – links der Krom-Satz (Signatur 10: derselbe am Bildschirm festgemachte Stahl wie der
+ * Hero-Titel; er kommt von unten ins Licht), Mitte Lead + Lebenslauf als die eine gefüllte Taste, rechts alle
+ * Kanäle. Darunter wie bisher das Messprotokoll (Signatur 7).
+ * Kanäle: E-Mail (kanonisches Icon, Joker 2026-11-09 gleiche Grösse wie die übrigen), LinkedIn, GitHub, beide
+ * Lebensläufe, Region (kein Link). Telefon/Adresse nie (CLAUDE.md). Kein Formular → keine Angriffsfläche.
+ * Der Krom-Satz ist Entwurf (ui.ts contact.headline) – Freigabe Joker.
  */
+import '@fontsource-variable/archivo/wdth.css';
 import { Icon } from 'astro-icon/components';
 import { t, anchors, type Lang } from '../i18n/ui';
+import Messspur from './Messspur.astro';
 import { profile } from '../data/profile';
 
 interface Props {
@@ -24,12 +29,21 @@ const channels = [
 ] as const;
 ---
 
-<section class="contact" id={anchors[lang].contact} aria-labelledby="contact-title">
-  <div class="container contact__grid">
-    <h2 class="contact__title" id="contact-title">{t(lang, 'contact.title')}</h2>
+<section class="contact section mess-bereich" id={anchors[lang].contact} aria-labelledby="contact-title">
+  <Messspur teil="segment" index={5} letztes />
+  <div class="container">
+    <h2 class="section-title" id="contact-title">{t(lang, 'contact.title')}</h2>
 
-    <div class="contact__body">
-      <p class="contact__lead">{t(lang, 'contact.lead')}</p>
+    <div class="panel contact__panel">
+      <p class="contact__headline krom">{t(lang, 'contact.headline')}</p>
+
+      <div class="contact__mitte">
+        <p class="contact__lead">{t(lang, 'contact.lead')}</p>
+        <a class="db-btn db-btn--dolu" href={profile.cv[lang]} type="application/pdf">
+          <Icon name="ph:identification-card" class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />
+          <span class="db-btn__label">{t(lang, 'hero.cv')}</span>
+        </a>
+      </div>
 
       <ul class="contact__channels" role="list">
         {channels.map((c) => (
@@ -44,51 +58,63 @@ const channels = [
             </a>
           </li>
         ))}
+        <li class="contact__ort">
+          <span class="mono contact__label label-icon label-icon--lg"><Icon name="location" aria-hidden="true" />{t(lang, 'facts.location')}</span>
+          <span class="contact__value">{profile.region[lang]}</span>
+        </li>
       </ul>
     </div>
+  </div>
+  <!-- Messprotokoll: die Messspur landet hier (DESIGN.md → Signatur 7) -->
+  <div class="container contact__protokoll">
+    <Messspur teil="protokoll" lang={lang} />
   </div>
 </section>
 
 <style>
-  .contact {
-    padding-block: var(--section-y);
-    background: var(--band);
-    border-top: 1px solid var(--hairline);
-  }
-  .contact__grid {
+  .contact { padding-bottom: var(--section-y); }
+
+  .contact__panel {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    gap: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+    padding: var(--panel-pad);
   }
-  .contact__title {
-    font-size: var(--step-2);
-    line-height: 1;
-    letter-spacing: -0.03em;
+
+  /* Krom-Satz: Grösse wie der Hero-Titel, eine Stufe kleiner; Breite 80 wie dort ab 1024 */
+  .contact__headline {
+    max-width: 100%;
+    font-size: clamp(2.75rem, 1.9rem + 3.5vw, 4.75rem);
   }
-  .contact__body {
+  @media (min-width: 1024px) {
+    .contact__headline { font-stretch: 80%; }
+  }
+
+  .contact__mitte {
     display: flex;
     flex-direction: column;
-    gap: clamp(1.25rem, 1rem + 1vw, 2rem);
-    min-width: 0;
+    align-items: flex-start;
+    gap: 1.25rem;
   }
-  .contact__lead { color: var(--ink-soft); }
+  .contact__lead { color: var(--ink-soft); max-width: 30ch; }
 
-  .contact__channels { border-top: 1px solid var(--ink); }
-  .contact__channels a {
+  .contact__channels { border-top: 1px solid var(--hairline-strong); }
+  .contact__channels a,
+  .contact__ort {
     position: relative;
     display: grid;
-    grid-template-columns: 9rem minmax(0, 1fr);
+    grid-template-columns: 7.5rem minmax(0, 1fr);
     gap: 1rem;
     align-items: center;
     min-height: 2.75rem;
-    padding-block: 0.7rem;
-    border-bottom: 1px solid var(--hairline-strong);
+    padding-block: 0.6rem;
+    border-bottom: 1px solid var(--hairline);
     text-decoration: none;
   }
   .contact__label { color: var(--ink-soft); }
-  .contact__value { min-width: 0; overflow-wrap: anywhere; }
+  .contact__value { min-width: 0; overflow-wrap: anywhere; font-size: var(--step-caption); }
 
-  /* Sekundenzeiger auf der Zeile, wie in der Projektliste */
+  /* Indikator (Signatur 2): Stahlblau-Linie auf der Zeile bei Hover/Fokus */
   .contact__channels a::after {
     content: '';
     position: absolute;
@@ -106,14 +132,26 @@ const channels = [
     .contact__channels a:hover::after { transform: scaleX(1); transition-duration: 240ms; }
   }
 
-  @media (min-width: 768px) {
-    .contact__grid {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      column-gap: var(--gap);
+  /* ab 1024 px: drei Zonen (Referenz), Hairline vor den Kanälen */
+  @media (min-width: 1024px) {
+    .contact__panel {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 3fr) minmax(0, 4fr);
+      align-items: center;
+      column-gap: clamp(2rem, 1rem + 2vw, 3.5rem);
     }
-    .contact__title { grid-column: 1 / span 4; }
-    .contact__body { grid-column: 5 / -1; }
+    .contact__channels {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: clamp(2rem, 1rem + 2vw, 3.5rem);
+      border-top: 0;
+      border-left: 1px solid var(--hairline);
+    }
+    .contact__channels > li:last-child > * { border-bottom: 0; }
   }
+
+  .contact__protokoll { margin-top: clamp(2.5rem, 2rem + 2vw, 4rem); }
 
   @media (prefers-reduced-motion: reduce) {
     .contact__channels a::after { transition: none; }

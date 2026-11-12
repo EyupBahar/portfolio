@@ -1,0 +1,82 @@
+---
+/**
+ * Projekte-Seite (/projekte/, /en/projects/) – specs/001-projekt-slider, Joker 2026-11-12: die frühere
+ * Projektliste der Startseite (Vitrine, Zemin-Wechsel, Logbuch-Zeilen mit Geräten) steht hier unverändert.
+ * Die Startseite zeigt stattdessen den Projekt-Slider. Keine Messspur: die Skala ist die Signatur der
+ * Startseite (DESIGN.md → Signatur 7).
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectList from './ProjectList.astro';
+import { t, routes, type Lang } from '../i18n/ui';
+import { profile } from '../data/profile';
+import '../styles/uebergang.css';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const projects = (await getCollection('projects', (p) => p.id.startsWith(`${lang}/`))).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const site = Astro.site ?? new URL('https://eyupbahar.com');
+const pageUrl = new URL(routes.projects[lang], site).href;
+const title = t(lang, 'projects.page.title');
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#page`,
+    name: title,
+    description: t(lang, 'projects.page.description'),
+    url: pageUrl,
+    inLanguage: lang === 'de' ? 'de-CH' : 'en',
+    isPartOf: { '@id': new URL('/#website', site).href },
+    author: { '@id': new URL('/#person', site).href },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: projects.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: new URL(routes.project(p.id.replace(`${lang}/`, ''))[lang], site).href,
+        name: p.data.title,
+      })),
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: profile.name, item: new URL(routes.home[lang], site).href },
+      { '@type': 'ListItem', position: 2, name: title, item: pageUrl },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t(lang, 'projects.page.metaTitle')} | ${profile.name}`}
+  description={t(lang, 'projects.page.description')}
+  alternates={routes.projects}
+  schema={schema}
+>
+  <!-- Rücksprungziel der Seitenübergänge (#projekt-<slug>), klassisch im <head> – siehe public/vt-ziel.js -->
+  <script is:inline slot="head" src="/vt-ziel.js"></script>
+  <div class="projekte-seite">
+    <ProjectList lang={lang} headingLevel={1} title={title} items={projects} />
+  </div>
+</BaseLayout>
+
+<script>
+  // Seitenübergang Projektzeile → Fallstudie (specs/001-projekt-slider)
+  import { initUebergang } from '../scripts/uebergang';
+  initUebergang();
+</script>
+
+<style>
+  /* Abstand unter dem Header wie bei der Fallstudie (.case) */
+  .projekte-seite { padding-top: clamp(2rem, 1rem + 4vw, 5rem); }
+</style>

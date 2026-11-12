@@ -11,6 +11,8 @@ liveUrl: https://euphratreinigung.ch
 cover: ../../../assets/projects/euphrat-reinigung.webp
 coverAlt: Euphrat Reinigung home page with a cleaner at work
 coverMobile: ../../../assets/projects/euphrat-reinigung-mobile.webp
+screenFull: ../../../assets/projects/euphrat-reinigung-full.webp
+screenFullMobile: ../../../assets/projects/euphrat-reinigung-full-mobile.webp
 order: 5
 ---
 

@@ -1,0 +1,96 @@
+/**
+ * Seitenübergänge Projekt ↔ Fallstudie (specs/001-projekt-slider; DESIGN.md → Signatur 9).
+ * Referenz Pinterest-Pin 907334656169529758: der Streifen am Kartenrand wächst zur Fläche der Detailseite,
+ * das Produktbild wandert an seinen Platz; zurück läuft es umgekehrt.
+ *
+ * Das Opt-in für dokumentübergreifende View Transitions steht in global.css (@view-transition). Hier stehen
+ * nur Namen und Animationen. Eingebunden von HomePage, ProjectsPage und CasePage – global, nicht scoped,
+ * weil die Pseudo-Elemente an html hängen.
+ *
+ * Der Pseudo-Baum gehört dem NEUEN Dokument und wird von dessen CSS gestaltet. Die Richtung ergibt sich
+ * deshalb aus der Ankunftsseite: Fallstudie = vor (Rest gleitet von rechts nach), Startseite/Projekte-Seite
+ * mit Rücksprungziel #projekt-<slug> = zurück (von links).
+ *
+ * Rücksprungziel: :target allein reicht nicht – gemessen 2026-11-12 rendern Chromium und WebKit die
+ * Ankunftsseite, bevor die Zielkarte geparst ist. /public/vt-ziel.js (klassisch im <head>) hält deshalb das
+ * erste Rendern bis zum Ziel an (rel=expect) und setzt Richtung und Namen; die :target-Regeln unten bleiben
+ * als Absicherung.
+ *
+ * Namen: projekt-bild (Screenshot ↔ Titelbild), projekt-flaeche (Streifen ↔ Fakten-Tafel), site-kopf.
+ * Eigene Keyframes nur mit transform/opacity; die Grössen-Morphs der Gruppen rechnet der Browser.
+ * Nie Namen auf main, section oder body: dort hängen feste Ebenen (Messspur, Zemin).
+ */
+
+/* Kopfzeile bleibt stehen, statt mit der Seite zu gleiten */
+.site-header { view-transition-name: site-kopf; }
+
+/* Fallstudie: statisch, genau ein Projekt je Seite */
+.case__cover,
+.case__screens { view-transition-name: projekt-bild; }
+.case__facts { view-transition-name: projekt-flaeche; }
+
+/* „Nächstes Projekt": kein Morph von einem Projektbild ins andere (Klasse setzt uebergang.ts) */
+html.ohne-morph .case__cover,
+html.ohne-morph .case__screens,
+html.ohne-morph .case__facts { view-transition-name: none; }
+
+/* Rücksprungziel: Karte (Startseite) bzw. Zeile (Projekte-Seite) mit #projekt-<slug>; der Wert von data-vt
+ * ist der Name des Übergangs (eine Quelle für CSS, uebergang.ts und vt-ziel.js). Nach einem Klick
+ * (html.vt-klick) gelten nur die Namen, die das Skript an die angeklickte Quelle setzt – zwei Elemente
+ * mit demselben Namen brächen den Übergang ab. */
+html:not(.vt-klick) :target > [data-vt='projekt-bild'] { view-transition-name: projekt-bild; }
+html:not(.vt-klick) :target > [data-vt='projekt-flaeche'] { view-transition-name: projekt-flaeche; }
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(projekt-bild),
+  ::view-transition-group(projekt-flaeche) {
+    animation-duration: 450ms;
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* Bild: beide Zustände füllen die Gruppe von links oben (wie die Slider-Karte ihr Bild beschneidet), der
+   * neue steht sofort deckend – so gibt es kein Doppelbild beim Überblenden (gemessen 2026-11-12: Logo der
+   * Site doppelt bei 220 ms). Die Gruppe wächst, der Beschnitt löst sich auf. */
+  ::view-transition-old(projekt-bild),
+  ::view-transition-new(projekt-bild) {
+    block-size: 100%;
+    object-fit: cover;
+    object-position: left top;
+  }
+  ::view-transition-old(projekt-bild) { animation: vt-aus 150ms ease-out both; }
+  ::view-transition-new(projekt-bild) { animation: none; }
+
+  /* Fläche: der neue Zustand steht sofort deckend in der Gruppe und wird mit ihr aufgezogen – unskaliert
+   * von links oben, so wächst der Streifen sichtbar zur Tafel (bzw. schrumpft zurück). Der alte Zustand
+   * blendet schnell aus. */
+  ::view-transition-old(projekt-flaeche),
+  ::view-transition-new(projekt-flaeche) {
+    block-size: 100%;
+    object-fit: none;
+    object-position: left top;
+  }
+  ::view-transition-old(projekt-flaeche) { animation: vt-aus 150ms ease-out both; }
+  ::view-transition-new(projekt-flaeche) { animation: none; }
+
+  /* Kopfzeile: harter Tausch, sie ist auf beiden Seiten gleich */
+  ::view-transition-old(site-kopf) { animation: none; opacity: 0; }
+  ::view-transition-new(site-kopf) { animation: none; }
+
+  /* vor: Ankunft auf einer Fallstudie */
+  :root:has(.case)::view-transition-old(root) { animation: vt-aus 200ms ease-out both; }
+  :root:has(.case)::view-transition-new(root) {
+    animation: vt-von-rechts 450ms cubic-bezier(0.22, 0.61, 0.36, 1) 100ms both;
+  }
+
+  /* zurück: Ankunft mit Rücksprungziel #projekt-<slug> (Klasse setzt /vt-ziel.js im <head>) */
+  :root.vt-zurueck::view-transition-old(root) {
+    animation: vt-aus 200ms ease-out both;
+  }
+  :root.vt-zurueck::view-transition-new(root) {
+    animation: vt-von-links 450ms cubic-bezier(0.22, 0.61, 0.36, 1) 100ms both;
+  }
+}
+
+@keyframes vt-aus { to { opacity: 0; } }
+@keyframes vt-von-rechts { from { opacity: 0; transform: translateX(4%); } }
+@keyframes vt-von-links { from { opacity: 0; transform: translateX(-4%); } }

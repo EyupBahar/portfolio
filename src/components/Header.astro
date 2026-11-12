@@ -1,8 +1,9 @@
 ---
 /**
  * Kopfzeile ohne JS: Logo + Wortmarke links, wenige Ziele rechts.
- * Bei vier Zielen braucht es kein Burger-Menü; unter 768 px fallen die beiden
- * Sprungmarken weg (Struktur, nicht Grösse), Lebenslauf und Sprache bleiben.
+ * Bei vier Zielen braucht es kein Burger-Menü; unter 768 px fällt die Sprungmarke „Kontakt" weg (Struktur,
+ * nicht Grösse). „Projekte" bleibt immer – seit specs/001-projekt-slider eine eigene Seite, die mobil sonst
+ * nur über „Alle Projekte" unter dem Slider erreichbar wäre (Joker 2026-11-12).
  * Logo (Joker, 2026-11-09): Zeichnung mit transparentem Grund (src/assets/logo.png) – sitzt randlos
  * auf --paper, kein Rahmen. Dekorativ (alt=""), der Name im selben Link benennt das Ziel.
  */
@@ -19,6 +20,9 @@ interface Props {
 const { lang, alternates } = Astro.props;
 const other: Lang = lang === 'de' ? 'en' : 'de';
 const home = routes.home[lang];
+// „Projekte" führt seit specs/001-projekt-slider auf die eigene Seite (vorher Sprungmarke der Startseite)
+const projekte = routes.projects[lang];
+const aufProjekteSeite = Astro.url.pathname === projekte;
 ---
 
 <header class="site-header">
@@ -39,7 +43,7 @@ const home = routes.home[lang];
     </a>
     <nav aria-label={t(lang, 'nav.label')}>
       <ul class="site-header__nav" role="list">
-        <li class="site-header__anchor"><a href={`${home}#${anchors[lang].projects}`}>{t(lang, 'nav.projects')}</a></li>
+        <li><a href={projekte} aria-current={aufProjekteSeite ? 'page' : undefined}>{t(lang, 'nav.projects')}</a></li>
         <li class="site-header__anchor"><a href={`${home}#${anchors[lang].contact}`}>{t(lang, 'nav.contact')}</a></li>
         <li><a href={profile.cv[lang]} type="application/pdf">{t(lang, 'nav.cv')}</a></li>
         <li>
@@ -48,8 +52,9 @@ const home = routes.home[lang];
             href={alternates[other]}
             hreflang={other === 'de' ? 'de-CH' : 'en'}
             lang={other === 'de' ? 'de-CH' : 'en'}
-            aria-label={t(lang, 'nav.switchLabel')}
-          >{t(lang, 'nav.switch')}</a>
+          >{t(lang, 'nav.switch')}<span class="visually-hidden">: {t(lang, 'nav.switchLabel')}</span></a>
+          {/* Kein aria-label: der zugängliche Name muss den sichtbaren Text enthalten (WCAG 2.5.3, axe
+              label-content-name-mismatch). Name jetzt „EN: English version". */}
         </li>
       </ul>
     </nav>
@@ -114,13 +119,28 @@ const home = routes.home[lang];
     transform-origin: left;
     transition: transform var(--dur-fast) var(--ease); /* raus: schnell */
   }
-  .site-header__nav a:focus-visible::after { transform: scaleX(1); transition-duration: var(--dur); }
+  .site-header__nav a:focus-visible::after,
+  .site-header__nav a[aria-current='page']::after { transform: scaleX(1); transition-duration: var(--dur); }
   @media (hover: hover) and (pointer: fine) {
     .site-header__nav a:hover::after { transform: scaleX(1); transition-duration: var(--dur); }
   }
   .site-header__lang {
     font-family: var(--font-mono);
     border: 1px solid var(--hairline-strong);
+  }
+
+  /* Unter 360 px passen Wortmarke + drei Ziele nicht in eine Zeile (gemessen 320 px DE: 36 px zu breit, seit
+   * „Projekte" mobil bleibt). Der Name wird dort nur visuell ausgeblendet – er bleibt der zugängliche Name des
+   * Logo-Links und steht direkt darunter gross im Hero. */
+  @media (max-width: 359px) {
+    .site-header__mark > span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 
   .site-header__anchor { display: none; }

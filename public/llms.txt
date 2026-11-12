@@ -5,6 +5,7 @@
 ## Deutsch
 
 - [Eyüp Bahar – Softwareentwickler](https://eyupbahar.com/startseite.md)
+- [Projekte](https://eyupbahar.com/projekte.md)
 - [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin.md)
 - [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen.md)
 - [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita.md)
@@ -16,6 +17,7 @@
 ## English
 
 - [Eyüp Bahar – Software Developer](https://eyupbahar.com/en.md)
+- [Projects](https://eyupbahar.com/en/projects.md)
 - [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin.md)
 - [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen.md)
 - [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita.md)

@@ -10,7 +10,6 @@ import '../styles/global.css';
 import '../styles/blocks/buton.css';
 import '../styles/blocks/animasyon.css';
 import '../styles/blocks/card.css';
-import '../styles/blocks/zeitstrahl.css';
 import '../styles/overrides.css';
 
 import Header from '../components/Header.astro';
@@ -97,6 +96,8 @@ const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');
     <script type="application/ld+json" set:html={jsonLd(person)} />
     <script type="application/ld+json" set:html={jsonLd(website)} />
     {schema.map((s) => <script type="application/ld+json" set:html={jsonLd(s)} />)}
+    <!-- Seitenspezifisches im <head>, z. B. /vt-ziel.js (Seitenübergänge, specs/001-projekt-slider) -->
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#main">{t(lang, 'skip')}</a>

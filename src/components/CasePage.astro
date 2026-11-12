@@ -9,8 +9,9 @@ import DeviceFrames from './DeviceFrames.astro';
 import { Icon } from 'astro-icon/components';
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { t, routes, anchors, type Lang } from '../i18n/ui';
+import { t, routes, type Lang } from '../i18n/ui';
 import { profile } from '../data/profile';
+import '../styles/uebergang.css';
 
 interface Props {
   lang: Lang;
@@ -62,7 +63,7 @@ const schema = [
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: profile.name, item: new URL(routes.home[lang], site).href },
-      { '@type': 'ListItem', position: 2, name: t(lang, 'nav.projects'), item: new URL(`${routes.home[lang]}#${anchors[lang].projects}`, site).href },
+      { '@type': 'ListItem', position: 2, name: t(lang, 'nav.projects'), item: new URL(routes.projects[lang], site).href },
       { '@type': 'ListItem', position: 3, name: p.title, item: pageUrl },
     ],
   },
@@ -78,7 +79,15 @@ const schema = [
 >
   <article class="case">
     <div class="container">
-      <a class="db-btn db-btn--cizgi case__back" href={`${routes.home[lang]}#${anchors[lang].projects}`}>
+      <!-- Zurück: standardmässig zur Projekte-Seite (Zeile dieses Projekts). Kam man vom Projekt-Slider der
+           Startseite, setzt das Skript unten das Ziel auf dessen Karte (specs/001-projekt-slider, FR-008). -->
+      <a
+        class="db-btn db-btn--cizgi case__back"
+        href={`${routes.projects[lang]}#projekt-${slug}`}
+        data-home={`${routes.home[lang]}#projekt-${slug}`}
+        data-home-pfad={routes.home[lang]}
+        data-home-label={t(lang, 'case.backHome')}
+      >
         <Icon name="ph:arrow-left" class="db-btn__icon db-btn__icon--lead case__back-icon" aria-hidden="true" />
         <span class="db-btn__label">{t(lang, 'case.back')}</span>
       </a>
@@ -143,6 +152,29 @@ const schema = [
     </div>
   </article>
 </BaseLayout>
+
+<script>
+  // Seitenübergänge (specs/001-projekt-slider): „Nächstes Projekt" ohne Morph
+  import { initUebergang } from '../scripts/uebergang';
+  initUebergang();
+
+  // Rückweg (specs/001-projekt-slider, FR-008): kam die Besucherin von der Startseite derselben Sprache
+  // (Projekt-Slider), führt „Zurück" zur Karte dieses Projekts dort. Sonst – und ohne Skript – zur
+  // Projekte-Seite. Referrer-Policy strict-origin-when-cross-origin liefert same-origin den vollen Pfad.
+  const back = document.querySelector<HTMLAnchorElement>('.case__back[data-home]');
+  if (back?.dataset.home && document.referrer) {
+    try {
+      const ref = new URL(document.referrer);
+      if (ref.origin === window.location.origin && ref.pathname === back.dataset.homePfad) {
+        back.href = back.dataset.home;
+        const label = back.querySelector('.db-btn__label');
+        if (label && back.dataset.homeLabel) label.textContent = back.dataset.homeLabel;
+      }
+    } catch {
+      // ungültiger Referrer – Standardziel bleibt
+    }
+  }
+</script>
 
 <style>
   .case { padding-block: clamp(1.5rem, 1rem + 2vw, 3rem) 0; }

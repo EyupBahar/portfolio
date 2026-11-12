@@ -1,21 +1,24 @@
 ---
 /**
  * Startseite – gleiche Struktur für DE und EN, nur die Sprache wechselt.
- * Reihenfolge aus DESIGN.md → opening_ritual: Hero (Name, Porträt, Buttons) → Kurzprofil →
- * Schwerpunkte → Stack → Projekte → Ablauf → CTA-Band → Kontakt.
+ * Reihenfolge aus DESIGN.md → opening_ritual: Hero (Name, Porträt, Buttons) → Kennzahlen → Kurzprofil →
+ * Schwerpunkte → Stack (Laufband) → Projekte → Ablauf → Kontakt (seit 2026-11-12 mit CTA in einem Panel).
  */
 import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from './Hero.astro';
+import Kennzahlen from './Kennzahlen.astro';
 import Facts from './Facts.astro';
 import Focus from './Focus.astro';
 import Stack from './Stack.astro';
-import ProjectList from './ProjectList.astro';
+import ProjectSlider from './ProjectSlider.astro';
 import Process from './Process.astro';
-import CtaBand from './CtaBand.astro';
 import Contact from './Contact.astro';
+import Messspur from './Messspur.astro';
 import { t, routes, type Lang } from '../i18n/ui';
 import { portrait } from '../data/portrait';
+import '../styles/uebergang.css';
 
 interface Props {
   lang: Lang;
@@ -28,6 +31,12 @@ const site = Astro.site ?? new URL('https://eyupbahar.com');
 const personImage = portrait
   ? new URL((await getImage({ src: portrait, width: 800, format: 'jpg' })).src, site).href
   : undefined;
+
+// Projekt-Slider (specs/001-projekt-slider): nur Projekte mit Live-Website und Desktop-Screenshot (Joker
+// 2026-11-12: „yalnız canlı siteler"). Die vollständige Liste steht auf /projekte/.
+const featured = (await getCollection('projects', (p) => p.id.startsWith(`${lang}/`)))
+  .filter((p) => p.data.liveUrl && p.data.cover)
+  .sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout
@@ -37,12 +46,62 @@ const personImage = portrait
   alternates={routes.home}
   personImage={personImage}
 >
+  <!-- Rücksprungziel der Seitenübergänge (#projekt-<slug>), klassisch im <head> – siehe public/vt-ziel.js -->
+  <script is:inline slot="head" src="/vt-ziel.js"></script>
+  <!-- Messfeld + Messspur (futuristic-design, Joker 2026-11-12; DESIGN.md → Signatur 7): die Seite ist ein
+       Messfeld – Spaltenlinien des Hero-Rasters laufen fest hinter allen Sektionen, unten die Skala. -->
+  <div class="messfeld" aria-hidden="true"></div>
+  <Messspur teil="schiene" />
   <Hero lang={lang} />
+  <Kennzahlen lang={lang} />
   <Facts lang={lang} />
   <Focus lang={lang} />
   <Stack lang={lang} />
-  <ProjectList lang={lang} />
+  <ProjectSlider lang={lang} items={featured} />
   <Process lang={lang} />
-  <CtaBand lang={lang} />
   <Contact lang={lang} />
 </BaseLayout>
+
+<script>
+  // Seitenübergang Slider-Karte → Fallstudie (specs/001-projekt-slider)
+  import { initUebergang } from '../scripts/uebergang';
+  initUebergang();
+</script>
+
+<style>
+  /* Messfeld: die Spaltenanfänge des Hero-Rasters (jede zweite Fuge) als feste, sehr leise Linien hinter
+   * der ganzen Seite – die Glas-Panels lassen sie leise durchscheinen (--glass). Mobil nur die
+   * beiden Inhaltskanten. Statisch; mit Scroll-Timeline erscheint es erst, wenn das Hero geht (das Hero
+   * hat sein eigenes, dichteres Raster). 100 % = Viewport (fest) bzw. eigene Breite (background-size). */
+  .messfeld {
+    --W: min(100% - 2 * var(--gutter), var(--container));
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: calc((100% - var(--W)) / 2);
+    width: var(--W);
+    border-inline: 1px solid var(--hairline-faint);
+    pointer-events: none;
+  }
+  @media (min-width: 768px) {
+    .messfeld {
+      border-left: 0;
+      background-image: linear-gradient(to right, var(--hairline-faint) 1px, transparent 1px);
+      background-size: calc((100% + var(--gap)) / 12) 100%;
+    }
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .messfeld {
+        animation-name: messfeld-ein;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root);
+        animation-range: 30svh 90svh;
+      }
+    }
+  }
+  @keyframes messfeld-ein { from { opacity: 0; } to { opacity: 1; } }
+</style>

@@ -1,5 +1,5 @@
 /**
- * Schwerpunkte der Startseite: drei statische Panels (keine Reihenfolge, keine Links).
+ * Schwerpunkte der Startseite: drei Wendekarten (keine Reihenfolge, keine Links) – vorn das Icon, hinten der Text.
  * Texte liegen in ui.ts unter `focus.<key>.title` / `focus.<key>.text`; hier nur Icon und
  * die Stack-Zeile (Belege: Fallstudien, Kurzprofil).
  * Icons: eigene Zeichnungen Joker (src/icons/, 2026-11-09); KI-Panel `ki` (Strich-Icon, Vorlage Joker 2026-11-10 als

@@ -1,0 +1,113 @@
+---
+/**
+ * Kennzahlen (Joker 2026-11-12, Krom-Umbau, Referenz „Digital Designer"): ein Glas-Panel direkt unter dem
+ * Hero, vier Zellen mit Hairline-Teilern (mobil 2 × 2). Nur belegte Zahlen (src/data/stats.ts); die Zahl
+ * der Fallstudien wird aus der Content-Collection gezählt. Zähler (Joker 2026-11-12 ausdrücklich, ersetzt
+ * „statisch"): design-blocks animasyon--sayac (src/scripts/sayac.js), sichtbar 0 → Wert in 1.8 s; im Markup
+ * steht der Endwert – ohne JS, bei Reduce und im GEO-Spiegel bleibt die Zahl so stehen.
+ * Semantik: <dl>, je Zelle dt (Bezeichnung) vor dd (Zahl); optisch steht die Zahl über der Bezeichnung
+ * (column-reverse), das Icon gehört zur Zahl und ist aria-hidden.
+ * Liegt eigenständig zwischen Hero und Kurzprofil (Facts.astro gehört dem Kurzprofil); kein
+ * Messspur-Segment – die Skala hat sechs Sektionen, das Panel gehört zum Hero-Abschluss.
+ */
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import { t, type Lang } from '../i18n/ui';
+import { stats } from '../data/stats';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const cases = (await getCollection('projects', (p) => p.id.startsWith(`${lang}/`))).length;
+
+const items = [
+  { icon: 'ph:calendar-check-light', value: stats.years, label: t(lang, 'stats.years') },
+  { icon: 'ph:buildings-light', value: stats.companies, label: t(lang, 'stats.companies') },
+  { icon: 'ph:folders-light', value: cases, label: t(lang, 'stats.cases') },
+  { icon: 'ph:translate-light', value: stats.languages, label: t(lang, 'stats.languages') },
+];
+---
+
+<section class="kennzahlen" aria-label={t(lang, 'stats.label')}>
+  <div class="container">
+    <dl class="panel kennzahlen__panel">
+      {items.map((i) => (
+        <div class="kennzahlen__zelle">
+          <dt class="kennzahlen__label">{i.label}</dt>
+          <dd class="kennzahlen__wert">
+            <Icon name={i.icon} class="kennzahlen__icon" aria-hidden="true" />
+            <span class="kennzahlen__zahl" data-db-count-to={i.value}>{i.value}</span>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<script>
+  import '../scripts/sayac.js';
+</script>
+
+<style>
+  /* Rückt unter das Hero-Ende (dessen Unterabstand ist eine volle --section-y): das Glas liegt über dem
+   * Auslauf des Porträts – dort hat das Glas etwas, das durchscheint. */
+  .kennzahlen {
+    margin-top: calc(-0.5 * var(--section-y));
+    padding-bottom: var(--section-y);
+  }
+
+  .kennzahlen__panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kennzahlen__zelle {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding: clamp(1.25rem, 0.9rem + 1.5vw, 2.25rem) 0.75rem;
+    text-align: center;
+  }
+  /* 2 × 2: Teiler zwischen den Spalten und zwischen den Zeilen */
+  .kennzahlen__zelle:nth-child(even) { border-left: 1px solid var(--hairline); }
+  .kennzahlen__zelle:nth-child(n + 3) { border-top: 1px solid var(--hairline); }
+
+  .kennzahlen__wert {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+  }
+  .kennzahlen__icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--ink-soft);
+  }
+  .kennzahlen__zahl {
+    font-size: clamp(2.5rem, 2.1rem + 1.6vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .kennzahlen__label {
+    max-width: 18ch;
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ab 768 px: vier nebeneinander, nur senkrechte Teiler */
+  @media (min-width: 768px) {
+    .kennzahlen__panel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .kennzahlen__zelle:nth-child(n) { border: 0; }
+    .kennzahlen__zelle + .kennzahlen__zelle { border-left: 1px solid var(--hairline); }
+  }
+</style>

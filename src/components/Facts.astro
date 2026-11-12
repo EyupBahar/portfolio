@@ -2,11 +2,19 @@
 /**
  * Kurzprofil als Fahrplan-Tafel (DESIGN.md → Signatur 3): <dl>, jede Zeile ein eigenes Panel mit Abstand
  * (Joker 2026-11-09: „gap ver" – vorher Fugen-Raster), Label in Mono mit eigenem Icon (src/icons/),
- * Wert in Grotesk. Ab 768 px zwei Spalten.
+ * Wert in Grotesk.
+ * Joker 2026-11-12: alle Angaben ausser KI sind stehende Karten (Label, Wert, Icon gross unten mittig – in
+ * allen Karten einer Reihe auf derselben Linie; vorher Icon klein über dem Label), ab
+ * 1024 px fünf nebeneinander; 360–1023 px zwei Spalten, der Standort über die ganze Breite. KI bleibt eine
+ * liegende Zeile über die ganze Breite, unter den Karten. Der Standort trägt statt des Icons die Karte des
+ * Kantons Bern (weiss, unten mittig, Mitte auf der Linie der Icons).
  * Bis zum Umbau stand die Tafel im Hero; seit dem Porträt hat sie ihr eigenes Panel.
  */
 import { Icon } from 'astro-icon/components';
-import { t, type Lang } from '../i18n/ui';
+import { t, anchors, type Lang } from '../i18n/ui';
+import KantonBern from './KantonBern.astro';
+import Messspur from './Messspur.astro';
+import Reveal from './Reveal.astro';
 import { profile } from '../data/profile';
 
 interface Props {
@@ -16,28 +24,60 @@ interface Props {
 const { lang } = Astro.props;
 
 const facts = [
-  { icon: 'location', label: t(lang, 'facts.location'), value: profile.region[lang] },
+  // Standort zeigt kein Icon: an seinem Platz steht die Kantonskarte (Joker 2026-11-12, „lokasyon logosunu kaldır").
+  { icon: 'location', label: t(lang, 'facts.location'), value: profile.region[lang], karte: true },
   { icon: 'now', label: t(lang, 'facts.now'), value: t(lang, 'facts.nowValue') },
   { icon: 'frontend', label: t(lang, 'facts.frontend'), value: t(lang, 'facts.frontendValue') },
   { icon: 'backend', label: t(lang, 'facts.backend'), value: t(lang, 'facts.backendValue') },
+  { icon: 'sprache', label: t(lang, 'facts.languages'), value: t(lang, 'facts.languagesValue') },
   // Kein eigenes KI-Icon vorhanden – Phosphor light als Platzhalter, bis Joker eines liefert.
   // Mehrere Punkte: als Liste, damit die Zelle lesbar bleibt (Quelle bleibt ein String in ui.ts).
-  { icon: 'ph:sparkle-light', label: t(lang, 'facts.ai'), value: t(lang, 'facts.aiValue').split(' · ') },
-  { icon: 'sprache', label: t(lang, 'facts.languages'), value: t(lang, 'facts.languagesValue') },
+  // Als einzige Angabe liegend über die ganze Breite, darum zuletzt (Joker 2026-11-12).
+  // Markenzeichen der genutzten Modelle (Joker 2026-11-12), simple-icons via Iconify. OpenAI ist seit
+  // simple-icons 16 aus der Sammlung entfernt (keine Freigabe von OpenAI, Issue #13944) – Iconify führt das
+  // Zeichen weiter; Joker 2026-11-12 in Kenntnis davon: Zeichen bleibt.
+  {
+    icon: 'ph:sparkle-light',
+    label: t(lang, 'facts.ai'),
+    value: t(lang, 'facts.aiValue').split(' · '),
+    zeile: true,
+    marken: [
+      { slug: 'claude', name: 'Claude' },
+      { slug: 'openai', name: 'OpenAI' },
+      { slug: 'googlegemini', name: 'Gemini' },
+    ],
+  },
 ];
 ---
 
-<section class="facts section" aria-labelledby="facts-title">
+<section class="facts section mess-bereich" id={anchors[lang].profile} aria-labelledby="facts-title">
+  <Messspur teil="segment" index={0} />
   <div class="container">
     <h2 class="section-title" id="facts-title">{t(lang, 'facts.label')}</h2>
     <dl class="facts__list">
       {facts.map((f) => (
-        <div class="facts__item panel">
-          <dt class="mono label-icon label-icon--lg"><Icon name={f.icon} aria-hidden="true" />{f.label}</dt>
+        <div class:list={['facts__item panel db-anim-reveal', f.zeile ? 'facts__item--zeile' : 'facts__item--karte', f.karte && 'facts__item--ort']}>
+          {f.zeile
+            ? <dt class="mono label-icon label-icon--lg"><Icon name={f.icon} aria-hidden="true" />{f.label}</dt>
+            : <dt class="mono">{f.label}</dt>}
           <dd>
             {Array.isArray(f.value)
               ? <ul class="facts__sublist">{f.value.map((v) => <li>{v}</li>)}</ul>
-              : f.value}
+              : <span>{f.value}</span>}
+            {!f.zeile && (
+              f.karte
+                ? <span class="facts__symbol facts__symbol--karte" aria-hidden="true"><KantonBern /></span>
+                : <span class="facts__symbol" aria-hidden="true"><Icon name={f.icon} /></span>
+            )}
+            {f.marken && (
+              <ul class="facts__marken" role="list">
+                {f.marken.map((m) => (
+                  <li class={`facts__marke facts__marke--${m.slug}`}>
+                    <Icon name={`simple-icons:${m.slug}`} aria-hidden="true" /><span class="visually-hidden">{m.name}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </dd>
         </div>
       ))}
@@ -45,22 +85,81 @@ const facts = [
   </div>
 </section>
 
+<!-- Reveal der Kurzprofil-Zeilen (früher über das Skript in ProjectList; specs/001-projekt-slider) -->
+<Reveal />
+
 <style>
   .facts__list {
+    /* Mass der Karten-Icons (unten mittig); die Kantonskarte rechnet davon */
+    --symbol: clamp(3.5rem, 2.9rem + 1.3vw, 4.5rem);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--panel-gap);
   }
-  .facts__item {
+  /* Stehende Karte: Label, Wert, unten das Icon. Innenabstand knapper als --panel-pad, sonst bleiben
+   * bei fünf Spalten (1024 px) keine 140 px für „Webentwicklung,". */
+  .facts__item--karte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(1rem, 0.85rem + 0.6vw, 1.5rem);
+  }
+  /* Icon unten mittig, gross, in allen Karten einer Reihe auf derselben Linie (Joker 2026-11-12: „logoları
+   * aşağı ortaya al, büyüt, hizala"; vorher 2.25rem über dem Label). Die Karten einer Rasterzeile sind gleich
+   * hoch, der Wert füllt die Karte (flex: 1), das Icon sitzt mit margin-top: auto am Boden. Es steht im dd
+   * (im dl-Gruppen-div sind nur dt/dd erlaubt), aria-hidden – das Label im dt trägt die Bedeutung.
+   * Gebrochenes Weiss der Seite (Joker „beyaz"; tokens.css: kein #fff). Label und Wert bleiben links. */
+  .facts__item--karte dd {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .facts__symbol {
+    display: block;
+    align-self: center;
+    margin-top: auto;
+    padding-top: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    color: var(--ink);
+  }
+  .facts__symbol > :global(svg) {
+    width: var(--symbol);
+    height: var(--symbol);
+  }
+  /* Standort: statt des Orts-Icons die Kantonskarte (Joker 2026-11-12: „lokasyon logosunu kaldır, haritayı
+   * beyaz yap, logolarla kartın ortasına ortala"). Der Platz ist derselbe wie bei den Icons (--symbol), die
+   * Karte ist 1.5 × so breit und ragt gleichmässig darüber hinaus: Mitte auf derselben Linie wie die Icons
+   * der Nachbarkarten, Karte bleibt lesbar. Höhe der Karte = Breite × 188/200 → senkrecht −0.205, waagrecht
+   * −0.25 × --symbol (nach unten ragt sie 0.205 × --symbol in den Innenabstand, der ist grösser). */
+  .facts__symbol--karte > :global(.kanton) {
+    width: calc(var(--symbol) * 1.5);
+    height: auto; /* die Icon-Regel oben setzt height: --symbol – sonst wird der Kasten flach, Mitte rutscht hoch */
+    max-width: none;
+  }
+  /* Ausrichten auf die Icon-Linie nur in der Fünferreihe; darunter steht der Standort allein in seiner Zeile
+   * und die Karte sitzt ganz im Innenabstand (sonst 6 px bis zur Kante, gemessen 390). */
+  @media (min-width: 1024px) {
+    .facts__symbol--karte {
+      box-sizing: content-box; /* padding-top wie bei den Icons ausserhalb des Platzes, sonst sässe die Karte höher */
+      width: var(--symbol);
+      height: var(--symbol);
+    }
+    .facts__symbol--karte > :global(.kanton) {
+      margin: calc(var(--symbol) * -0.205) calc(var(--symbol) * -0.25);
+    }
+  }
+  /* Liegende Zeile (KI) – das bisherige Mass der Tafel. */
+  .facts__item--zeile {
     display: grid;
     grid-template-columns: 9rem minmax(0, 1fr);
     gap: 1rem;
     align-items: center;
     padding: 0.9rem var(--panel-pad);
+    grid-column: 1 / -1;
   }
   .facts__item dt { color: var(--ink-soft); }
-  /* Kurzprofil-Icons grösser als der gemeinsame Slot (Joker 2026-11-09); Kontakt bleibt 1.75rem.
-   * :global, weil das SVG aus astro-icon stammt; schlägt global.css .label-icon--lg > svg (0-1-1). */
+  /* KI-Zeile: Icon neben dem Label, grösser als der gemeinsame Slot (Joker 2026-11-09); Kontakt bleibt
+   * 1.75rem. :global, weil das SVG aus astro-icon stammt; schlägt global.css .label-icon--lg > svg (0-1-1). */
   .facts__item dt > :global(svg) {
     width: 2.25rem;
     height: 2.25rem;
@@ -76,11 +175,45 @@ const facts = [
   }
   .facts__sublist li + li { margin-top: 0.35rem; }
 
+  /* KI: Markenzeichen unter der Liste, ab 768 px rechts daneben. */
+  .facts__item--zeile dd {
+    display: grid;
+    gap: 1rem;
+    align-items: center;
+  }
+  .facts__marken {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 0.8rem + 1vw, 1.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .facts__marke > :global(svg) {
+    display: block;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  /* Markenfarben wie im Stack-Laufband (simple-icons `hex` 16.37); OpenAI zeichnet schwarz/weiss → --ink.
+   * Kontrast auf dem Glas-Panel: Claude 5.2:1, Gemini 4.1:1 (Grafik, Schwelle 3:1). */
+  .facts__marke--claude { color: #d97757; }
+  .facts__marke--openai { color: var(--ink); }
+  .facts__marke--googlegemini { color: #8e75b2; }
+
   @media (max-width: 479px) {
     /* Schmale Telefone: Label über dem Wert, sonst bleibt dem Wert zu wenig Breite */
-    .facts__item { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; }
+    .facts__item--zeile { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; }
+  }
+  /* Zwei Spalten ab 360 px: darunter bleiben einer Karte keine 110 px für „Webentwicklung,". */
+  @media (min-width: 360px) {
+    .facts__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .facts__item--ort { grid-column: 1 / -1; }
   }
   @media (min-width: 768px) {
-    .facts__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .facts__item--zeile dd { grid-template-columns: minmax(0, 1fr) auto; gap: 2rem; }
+  }
+  @media (min-width: 1024px) {
+    .facts__list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .facts__item--ort { grid-column: auto; }
   }
 </style>

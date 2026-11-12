@@ -16,8 +16,8 @@ const year = new Date().getFullYear();
     <p>© {year} {profile.name}</p>
     <ul class="site-footer__links" role="list">
       <li><a href={routes.privacy[lang]}>{t(lang, 'footer.privacy')}</a></li>
-      <li><a class="label-icon" href={profile.github.url} rel="noopener noreferrer"><Icon name="ph:github-logo-light" aria-hidden="true" />GitHub</a></li>
-      <li><a class="label-icon" href={profile.linkedin.url} rel="noopener noreferrer"><Icon name="ph:linkedin-logo-light" aria-hidden="true" />LinkedIn</a></li>
+      <li><a class="site-footer__kachel" href={profile.github.url} rel="noopener noreferrer" aria-label="GitHub"><Icon name="ph:github-logo-light" aria-hidden="true" /></a></li>
+      <li><a class="site-footer__kachel" href={profile.linkedin.url} rel="noopener noreferrer" aria-label="LinkedIn"><Icon name="ph:linkedin-logo-light" aria-hidden="true" /></a></li>
     </ul>
   </div>
 </footer>
@@ -38,7 +38,8 @@ const year = new Date().getFullYear();
   .site-footer__links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 1rem;
+    align-items: center;
+    gap: 0.5rem 1rem;
   }
   .site-footer__links a {
     display: inline-flex;
@@ -46,7 +47,20 @@ const year = new Date().getFullYear();
     min-height: 2.75rem;
     text-decoration: none;
   }
+  /* GitHub/LinkedIn als Hairline-Kachel (Joker 2026-11-12, Referenz „Digital Designer"): 44 px Ziel,
+   * Name als aria-label; Hover = Rahmen und Zeichen im Indikator Stahlblau */
+  .site-footer__links .site-footer__kachel {
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--hairline-strong);
+    color: var(--ink);
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  }
+  .site-footer__kachel :global(svg) { width: 1.25rem; height: 1.25rem; }
   @media (hover: hover) and (pointer: fine) {
     .site-footer__links a:hover { color: var(--ink); text-decoration: underline; }
+    .site-footer__links .site-footer__kachel:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
   }
+  .site-footer__kachel:focus-visible { color: var(--accent); }
 </style>

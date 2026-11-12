@@ -11,6 +11,8 @@ liveUrl: https://www.zweiradgisin.ch
 cover: ../../../assets/projects/zweirad-gisin.webp
 coverAlt: zweiradgisin.ch home page with e-bike hero and navigation
 coverMobile: ../../../assets/projects/zweirad-gisin-mobile.webp
+screenFull: ../../../assets/projects/zweirad-gisin-full.webp
+screenFullMobile: ../../../assets/projects/zweirad-gisin-full-mobile.webp
 order: 1
 ---
 

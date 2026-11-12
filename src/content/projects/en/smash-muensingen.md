@@ -11,6 +11,8 @@ liveUrl: https://smash-muensingen.vercel.app
 cover: ../../../assets/projects/smash-muensingen.webp
 coverAlt: SMASH Münsingen home page looking into the tennis hall
 coverMobile: ../../../assets/projects/smash-muensingen-mobile.webp
+screenFull: ../../../assets/projects/smash-muensingen-full.webp
+screenFullMobile: ../../../assets/projects/smash-muensingen-full-mobile.webp
 order: 2
 ---
 

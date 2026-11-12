@@ -1,11 +1,29 @@
 ---
 /**
- * Eröffnung (Joker 2026-11-09, Umbau „Schalttafel"): Name + Rolle + Lead + Buttons links,
- * rechts das Porträt als quadratisches Panel (Hairline-Rahmen, flach, kein Schatten).
+ * Eröffnung (Joker 2026-11-09, Umbau „Schalttafel"): Name + Rolle + Lead + Buttons links.
  * Fehlt die Porträtdatei (src/data/portrait.ts), steht der Name allein über die ganze Breite.
  * Ladebewegung: design-blocks animasyon--giris (die direkten Kinder kommen gestaffelt).
  * Das Kurzprofil steht seit dem Umbau in Facts.astro direkt darunter.
+ *
+ * Fugen-Raster v2 (Joker 2026-11-12, futuristic-design; DESIGN.md → Signatur 6): das Porträt ist kein
+ * Panel mehr, sondern der Grund des ganzen Hero. Ein Raster beginnt an der Textkante und endet im
+ * Bild; das Foto wird über vier Rasterzellen in einer weichen Rampe deckend (Joker: „soft"; vorher
+ * harte Stufen). Unter dem Text steht es höchstens bei ~15 %.
+ * Ab 1024 px liegt das Foto hinter dem Text (Gesicht rechts davon, weil es im Original bei 36 % der
+ * Breite sitzt – flächig gestreckt läge es unter dem Lead); darunter steht es als randloses Band
+ * zwischen Titel und Lead und die Stufen laufen von oben (vom Titel her) ins Bild.
+ * Beim Laden öffnen sich die Stufen in Leserichtung (Vorhang je Rasterspalte bzw. -zeile); ab 1280 px
+ * laufen danach Fugen-Signale (Stahlblau) vom Text her ins Bild. Nur transform/opacity, kein JS;
+ * unter prefers-reduced-motion steht alles still im Ruhezustand.
+ *
+ * Krom (Joker 2026-11-12, Referenz „Digital Designer"; DESIGN.md → Signatur 10 „Sabit ışık"): die Rolle ist
+ * der grosse Titel – schmale Archivo in Grossbuchstaben, Fläche Stahl (.krom, global.css), der Name steht
+ * klein darüber. Ab 1024 px ein feiner Bogen um das Porträt mit einem Stern: das ist die Lichtquelle, an der
+ * der Krom-Stahl (am Bildschirm festgemacht) beim ersten Bild seinen hellsten Punkt hat. Das „Available
+ * for" der Referenz (rechts unten) fehlt bewusst: dort liegt bei 1024–1920 px überall Foto, Text kam auf
+ * 1.3–4.1:1 (gemessen 2026-11-12); „Aktuell" steht gleich darunter im Kurzprofil.
  */
+import '@fontsource-variable/archivo/wdth.css';
 import { Image } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import { t, type Lang } from '../i18n/ui';
@@ -17,28 +35,57 @@ interface Props {
 }
 
 const { lang } = Astro.props;
+
+/* Vorhang: eine Bahn je Rasterspalte (Desktop) bzw. -zeile (mobil). 28 decken bis 2560 px; die letzte
+ * Bahn füllt den Rest, damit auch breitere Fenster beim Laden nicht aufblitzen. */
+const bahnen = Array.from({ length: 28 }, (_, i) => i);
+
+/* Rolle als Krom-Titel: „Softwareentwickler" darf nur an der Wortfuge trennen (weiches Trennzeichen, nur
+ * hier – ui.ts hero.role bleibt unverändert für Titel, JSON-LD, OG). EN trennt am Leerzeichen. */
+const rolle = t(lang, 'hero.role').replace(/^Software(?=\S)/, 'Software­');
 ---
 
 <section class="hero" aria-labelledby="hero-title">
   <div class:list={['container', 'hero__grid', 'db-anim-giris', { 'hero__grid--portrait': !!portrait }]}>
     <h1 class="hero__title" id="hero-title">
-      {profile.name}
-      <span class="hero__role">{t(lang, 'hero.role')}</span>
+      <span class="hero__name">{profile.name}</span>
+      <span class="hero__role krom">{rolle}</span>
     </h1>
 
     {portrait && (
-      <figure class="hero__portrait panel">
-        <Image
-          src={portrait}
-          alt={t(lang, 'hero.portraitAlt')}
-          widths={[400, 560, 720, 1120]}
-          sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1279px) 40vw, 560px"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          quality={80}
-        />
-      </figure>
+      <div class="hero__visual">
+        <div class="hero__raster" aria-hidden="true"><span class="hero__fugen"></span></div>
+        <div class="hero__bild">
+          <div class="hero__foto">
+            <Image
+              src={portrait}
+              alt={t(lang, 'hero.portraitAlt')}
+              widths={[480, 720, 960, 1254]}
+              sizes="(max-width: 1023px) 100vw, 75vw"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              quality={80}
+            />
+            <div class="hero__vorhang" aria-hidden="true">
+              {bahnen.map(() => <span class="bahn"></span>)}
+            </div>
+          </div>
+        </div>
+        <div class="hero__signale" aria-hidden="true">
+          <span class="signal"></span>
+          <span class="signal"></span>
+        </div>
+        {/* Bogen + Stern zuletzt: über dem Foto, unter dem Text (das ganze Visual liegt auf z-index −1) */}
+        <div class="hero__orbit" aria-hidden="true">
+          <svg class="hero__bogen" viewBox="0 0 200 200" focusable="false">
+            <path d="M 14.3 50.5 A 99 99 0 0 1 149.5 14.3" />
+          </svg>
+          <svg class="hero__stern" viewBox="0 0 24 24" focusable="false">
+            <path d="M12 0c.6 6.2 5.8 11.4 12 12-6.2.6-11.4 5.8-12 12-.6-6.2-5.8-11.4-12-12C6.2 11.4 11.4 6.2 12 0Z" />
+          </svg>
+        </div>
+      </div>
     )}
 
     <p class="hero__lead">{t(lang, 'hero.lead')}</p>
@@ -61,7 +108,12 @@ const { lang } = Astro.props;
 </section>
 
 <style>
+  /* Container für die Rasterrechnung (cqi = Sektionsbreite ohne Scrollleiste); isolation hält das
+   * Bild (z-index −1) über dem Seitengrund und unter dem Text. */
   .hero {
+    position: relative;
+    isolation: isolate;
+    container-type: inline-size;
     padding-block: clamp(2.5rem, 1.5rem + 4vw, 6rem) var(--section-y);
   }
 
@@ -69,37 +121,346 @@ const { lang } = Astro.props;
   .hero .db-anim-giris { max-width: none; }
 
   .hero__grid {
+    --row-gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    gap: var(--row-gap);
   }
 
-  .hero__title {
-    font-size: var(--step-display);
-    font-weight: 600;
-    line-height: 0.95;
-    letter-spacing: -0.035em;
-  }
-  .hero__role {
+  /* Name klein über der Rolle; die Rolle ist der Krom-Titel (Schrift, Stahl, Grossbuchstaben: .krom).
+   * Grösse eigene Skala: schmale Schrift trägt mehr als --step-display, Decke bleibt 88 px (Display-Tavan,
+   * frontend-design §2). Zwei Zeilen gewollt (Referenz). Name 600: als Namensschild, nicht als Lead-Anfang
+   * (Review 2026-11-12). */
+  .hero__name {
     display: block;
-    margin-top: 0.4em;
+    margin-bottom: 0.6rem;
     font-size: var(--step-3);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.01em;
-    color: var(--ink-soft);
+  }
+  /* min-content: Kasten = längste Zeile – zwingt die Trennung an der Wortfuge (DE weiches Trennzeichen,
+   * EN Leerzeichen) und hält jeden Buchstaben im Kasten (background-clip: text malt nur im Kasten;
+   * mit max-width in ch fiel das letzte R von ENTWICKLER heraus, gemessen 1440). */
+  .hero__role {
+    display: block;
+    width: min-content;
+    max-width: 100%;
+    padding-inline-end: 0.04em;
+    font-size: clamp(3.25rem, 2.2rem + 4.3vw, 5.5rem);
+  }
+  /* ab 1024 px breiter (wdth 80 statt 62): bei 62 war der Titel schmaler als der Lead daneben und ging
+   * unter (Review 2026-11-12); 80 bringt ENTWICKLER ungefähr auf Lead-Breite. */
+  @media (min-width: 1024px) {
+    .hero__role { font-stretch: 80%; }
   }
 
-  /* Porträt-Panel: quadratisch, das Bild füllt den Rahmen (CLS: Fläche steht vor dem Laden) */
-  .hero__portrait {
-    margin: 0;
-    aspect-ratio: 1;
-    overflow: hidden;
+  /* Bogen + Stern (ab 1024 px): feiner Kreis um den Kopf, links ins Foto ausgeblendet; der Stern sitzt
+   * auf 2 Uhr und ist die Lichtquelle des Krom-Stahls (tokens.css --krom, Licht bei 82 % / 22 %). */
+  .hero__orbit { display: none; }
+
+  /* — Fugen-Raster v2 (DESIGN.md → Signatur 6) —
+   * --zelle: mobil ein Zwölftel der Inhaltsbreite samt Gap, ab 768 px eine halbe Rasterspalte samt
+   * Gap – jede zweite Fuge liegt dann auf einem Spaltenanfang, die erste auf der Textkante (--L). */
+  .hero__visual {
+    --W: min(100cqi - 2 * var(--gutter), var(--container));
+    --L: calc((100cqi - var(--W)) / 2);
+    --zelle: calc((var(--W) + var(--row-gap)) / 12);
+    position: relative;
+    z-index: -1;
+    /* mobil: randloses Band, beginnt direkt unter dem Titel (unter der Rolle lag die 10-%-Stufe mit
+     * Fugen → 3.83:1 bei 390 px, gemessen); unten reicht eine Zelle unter den Lead */
+    margin-inline: calc(-1 * var(--gutter));
+    margin-block: calc(-1 * var(--row-gap)) calc(-1 * (var(--zelle) + var(--row-gap)));
+    /* 5:4 statt 1:1 (seit dem Krom-Titel, zwei Zeilen): bei 1:1 lag der Lebenslauf bei 390×844 am Falz
+     * unter der Messspur (Review 2026-11-12). Das quadratische Foto wird unten beschnitten (Arme). */
+    aspect-ratio: 5 / 4;
   }
-  .hero__portrait :global(img) {
+
+  .hero__bild,
+  .hero__foto {
+    position: absolute;
+    inset: 0;
+  }
+  .hero__bild { overflow: hidden; }
+
+  /* Foto: mobil quadratisch über die volle Breite */
+  .hero__foto :global(img) {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  /* Rampe: mobil von oben (Titel) her weich über zwei Zellen, dann voll; unten weich in den Lead.
+   * Ohne Masken-Unterstützung steht das Foto voll da (Titel und Lead liegen dann auf ihm). */
+  .hero__bild {
+    -webkit-mask-image: linear-gradient(to bottom,
+      transparent,
+      rgb(0 0 0 / 0.06) calc(0.5 * var(--zelle)),
+      rgb(0 0 0 / 0.25) var(--zelle),
+      rgb(0 0 0 / 0.56) calc(1.5 * var(--zelle)),
+      #000 calc(2 * var(--zelle)) calc(100% - 3 * var(--zelle)),
+      transparent);
+    mask-image: linear-gradient(to bottom,
+      transparent,
+      rgb(0 0 0 / 0.06) calc(0.5 * var(--zelle)),
+      rgb(0 0 0 / 0.25) var(--zelle),
+      rgb(0 0 0 / 0.56) calc(1.5 * var(--zelle)),
+      #000 calc(2 * var(--zelle)) calc(100% - 3 * var(--zelle)),
+      transparent);
+  }
+
+  /* Fugen: mobil vom Titel her (zwei Zellen über dem Bild) bis in die obere Bildhälfte */
+  .hero__raster {
+    position: absolute;
+    top: calc(-2 * var(--zelle));
+    right: 0;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom,
+      transparent, #000 calc(2 * var(--zelle)), #000 calc(3 * var(--zelle)), transparent calc(6 * var(--zelle)));
+    mask-image: linear-gradient(to bottom,
+      transparent, #000 calc(2 * var(--zelle)), #000 calc(3 * var(--zelle)), transparent calc(6 * var(--zelle)));
+  }
+  .hero__fugen {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--hairline) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--hairline) 1px, transparent 1px);
+    background-size: var(--zelle) var(--zelle);
+    background-position: var(--gutter) 0;
+  }
+
+  /* Vorhang: Papierbahnen über dem Foto, im Ruhezustand unsichtbar; mobil eine Bahn je Rasterzeile */
+  .hero__vorhang {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+  }
+  .bahn {
+    flex: none;
+    height: var(--zelle);
+    background: var(--paper);
+    opacity: 0;
+  }
+  .bahn:last-child { flex: 1 0 auto; }
+
+  .hero__signale { display: none; }
+
+  /* ab 768 px: Zelle = halbe Rasterspalte samt Gap (jede zweite Fuge auf einem Spaltenanfang);
+   * 768–1023 Band 3:2, Haaransatz knapp unter der zweiten Stufe (Zeilen-Zelle sonst ~61 px →
+   * die 40-%-Kante lief quer durchs Haar, gemessen 768); 3:2 statt 4:3 hält die erste Taste im
+   * ersten Bildschirm (768×1024) */
+  @media (min-width: 768px) {
+    .hero__grid { --row-gap: clamp(1.75rem, 1rem + 1.5vw, 2.75rem); }
+    .hero__visual {
+      --zelle: calc((var(--W) + var(--gap)) / 24);
+      aspect-ratio: 3 / 2;
+    }
+    .hero__foto :global(img) { transform: translateY(-6%); }
+  }
+
+  /* — ab 1024 px: das Foto ist der Grund des Hero —
+   * --k = Rasterzelle, an der das Foto beginnt. Die Buttons sind rem-breit und reichen bei 1024 px
+   * bis Zelle 11.7, bei 1440 px nur bis 8.2 – deshalb hier 10, ab 1280 px 8: Text liegt so überall
+   * auf ≤ 14 %, die Schulter erst ab der 28-%-Stufe. Das Bild ist quadratisch, mindestens so hoch
+   * wie das Hero und so breit, dass es bis an den rechten Rand reicht. */
+  @media (min-width: 1024px) {
+    .hero { min-height: min(50rem, 100svh - 4rem); }
+
+    .hero__visual {
+      --k: 10;
+      --p: calc(var(--L) + var(--k) * var(--zelle));
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      aspect-ratio: auto;
+    }
+
+    .hero__foto :global(img) {
+      left: var(--p);
+      width: auto;
+      height: max(100% / 0.94, 100cqi - var(--p));
+    }
+
+    /* Weiche Rampe über vier Zellen, Stützpunkte alle halbe Zelle (≈ t^2.6), voll ab p + 4 Zellen.
+     * Harte Stufen (v2, 6/14/28/55 %) schnitten das helle Shirt in Streifen – Joker 2026-11-12:
+     * „geçiş daha soft olsun". Text liegt bei 1024/1280/1440 auf ≤ 15 %; gemessen am Original sitzt
+     * der Haaransatz bei 23.5 %, die Schulter bei 11 % der Bildbreite (Kopf ab p + 4.3 Zellen). */
+    .hero__bild {
+      -webkit-mask-image: linear-gradient(to right,
+        transparent var(--p),
+        rgb(0 0 0 / 0.01) calc(var(--p) + 0.5 * var(--zelle)),
+        rgb(0 0 0 / 0.03) calc(var(--p) + var(--zelle)),
+        rgb(0 0 0 / 0.08) calc(var(--p) + 1.5 * var(--zelle)),
+        rgb(0 0 0 / 0.16) calc(var(--p) + 2 * var(--zelle)),
+        rgb(0 0 0 / 0.3) calc(var(--p) + 2.5 * var(--zelle)),
+        rgb(0 0 0 / 0.47) calc(var(--p) + 3 * var(--zelle)),
+        rgb(0 0 0 / 0.7) calc(var(--p) + 3.5 * var(--zelle)),
+        #000 calc(var(--p) + 4 * var(--zelle)));
+      mask-image: linear-gradient(to right,
+        transparent var(--p),
+        rgb(0 0 0 / 0.01) calc(var(--p) + 0.5 * var(--zelle)),
+        rgb(0 0 0 / 0.03) calc(var(--p) + var(--zelle)),
+        rgb(0 0 0 / 0.08) calc(var(--p) + 1.5 * var(--zelle)),
+        rgb(0 0 0 / 0.16) calc(var(--p) + 2 * var(--zelle)),
+        rgb(0 0 0 / 0.3) calc(var(--p) + 2.5 * var(--zelle)),
+        rgb(0 0 0 / 0.47) calc(var(--p) + 3 * var(--zelle)),
+        rgb(0 0 0 / 0.7) calc(var(--p) + 3.5 * var(--zelle)),
+        #000 calc(var(--p) + 4 * var(--zelle)));
+    }
+    /* Kante zur Kopfzeile und Auslauf in das Kurzprofil (ab 55 %: bei 62 % stand das helle Shirt
+     * noch dicht über der Kurzprofil-Überschrift, Review 2026-11-12) */
+    .hero__foto {
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--zelle), #000 55%, transparent 97%);
+      mask-image: linear-gradient(to bottom, transparent, #000 var(--zelle), #000 55%, transparent 97%);
+    }
+    /* Fugen: von der Textkante her eingeblendet, voll auf jeder Stufengrenze (die Fuge erklärt die
+     * Kante), zwei Zellen ins volle Bild, dann aus – das Gesicht bleibt frei */
+    .hero__raster {
+      top: 0;
+      -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+      mask-image: linear-gradient(to bottom, #000 60%, transparent);
+    }
+    .hero__fugen {
+      background-position: var(--L) 0;
+      -webkit-mask-image: linear-gradient(to right,
+        transparent var(--L),
+        rgb(0 0 0 / 0.35) var(--p),
+        #000 calc(var(--p) + 2 * var(--zelle)),
+        #000 calc(var(--p) + 4 * var(--zelle)),
+        transparent calc(var(--p) + 6 * var(--zelle)));
+      mask-image: linear-gradient(to right,
+        transparent var(--L),
+        rgb(0 0 0 / 0.35) var(--p),
+        #000 calc(var(--p) + 2 * var(--zelle)),
+        #000 calc(var(--p) + 4 * var(--zelle)),
+        transparent calc(var(--p) + 6 * var(--zelle)));
+    }
+
+    /* Vorhang: eine Bahn je Rasterspalte, ab der ersten Stufe */
+    .hero__vorhang {
+      left: var(--p);
+      flex-direction: row;
+    }
+    .bahn {
+      width: var(--zelle);
+      height: auto;
+    }
+
+    /* Mittelpunkt = Gesicht (gemessen: p + 6.5 Zellen waagrecht, ~32 % der Hero-Höhe senkrecht), Radius
+     * 32 % der Hero-Höhe: der Bogen läuft mit Abstand über den Kopf. translate = statische Zentrierung,
+     * keine Animation. (Vorher Mittelpunkt auf der Brust → Bogen schnitt bei 1024 den Haaransatz.) */
+    .hero__orbit {
+      display: block;
+      position: absolute;
+      top: 32%;
+      left: calc(var(--p) + 6.5 * var(--zelle));
+      height: 64%;
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      pointer-events: none;
+      -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 62%);
+      mask-image: linear-gradient(to right, transparent 20%, #000 62%);
+    }
+    .hero__bogen {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    /* Ein Bogen von 10 bis 1 Uhr, der im Stern endet (expliziter Pfad: Kreis + dasharray mit
+     * non-scaling-stroke zerfiel in Bruchstücke, Review 2026-11-12). Links blendet die Maske ihn ins Foto. */
+    .hero__bogen path {
+      fill: none;
+      stroke: rgb(216 220 227 / 0.5);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+    /* 1 Uhr = Pfadende (149.5 / 14.3 von 200) – dort ist das Foto dunkel (bei 2 Uhr lag der Stern auf dem
+     * hellen Schild und verschwand, gemessen 1440). Der Stern sitzt mittig auf dem Ende der Linie. */
+    .hero__stern {
+      position: absolute;
+      left: 74.75%;
+      top: 7.15%;
+      width: 1.5rem;
+      height: 1.5rem;
+      margin: -0.75rem 0 0 -0.75rem;
+      fill: var(--ink);
+    }
+  }
+
+  /* ab 1280 px: Lead schmaler (6 Spalten) → Foto zwei Zellen früher; Signale in der Bahn über dem
+   * Titel und unter den Buttons, vom Textende her ins Bild */
+  @media (min-width: 1280px) {
+    .hero__visual { --k: 8; }
+
+    .hero__signale {
+      display: block;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .signal {
+      position: absolute;
+      left: calc(var(--p) + 2 * var(--zelle));
+      width: var(--zelle);
+      height: 2px;
+      margin-top: -1px;
+      background: var(--accent);
+      opacity: 0;
+    }
+    .signal:nth-child(1) { top: var(--zelle); }
+    .signal:nth-child(2) { top: calc(11 * var(--zelle)); }
+  }
+
+  /* — Bewegung — einmal: die Stufen öffnen in Leserichtung; dann Fugen-Signale vom Text ins Bild */
+  @media (prefers-reduced-motion: no-preference) {
+    .bahn { animation: bahn-auf 0.6s var(--ease) 0.2s backwards; }
+    /* nur „from": jede Bahn endet unsichtbar, die Stufe darunter bleibt */
+    @keyframes bahn-auf { from { opacity: 1; } }
+
+    .bahn:nth-child(2)  { animation-delay: 0.24s; }
+    .bahn:nth-child(3)  { animation-delay: 0.28s; }
+    .bahn:nth-child(4)  { animation-delay: 0.32s; }
+    .bahn:nth-child(5)  { animation-delay: 0.36s; }
+    .bahn:nth-child(6)  { animation-delay: 0.40s; }
+    .bahn:nth-child(7)  { animation-delay: 0.44s; }
+    .bahn:nth-child(8)  { animation-delay: 0.48s; }
+    .bahn:nth-child(9)  { animation-delay: 0.52s; }
+    .bahn:nth-child(10) { animation-delay: 0.56s; }
+    .bahn:nth-child(11) { animation-delay: 0.60s; }
+    .bahn:nth-child(12) { animation-delay: 0.64s; }
+    .bahn:nth-child(13) { animation-delay: 0.68s; }
+    .bahn:nth-child(14) { animation-delay: 0.72s; }
+    .bahn:nth-child(15) { animation-delay: 0.76s; }
+    .bahn:nth-child(16) { animation-delay: 0.80s; }
+    .bahn:nth-child(17) { animation-delay: 0.84s; }
+    .bahn:nth-child(18) { animation-delay: 0.88s; }
+    .bahn:nth-child(n + 19) { animation-delay: 0.92s; }
+
+    /* Ein Signal alle 10.5 s (jede Bahn alle 21 s), Lauf 2.5 s; erlischt im Bild */
+    @media (min-width: 1280px) {
+      .signal {
+        animation: fugen-signal 21s linear infinite;
+        animation-delay: 1.6s;
+      }
+      .signal:nth-child(2) { animation-delay: 12.1s; }
+    }
+    @keyframes fugen-signal {
+      0%   { transform: translateX(0); opacity: 0; }
+      1.5% { opacity: 1; }
+      8.5% { opacity: 1; }
+      12%  { transform: translateX(calc(4 * var(--zelle))); opacity: 0; }
+      100% { transform: translateX(calc(4 * var(--zelle))); opacity: 0; }
+    }
   }
 
   .hero__lead {
@@ -113,7 +474,8 @@ const { lang } = Astro.props;
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-  /* Sekundär-Buttons in Tinte, nur der Lebenslauf trägt den Akzent (eine gefüllte Taste pro Viewport) */
+  /* Sekundär-Buttons gerahmt in Silber, der Lebenslauf ist die eine gefüllte Taste (Silber seit 2026-11-12,
+   * overrides.css §5; Stahlblau nur noch beim Hover/Fokus) */
   .hero .db-btn--cerceveli { --db-b: var(--ink); --db-fg: var(--paper); }
   @media (max-width: 767px), (any-pointer: coarse) {
     .hero .db-btn { min-height: 2.75rem; }
@@ -123,23 +485,19 @@ const { lang } = Astro.props;
     .hero__grid {
       grid-template-columns: repeat(12, minmax(0, 1fr));
       column-gap: var(--gap);
-      row-gap: clamp(1.75rem, 1rem + 1.5vw, 2.75rem);
       align-items: start;
     }
     .hero__title { grid-column: 1 / -1; }
     .hero__lead { grid-column: 1 / span 7; }
     .hero__actions { grid-column: 1 / span 7; }
-    /* Mit Porträt: Titel über alles, darunter Text links, Bild rechts über zwei Zeilen */
-    .hero__grid--portrait .hero__portrait { grid-column: 8 / -1; grid-row: 2 / span 2; }
+    /* 768–1023: Band über die volle Breite zwischen Titel und Lead */
+    .hero__grid--portrait .hero__visual { grid-column: 1 / -1; }
+  }
+  @media (min-width: 1024px) {
+    .hero__grid--portrait .hero__title { grid-column: 1 / span 7; }
   }
   @media (min-width: 1280px) {
     .hero__lead { grid-column: 1 / span 6; }
     .hero__actions { grid-column: 1 / span 6; }
-    /* Mit Porträt: Bild steht neben dem Titel; Titel oben, Buttons unten bündig mit dem Bild */
-    .hero__grid--portrait { grid-template-rows: auto auto 1fr; }
-    .hero__grid--portrait .hero__title { grid-column: 1 / span 7; grid-row: 1; }
-    .hero__grid--portrait .hero__portrait { grid-column: 8 / -1; grid-row: 1 / span 3; }
-    .hero__grid--portrait .hero__lead { grid-row: 2; }
-    .hero__grid--portrait .hero__actions { grid-row: 3; align-self: end; }
   }
 </style>

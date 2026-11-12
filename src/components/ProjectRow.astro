@@ -12,9 +12,12 @@ import { t, routes, type Lang } from '../i18n/ui';
 interface Props {
   project: CollectionEntry<'projects'>;
   lang: Lang;
+  /** Ebene des Projekttitels: eine unter der Listenüberschrift (h2 auf /projekte/, sonst h3) */
+  titleLevel?: 2 | 3;
 }
 
-const { project, lang } = Astro.props;
+const { project, lang, titleLevel = 3 } = Astro.props;
+const Titel = titleLevel === 2 ? 'h2' : 'h3';
 const p = project.data;
 const link = p.liveUrl
   ? { href: p.liveUrl, label: t(lang, 'projects.live') }
@@ -22,17 +25,19 @@ const link = p.liveUrl
     ? { href: p.repoUrl, label: t(lang, 'projects.repo') }
     : undefined;
 const kind = t(lang, p.kind === 'client' ? 'projects.kind.client' : 'projects.kind.own');
-const caseHref = routes.project(project.id.replace(`${lang}/`, ''))[lang];
+const slug = project.id.replace(`${lang}/`, '');
+const caseHref = routes.project(slug)[lang];
 ---
 
-<li class="project db-anim-reveal">
+<!-- id = Rücksprungziel aus der Fallstudie; data-vt-* = Seitenübergang (specs/001-projekt-slider) -->
+<li class="project db-anim-reveal" id={`projekt-${slug}`} data-vt-quelle>
   <p class="project__meta mono">
     <span>{p.year}</span>
     <span class="project__kind">{kind}</span>
   </p>
 
   <div class="project__body">
-    <h3 class="project__title"><a href={caseHref}>{p.title}</a></h3>
+    <Titel class="project__title"><a href={caseHref}>{p.title}</a></Titel>
     <p class="project__context">{p.context}</p>
     <p class="project__summary">{p.summary}</p>
     {link && (
@@ -48,7 +53,7 @@ const caseHref = routes.project(project.id.replace(`${lang}/`, ''))[lang];
   </div>
 
   {(p.cover || p.screens) && (
-    <div class="project__media">
+    <div class="project__media" data-vt="projekt-bild">
       <DeviceFrames
         desktop={p.cover}
         desktopAlt={p.coverAlt ?? ''}
@@ -56,6 +61,8 @@ const caseHref = routes.project(project.id.replace(`${lang}/`, ''))[lang];
         mobileAlt={t(lang, 'projects.mobileAlt')}
         screens={p.screens}
         screensAlt={p.screensAlt}
+        desktopScroll={p.screenFull}
+        mobileScroll={p.screenFullMobile}
       />
     </div>
   )}
@@ -166,5 +173,33 @@ const caseHref = routes.project(project.id.replace(`${lang}/`, ''))[lang];
   @media (prefers-reduced-motion: reduce) {
     .project::before,
     .project__media :global(img) { transition: none; }
+  }
+
+  /* Unter 1024 px gibt es die Vitrine nicht – dafür laufen hier die Bildschirme: statt des Startseiten-
+   * Bilds steht die lange Aufnahme im Gerät und rollt durch, während das Gerät durchs Bild wandert
+   * (view-timeline des Geräts, kein Anheften). Nur Projekte mit `screenFull`; ohne Scroll-Timeline /
+   * mit Reduce bleibt das Startseiten-Bild (die Aufnahme wird dann nie geladen: lazy + display:none).
+   * 0-4-x schlägt die Grundregeln in DeviceFrames (0-3-0). */
+  @supports (animation-timeline: view()) {
+    @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+      .project__media {
+        view-timeline-name: --geraet;
+        view-timeline-axis: block;
+      }
+      .project .project__media :global(.screen--lauf > img:not(.screen-scroll)) { display: none; }
+      .project .project__media :global(.screen-scroll) {
+        display: block;
+        animation-name: geraet-lauf;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --geraet;
+        animation-range: cover 25% cover 80%;
+      }
+    }
+  }
+  @keyframes geraet-lauf {
+    from { transform: translateY(0); }
+    to { transform: translateY(calc(-100% + 100cqh)); }
   }
 </style>

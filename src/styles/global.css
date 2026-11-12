@@ -13,9 +13,11 @@ html {
   scroll-padding-top: 5rem;
 }
 
+/* Kein eigener body-Grund: der Seitengrund kommt von html (Leinwand). Ein body-Grund würde über den festen
+ * Ebenen mit negativem z-index liegen (Zemin-Wechsel der Projekte, Messfeld) und sie unsichtbar machen –
+ * gemessen 2026-11-12. */
 body {
   margin: 0;
-  background: var(--paper);
   font-size: var(--step-body);
   line-height: 1.6;
   font-kerning: normal;
@@ -99,18 +101,66 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   height: 1.75rem;
 }
 
-/* — Schalttafel — eine Sektion = ein Panel: Fläche eine Stufe heller, Hairline-Rahmen, kein Schatten,
- * kein Radius (DESIGN.md → Signatur 1). Innenabstand --panel-pad. */
+/* — Schalttafel — eine Sektion = ein Panel: halbtransparentes Weiss (Glas, ohne Blur), heller Rahmen mit
+ * Lichtkante oben, kein Schatten, kein Radius (DESIGN.md → Signatur 1). Innenabstand --panel-pad. */
 .panel {
-  background: var(--band);
-  border: 1px solid var(--hairline);
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  border-top-color: var(--glass-light);
 }
 
-/* Sektionen der Startseite: gleicher Abstand nach unten, gleiche Überschrift. */
+/* Sektionen der Startseite: gleicher Abstand nach unten, gleiche Überschrift.
+ * Überschrift seit 2026-11-12 (Joker, Referenz „Digital Designer") klein, Grossbuchstaben, gesperrt, mit
+ * Hairline darunter – die Sektion spricht über ihren Inhalt, nicht über die Überschrift. Es ist die
+ * Überschrift selbst (h2), kein Etikett darüber (`eyebrow`-Regel bleibt eingehalten). */
 .section { padding-bottom: var(--section-y); }
 .section-title {
-  margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
-  font-size: var(--step-2);
-  line-height: 1;
-  letter-spacing: -0.03em;
+  margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem);
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--font-body);
+  font-size: clamp(0.875rem, 0.83rem + 0.19vw, 1rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* — Krom (Signatur 10 „Sabit ışık", Joker 2026-11-12) — Hero-Rolle und Kontakt-Titel. Schmale Archivo,
+ * Grossbuchstaben; die Fläche ist der Stahl aus --krom, am Bildschirm festgemacht: beim Scrollen gleitet die
+ * Schrift unter dem Licht durch (kein Keyframe, kein JS). Ohne background-clip:text bleibt --ink;
+ * Reduced Motion und Touch (hover: none – iOS ignoriert `fixed`) = --krom-ruhe fest an der Schrift;
+ * Forced Colors = Systemtext (sonst wäre die Schrift unsichtbar).
+ * Kein Vorfahr mit transform darf dazwischen stehen – sonst hängt `fixed` am Vorfahren statt am Bildschirm. */
+.krom {
+  font-family: var(--font-krom);
+  font-stretch: 62%;
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .krom {
+    background-image: var(--krom);
+    background-attachment: fixed;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  @media (prefers-reduced-motion: reduce), (hover: none) {
+    .krom {
+      background-image: var(--krom-ruhe);
+      background-attachment: scroll;
+    }
+  }
+}
+@media (forced-colors: active) {
+  .krom {
+    background: none;
+    -webkit-text-fill-color: CanvasText;
+    color: CanvasText;
+  }
 }

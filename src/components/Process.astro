@@ -1,12 +1,21 @@
 ---
 /**
- * Ablauf „Wie ich arbeite" (DESIGN.md → Signatur 5): design-blocks zeitstrahl--yatay-ray, vier Knoten.
- * Der Knoten trägt Jokers eigenes Icon (src/icons/, 2026-11-09); die Nummer steht als Mono-Präfix im
- * Titel – echte Reihenfolge, deshalb nummeriert, und das <ol> zählt ohnehin. Unter 56 rem kippt der
- * Block selbst in die Vertikale.
+ * Ablauf „Wie ich arbeite" (DESIGN.md → Signatur 5) – seit 2026-11-12 vier Karten statt Zeitstrahl
+ * (Joker: „kartlara böl, burada kal, ilk kart görünsün, diğerleri scroll ile gelsin"; gewählt:
+ * „Reihe füllt sich").
+ *
+ * ≥ 64 rem mit Scroll-Timeline: die Szene klebt unter der Kopfzeile (Technik animasyon--kamera wie die
+ * Vitrine, Strecke 250svh). Karte 01 steht; 02–04 gleiten je eine Spalte von rechts in ihren Platz, danach
+ * zieht die Stahlblau-Messlinie von der vorigen Karte zu ihr.
+ * < 64 rem: Kartenstapel per `position: sticky` – jede Karte bleibt mit ihrer Kopfzeile stehen, die nächste
+ * schiebt sich darüber (braucht keine Scroll-Timeline, läuft also auch in Firefox). Stapelkarten sind
+ * deckend, sonst schiene der Text der unteren durch das Glas.
+ * Reduce, ohne Timeline (≥ 64 rem) oder zu niedriges Fenster: ruhige Reihe bzw. Liste ohne Leerstrecke.
+ * Kein JS, nur transform/opacity.
  */
 import { Icon } from 'astro-icon/components';
-import { t, type Lang, type UiKey } from '../i18n/ui';
+import { t, anchors, type Lang, type UiKey } from '../i18n/ui';
+import Messspur from './Messspur.astro';
 import { process } from '../data/process';
 
 interface Props {
@@ -16,23 +25,22 @@ interface Props {
 const { lang } = Astro.props;
 ---
 
-<section class="process section" aria-labelledby="process-title">
-  <div class="container">
-    <h2 class="section-title" id="process-title">{t(lang, 'process.title')}</h2>
-    <div class="panel process__panel">
-      <ol class="db-zs-ray">
+<section class="process section mess-bereich" id={anchors[lang].process} aria-labelledby="process-title">
+  <Messspur teil="segment" index={4} />
+  <div class="process__yol">
+    <div class="container process__sahne">
+      <h2 class="section-title process__titel" id="process-title">{t(lang, 'process.title')}</h2>
+      <ol class="process__liste" role="list">
         {process.map((step, i) => (
-          <li class="db-zs-ray__step">
-            <div class="db-zs-ray__node process__node" aria-hidden="true">
+          <li class="panel process__karte">
+            <span class="process__ikon" aria-hidden="true">
               <Icon name={step.icon} />
-            </div>
-            <div class="db-zs-ray__body">
-              <h3 class="db-zs-ray__title">
-                <span class="mono process__num">{String(i + 1).padStart(2, '0')}</span>
-                {t(lang, `process.${step.key}.title` as UiKey)}
-              </h3>
-              <p class="db-zs-ray__text">{t(lang, `process.${step.key}.text` as UiKey)}</p>
-            </div>
+            </span>
+            <h3 class="process__kopf">
+              <span class="mono process__num">{String(i + 1).padStart(2, '0')}</span>
+              {t(lang, `process.${step.key}.title` as UiKey)}
+            </h3>
+            <p class="process__text">{t(lang, `process.${step.key}.text` as UiKey)}</p>
           </li>
         ))}
       </ol>
@@ -41,19 +49,174 @@ const { lang } = Astro.props;
 </section>
 
 <style>
-  .process__panel {
+  /* — Grundform (alle Breiten): Karte = Glas-Panel, Kopfzeile Icon | Nummer + Titel, Text darunter — */
+  .process__liste {
+    --ikon: 2.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--panel-gap);
+  }
+  .process__karte {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    align-content: start; /* gestreckte Karte (Stapel 1fr): Rest nach unten, Kopfzeile bleibt Kopfzeile */
+    column-gap: 1rem;
+    row-gap: 0.75rem;
     padding: var(--panel-pad);
   }
-  /* Eigene 512er-Zeichnungen frei im Knoten (ohne Rahmen/Grund, overrides §7): 85 % des Knotenmasses,
-   * also 2.75–4 rem – nie unter 1.5rem (DESIGN.md → Icons) */
-  .process__node :global(svg) {
-    width: calc(var(--db-node) * 0.85);
-    height: calc(var(--db-node) * 0.85);
+  /* Eigene Zeichnungen frei, ohne Rahmen/Grund (DESIGN.md → Icons), nie unter 1.5rem */
+  .process__ikon {
+    display: flex;
+    width: var(--ikon);
+    height: var(--ikon);
+  }
+  .process__ikon :global(svg) {
+    width: 100%;
+    height: 100%;
+    color: var(--ink);
+  }
+  .process__kopf {
+    font-family: var(--font-body);
+    font-size: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+    line-height: 1.25;
     color: var(--ink);
   }
   .process__num {
     margin-right: 0.6rem;
     color: var(--ink-soft);
     vertical-align: 0.15em;
+  }
+  .process__text {
+    grid-column: 1 / -1;
+    max-width: 34ch;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  /* — Reihe ab 64 rem: vier Spalten, Icon über dem Titel, Messlinie in der Fuge auf Höhe der Icon-Mitte.
+   *   Statisch eine graue Hairline (wie früher der Zeitstrahl), in der Szene zeichnet sie sich in Stahlblau. — */
+  @media (min-width: 64rem) {
+    .process__liste {
+      --ikon: 3.5rem;
+      --fuge: clamp(1.5rem, 2.5vw, 3rem);
+      --karte-pad: 1.5rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--fuge);
+    }
+    .process__karte {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      align-content: start;
+      row-gap: 1rem;
+      padding: var(--karte-pad);
+    }
+    .process__text { grid-column: auto; }
+    /* left: 100 % = Innenkante des 1-px-Rands → + 1px, damit die Linie genau die Fuge füllt */
+    .process__karte:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: calc(var(--karte-pad) + var(--ikon) / 2);
+      left: calc(100% + 1px);
+      width: var(--fuge);
+      height: 1px;
+      background: var(--hairline-strong);
+    }
+  }
+
+  /* — Szene ≥ 64 rem: klebt unter der Kopfzeile (4rem + 1px Hairline – kein zweites sticky top:0), Strecke
+   *   250svh ≈ 1.6 Bildschirme Scrollweg für drei Ankünfte. Min. 40rem Fensterhöhe, sonst passt die Reihe
+   *   nicht sicher in die Szene. overflow am sticky Element selbst (kein Vorfahre) – hält Karte 04, die
+   *   eine Spalte rechts ausserhalb startet, aus dem Seitenüberlauf. — */
+  @supports (animation-timeline: view()) {
+    @media (min-width: 64rem) and (min-height: 40rem) and (prefers-reduced-motion: no-preference) {
+      .process__yol {
+        height: 250svh;
+        view-timeline-name: --ablauf;
+        view-timeline-axis: block;
+      }
+      .process__sahne {
+        position: sticky;
+        top: 4rem;
+        height: calc(100svh - 4rem);
+        display: grid;
+        align-content: center;
+        overflow: hidden;
+      }
+
+      .process__karte:nth-child(n + 2) {
+        animation-name: process-karte;
+        animation-duration: 1ms; /* von der Timeline überschrieben; Chrome braucht einen Wert */
+        animation-timing-function: ease-out;
+        animation-fill-mode: both;
+        animation-timeline: --ablauf;
+      }
+      .process__karte:nth-child(2) { animation-range: contain 6% contain 26%; }
+      .process__karte:nth-child(3) { animation-range: contain 32% contain 52%; }
+      .process__karte:nth-child(4) { animation-range: contain 58% contain 78%; }
+
+      /* Linie zur nächsten Karte, sobald diese sitzt; ab 82 % steht die volle Reihe */
+      .process__karte:not(:last-child)::after {
+        background: var(--accent);
+        transform-origin: 0 50%;
+        animation-name: process-linie;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --ablauf;
+      }
+      .process__karte:nth-child(1)::after { animation-range: contain 20% contain 30%; }
+      .process__karte:nth-child(2)::after { animation-range: contain 46% contain 56%; }
+      .process__karte:nth-child(3)::after { animation-range: contain 72% contain 82%; }
+    }
+  }
+
+  /* — Stapel < 64 rem: Titel und Karten kleben, jede Karte eine Kopfzeile tiefer als die vorige. Gleiche
+   *   Kartenhöhen (1fr), sonst lugte eine längere untere Karte unter der oberen hervor. Kopfzeile =
+   *   Innenabstand + Icon + Luft. Titelhöhe ≈ 2rem (Schrift ≤ 1rem × 1.2 + 0.85rem Abstand + 1px Linie)
+   *   plus sein margin-bottom aus global.css.
+   *   sticky endet an der INHALTSkante der Liste (padding zählt nicht): ohne die leere Haltezeile (::after,
+   *   eine Kartenhöhe) klebte Karte 04 nie und der Stapel klappte zu, sobald sie ankam (gemessen 390 px).
+   *   Der Titel ist eine deckende Leiste über den Karten – beim Hinausscrollen gleiten sie darunter durch. — */
+  @media (max-width: 63.9375rem) and (min-height: 32rem) and (prefers-reduced-motion: no-preference) {
+    .process__liste {
+      --oben: calc(4rem + 2rem + clamp(1.25rem, 1rem + 1vw, 2rem));
+      --kopf: calc(var(--panel-pad) + var(--ikon) + 0.625rem);
+      grid-auto-rows: 1fr;
+      row-gap: 1.5rem;
+    }
+    .process__liste::after { content: ''; }
+    .process__titel {
+      position: sticky;
+      top: 4rem;
+      z-index: 1;
+      background: var(--paper);
+    }
+    .process__karte {
+      position: sticky;
+      background: var(--glass), var(--paper);
+    }
+    .process__karte:nth-child(1) { top: var(--oben); }
+    .process__karte:nth-child(2) { top: calc(var(--oben) + var(--kopf)); }
+    .process__karte:nth-child(3) { top: calc(var(--oben) + 2 * var(--kopf)); }
+    .process__karte:nth-child(4) { top: calc(var(--oben) + 3 * var(--kopf)); }
+  }
+
+  @keyframes process-karte {
+    from {
+      opacity: 0;
+      transform: translateX(calc(100% + var(--fuge)));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes process-linie {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
   }
 </style>

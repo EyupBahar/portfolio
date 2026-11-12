@@ -1,0 +1,542 @@
+---
+/**
+ * Projekt-Slider der Startseite (specs/001-projekt-slider, Joker 2026-11-12, Referenz Pinterest-Pin
+ * 907334656169529758): „Ausgewählte Projekte" als grosse Karten, eine pro Ansicht, seitwärts wechselnd.
+ * Keine Geräte – der flache Screenshot ist das grosse Bild der Karte. Nur Projekte mit Live-Website.
+ * Die vollständige Liste (Vitrine + Zeilen mit Geräten) steht auf /projekte/.
+ *
+ * Grundlage design-blocks `slider--hero` (K1: Tablist/Tabpanel, Zähler, gestaffelter Einlauf in CSS),
+ * übersetzt in die Schalttafel (DESIGN.md → Signatur 9):
+ *   Bild | Text | Streifen (ab 1024 px 6/5/1, ab 1280 px 7/4/1) – der farbige Streifen der Referenz wird hier zur
+ *   Hairline-Fuge mit 2-px-Akzentlinie und Projektnummer; keine Projektfarben.
+ *
+ * Zustände:
+ *   - ohne JavaScript (`scripting: none`): Karten untereinander, keine Steuerleiste.
+ *   - mit JavaScript: Slider-Raster schon im ersten Frame (`scripting: enabled`), nicht erst nach dem
+ *     Skript – sonst spränge die Bühne, und beim Seitenübergang zurück wäre die Zielkarte falsch.
+ *     Sichtbar ist `.is-active` (SSR: Karte 1) bzw. vor dem Skript die `:target`-Karte (#projekt-<slug>).
+ *
+ * Messspur: Segment 3 als direktes Kind der Sektion (Absprache eyupbahar-e1). Keine transform-/filter-
+ * Vorfahren für das Segment – transformiert wird nur innerhalb der Bühne.
+ */
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import type { CollectionEntry } from 'astro:content';
+import Messspur from './Messspur.astro';
+import { t, routes, anchors, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** Projekte mit liveUrl + cover, nach `order` sortiert (HomePage filtert) */
+  items: CollectionEntry<'projects'>[];
+}
+
+const { lang, items } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+const total = pad(items.length);
+const slides = items.map((p, i) => {
+  const slug = p.id.replace(`${lang}/`, '');
+  return {
+    slug,
+    data: p.data,
+    nr: pad(i + 1),
+    caseHref: routes.project(slug)[lang],
+    kind: t(lang, p.data.kind === 'client' ? 'projects.kind.client' : 'projects.kind.own'),
+  };
+});
+---
+
+<section class="ausgewaehlt section mess-bereich" id={anchors[lang].projects} aria-labelledby="ausgewaehlt-title">
+  <Messspur teil="segment" index={3} />
+  <div class="container">
+    <h2 class="section-title" id="ausgewaehlt-title">{t(lang, 'projects.title')}</h2>
+
+    {slides.length > 0 && (
+      <div class="ps" data-ps aria-roledescription={t(lang, 'slider.label')} aria-labelledby="ausgewaehlt-title">
+        <div class="ps__buehne">
+          {slides.map((s, i) => (
+            <article
+              class:list={['ps__karte', 'panel', { 'is-active': i === 0 }]}
+              id={`projekt-${s.slug}`}
+              aria-labelledby={`ps-titel-${s.slug}`}
+              data-vt-quelle
+            >
+              <div class="ps__bild" data-vt="projekt-bild">
+                {s.data.cover && (
+                  <Image
+                    src={s.data.cover}
+                    alt={s.data.coverAlt ?? ''}
+                    widths={[640, 960, 1280, 1440]}
+                    sizes="(min-width: 1440px) 800px, (min-width: 1024px) 56vw, 100vw"
+                    loading="lazy"
+                    decoding="async"
+                    quality={80}
+                  />
+                )}
+              </div>
+
+              <div class="ps__text">
+                <h3 class="ps__titel" id={`ps-titel-${s.slug}`}>{s.data.title}</h3>
+                <p class="ps__kontext">{s.data.context}</p>
+                <p class="ps__meta mono">{s.data.year} · {s.kind}</p>
+                <p class="ps__kurz">{s.data.summary}</p>
+                <ul class="ps__stack mono" role="list" aria-label={t(lang, 'projects.stack')}>
+                  {s.data.stack.map((x) => <li>{x}</li>)}
+                </ul>
+                <div class="ps__tasten">
+                  <a class="db-btn db-btn--cizgi ps__taste" href={s.caseHref}>
+                    <span class="db-btn__label">{t(lang, 'slider.case')}<span class="visually-hidden">: {s.data.title}</span></span>
+                    <Icon name="ph:arrow-right" class="db-btn__icon" aria-hidden="true" />
+                  </a>
+                  {s.data.liveUrl && (
+                    <a class="db-btn db-btn--cizgi ps__taste" href={s.data.liveUrl} rel="noopener noreferrer">
+                      <Icon name="ph:globe-simple" class="db-btn__icon db-btn__icon--lead" aria-hidden="true" />
+                      <span class="db-btn__label">{t(lang, 'projects.live')}<span class="visually-hidden">: {s.data.title}</span></span>
+                      <Icon name="ph:arrow-up-right" class="db-btn__icon" aria-hidden="true" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div class="ps__streifen" data-vt="projekt-flaeche" aria-hidden="true">
+                <span class="ps__nummer mono">{s.nr}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {slides.length > 1 && (
+          <div class="ps__steuerung">
+            <p class="ps__zaehler mono" aria-live="polite" aria-atomic="true">
+              <span class="ps__jetzt">01</span> <span aria-hidden="true">/</span> <span class="ps__gesamt">{total}</span>
+            </p>
+            <div class="ps__tabs" role="tablist" aria-label={t(lang, 'slider.tabs')}>
+              {slides.map((s, i) => (
+                <button
+                  class="ps__tab"
+                  type="button"
+                  role="tab"
+                  id={`ps-tab-${s.slug}`}
+                  aria-controls={`projekt-${s.slug}`}
+                  aria-selected={i === 0 ? 'true' : 'false'}
+                  tabindex={i === 0 ? 0 : -1}
+                >
+                  <span class="visually-hidden">{s.nr} {s.data.title}</span>
+                </button>
+              ))}
+            </div>
+            <div class="ps__pfeile">
+              <button class="ps__pfeil" type="button" data-richtung="zurueck" aria-label={t(lang, 'slider.prev')}>
+                <Icon name="ph:arrow-left" aria-hidden="true" />
+              </button>
+              <button class="ps__pfeil" type="button" data-richtung="vor" aria-label={t(lang, 'slider.next')}>
+                <Icon name="ph:arrow-right" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )}
+
+    <a class="db-btn db-btn--cizgi ps__alle" href={routes.projects[lang]}>
+      <span class="db-btn__label">{t(lang, 'projects.all')}</span>
+      <Icon name="ph:arrow-right" class="db-btn__icon" aria-hidden="true" />
+    </a>
+  </div>
+</section>
+
+<style>
+  /* — Karte: Glas-Panel (global .panel), innen Bild | Text | Streifen — */
+  .ps__buehne {
+    display: grid;
+    gap: var(--panel-gap);
+  }
+  .ps__karte {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .ps__bild {
+    min-width: 0;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--glass-edge);
+  }
+  .ps__bild :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top; /* Logo und Navigation der Site bleiben im Bild, beschnitten wird rechts/unten */
+    /* Helle Kunden-Screenshots auf dunklem Grund leicht zurücknehmen (DESIGN.md → Tokens), beim Hover voll */
+    opacity: 0.9;
+    transition: opacity 280ms var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ps__karte:hover .ps__bild :global(img) { opacity: 1; }
+  }
+
+  .ps__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: var(--panel-pad);
+  }
+  .ps__titel {
+    font-size: var(--step-2);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .ps__kontext { color: var(--ink-soft); }
+  .ps__meta { color: var(--ink-soft); }
+  .ps__kurz { max-width: 52ch; }
+  .ps__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    color: var(--ink-soft);
+  }
+  .ps__tasten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+  .ps__taste { --db-b: var(--ink); }
+  @media (max-width: 767px), (any-pointer: coarse) {
+    .ps__taste, .ps__alle { min-height: 2.75rem; }
+  }
+
+  /* Streifen: Fuge mit Akzentlinie (Referenz: farbiger Streifen am rechten Rand). Mobil unten quer. */
+  .ps__streifen {
+    position: relative;
+    min-height: 0.75rem;
+    border-top: 1px solid var(--glass-edge);
+  }
+  .ps__streifen::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: left;
+  }
+  /* Mobil steht die Nummer schon im Zähler darunter – im Streifen erst ab 1024 px */
+  .ps__nummer { display: none; color: var(--ink-soft); }
+
+  @media (min-width: 1024px) {
+    .ps__karte {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr) minmax(3.5rem, 1fr);
+    }
+    /* Bild füllt die Zeilenhöhe; beim Bemessen zählt es mit 16:10 (Höhe 100 % wirkt dort wie auto) */
+    .ps__bild {
+      aspect-ratio: auto;
+      border-bottom: 0;
+      border-right: 1px solid var(--glass-edge);
+    }
+    .ps__bild :global(img) { aspect-ratio: 16 / 10; }
+    .ps__streifen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: var(--panel-pad) 0;
+      border-top: 0;
+      border-left: 1px solid var(--glass-edge);
+    }
+    .ps__streifen::before {
+      top: 0;
+      left: -1px;
+      width: 2px;
+      height: 100%;
+      transform-origin: bottom;
+    }
+    .ps__nummer { display: block; font-size: var(--step-3); }
+  }
+  @media (min-width: 1280px) {
+    .ps__karte { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr) minmax(3.5rem, 1fr); }
+  }
+
+  /* — Slider-Zustand: schon im ersten Frame, sobald Skripte laufen dürfen — */
+  .ps__steuerung { display: none; }
+
+  @media (scripting: enabled) {
+    .ps__buehne {
+      gap: 0;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+    .ps__karte {
+      grid-area: 1 / 1;
+      visibility: hidden;
+    }
+    .ps__karte.is-active { visibility: visible; }
+    /* Vor dem Skript: Rücksprung-Ziel #projekt-<slug> (Fallstudie → Startseite) zeigt seine Karte */
+    .ps:not(.is-js) .ps__buehne:has(.ps__karte:target) .ps__karte { visibility: hidden; }
+    .ps:not(.is-js) .ps__buehne:has(.ps__karte:target) .ps__karte:target { visibility: visible; }
+
+    .ps__steuerung {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'zaehler tabs pfeile';
+      align-items: center;
+      gap: 0.75rem 1.5rem;
+      margin-top: 1rem;
+    }
+  }
+
+  .ps__zaehler { grid-area: zaehler; color: var(--ink-soft); }
+  .ps__jetzt { color: var(--ink); }
+
+  /* Projektauswahl: Hairline-Segmente, das aktive mit Akzentlinie (Signatur 2 „Indikator") */
+  .ps__tabs {
+    grid-area: tabs;
+    display: flex;
+    gap: 0.5rem;
+    max-width: 20rem;
+  }
+  .ps__tab {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .ps__tab::before,
+  .ps__tab::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+  }
+  .ps__tab::before { height: 1px; background: var(--hairline-strong); }
+  .ps__tab::after {
+    height: 2px;
+    margin-top: -0.5px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+  .ps__tab[aria-selected='true']::after { transform: scaleX(1); transition-duration: 240ms; }
+  @media (hover: hover) and (pointer: fine) {
+    .ps__tab:hover::before { background: var(--ink-soft); }
+  }
+
+  .ps__pfeile { grid-area: pfeile; display: flex; gap: 0.5rem; }
+  .ps__pfeil {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--hairline-strong);
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  }
+  .ps__pfeil :global(svg) { width: 1.25rem; height: 1.25rem; }
+  @media (hover: hover) and (pointer: fine) {
+    .ps__pfeil:hover { background: var(--ink); color: var(--paper); }
+  }
+  .ps__pfeil:active { transform: scale(0.97); }
+  @media (any-pointer: coarse) {
+    .ps__tab, .ps__pfeil { height: 3rem; }
+    .ps__pfeil { width: 3rem; }
+  }
+
+  .ps__alle { --db-b: var(--ink); margin-top: 1.5rem; }
+
+  /* Schmal: Zähler + Pfeile in einer Zeile, Auswahl darunter über die ganze Breite */
+  @media (scripting: enabled) and (max-width: 599px) {
+    .ps__steuerung {
+      grid-template-columns: auto auto;
+      grid-template-areas: 'zaehler pfeile' 'tabs tabs';
+      justify-content: space-between;
+    }
+    .ps__tabs { max-width: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ps__bild :global(img),
+    .ps__tab::after,
+    .ps__pfeil { transition: none; }
+    .ps__pfeil:active { transform: none; }
+  }
+
+  /* — Kartenwechsel (Referenz: gestaffelter Seitwärts-Einlauf) —
+   * Alte Karte gleitet als Ganzes hinaus (300 ms), die neue läuft gestaffelt ein: Bild 0, Titel 80, Text
+   * 140, Streifen 220 ms, je 420 ms → fertig nach 640 ms. Richtung über --ps-dx: vor = von rechts (1),
+   * zurück = von links (−1). Nur transform/opacity; die Bühne schneidet ab (overflow hidden).
+   * Ease-out ohne Überschwingen. Klassen setzt das Skript, unter Reduce nie. */
+  .ps { --ps-dx: 1; --ps-ease: cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .ps[data-richtung='zurueck'] { --ps-dx: -1; }
+
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    /* Die alte Karte gibt ihre Glasfläche sofort ab – sonst lägen zwei Glasflächen übereinander */
+    .ps__karte.is-aus {
+      visibility: visible;
+      background: none;
+      border-color: transparent;
+      animation: ps-aus 300ms var(--ps-ease) both;
+    }
+    .ps__karte.is-ein { z-index: 1; }
+    .ps__karte.is-ein .ps__bild { animation: ps-ein 420ms var(--ps-ease) both; }
+    .ps__karte.is-ein .ps__titel { animation: ps-ein 420ms var(--ps-ease) 80ms both; }
+    .ps__karte.is-ein .ps__text > :not(.ps__titel) { animation: ps-ein 420ms var(--ps-ease) 140ms both; }
+    .ps__karte.is-ein .ps__streifen { animation: ps-streifen-ein 420ms var(--ps-ease) 220ms both; }
+  }
+  @keyframes ps-aus {
+    to { opacity: 0; transform: translateX(calc(var(--ps-dx) * -6%)); }
+  }
+  @keyframes ps-ein {
+    from { opacity: 0; transform: translateX(calc(var(--ps-dx) * 6%)); }
+  }
+  @keyframes ps-streifen-ein {
+    from { opacity: 0; transform: translateX(calc(var(--ps-dx) * 100%)); }
+  }
+</style>
+
+<script>
+  // Projekt-Slider (K1). Grundlage design-blocks slider--hero.js: aria-selected ist die einzige Wahrheit,
+  // Roving-Tabindex, ← → Pos1 Ende in der Tablist. Dazu: Pfeile, Wischen (Touch/Stift), Startkarte aus dem
+  // Hash (#projekt-<slug>, Rücksprung aus der Fallstudie), richtungsabhängiger Wechsel.
+  // Das Layout steht ohne dieses Skript (CSS `scripting: enabled`); es setzt nur Zustände und Klassen.
+  type Richtung = 'vor' | 'zurueck';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const NOTFALL_MS = 800; // falls animationend ausbleibt (Tab im Hintergrund, abgebrochene Animation)
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-ps]')) {
+    const karten = [...root.querySelectorAll<HTMLElement>('.ps__karte')];
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('.ps__tab')];
+    const buehne = root.querySelector<HTMLElement>('.ps__buehne');
+    const jetzt = root.querySelector<HTMLElement>('.ps__jetzt');
+    const tablist = root.querySelector<HTMLElement>('[role="tablist"]');
+    if (!buehne || karten.length < 2 || tabs.length !== karten.length) continue;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const n = karten.length;
+    let aktiv = 0;
+    let beenden: (() => void) | null = null;
+
+    const setzeZustand = (i: number) => {
+      karten.forEach((k, x) => {
+        const an = x === i;
+        k.classList.toggle('is-active', an);
+        k.toggleAttribute('inert', !an);
+        k.setAttribute('aria-hidden', String(!an));
+      });
+      tabs.forEach((t, x) => {
+        t.setAttribute('aria-selected', String(x === i));
+        t.tabIndex = x === i ? 0 : -1;
+      });
+      if (jetzt) jetzt.textContent = pad(i + 1);
+    };
+
+    const zeige = (ziel: number, richtung: Richtung | null, fokus: boolean) => {
+      const i = ((ziel % n) + n) % n;
+      beenden?.(); // laufenden Wechsel sofort abschliessen
+      if (i !== aktiv) {
+        const alt = karten[aktiv];
+        const neu = karten[i];
+        aktiv = i;
+        setzeZustand(i);
+        if (richtung && !reduce.matches) bewege(alt, neu, richtung);
+      }
+      if (fokus) tabs[i].focus();
+    };
+
+    const bewege = (alt: HTMLElement, neu: HTMLElement, richtung: Richtung) => {
+      let timer = 0;
+      root.dataset.richtung = richtung;
+      alt.classList.add('is-aus');
+      neu.classList.add('is-ein');
+      const fertig = () => {
+        alt.classList.remove('is-aus');
+        neu.classList.remove('is-ein');
+        delete root.dataset.richtung;
+        neu.removeEventListener('animationend', beiEnde);
+        window.clearTimeout(timer);
+        beenden = null;
+      };
+      // Der Streifen läuft als letzter ein (220 + 420 ms) – sein Ende schliesst den Wechsel ab.
+      const beiEnde = (e: AnimationEvent) => {
+        if (e.animationName.endsWith('ps-streifen-ein')) fertig();
+      };
+      neu.addEventListener('animationend', beiEnde);
+      timer = window.setTimeout(fertig, NOTFALL_MS);
+      beenden = fertig;
+    };
+
+    const ausHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      return id ? karten.findIndex((k) => k.id === id) : -1;
+    };
+
+    // Tab-Muster erst mit Skript: ohne JS (oder mit nur einer Karte) gäbe es Tabpanels ohne Tabs
+    karten.forEach((k, i) => {
+      k.setAttribute('role', 'tabpanel');
+      k.setAttribute('aria-labelledby', tabs[i].id);
+    });
+
+    // Start: Hash-Ziel oder Karte 1 – ohne Bewegung
+    const start = ausHash();
+    aktiv = start >= 0 ? start : 0;
+    setzeZustand(aktiv);
+    root.classList.add('is-js');
+
+    window.addEventListener('hashchange', () => {
+      const i = ausHash();
+      if (i >= 0) zeige(i, null, false);
+    });
+
+    tabs.forEach((t, i) =>
+      t.addEventListener('click', () => zeige(i, i > aktiv ? 'vor' : 'zurueck', false)),
+    );
+    tablist?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); zeige(aktiv + 1, 'vor', true); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); zeige(aktiv - 1, 'zurueck', true); }
+      else if (e.key === 'Home') { e.preventDefault(); zeige(0, 'zurueck', true); }
+      else if (e.key === 'End') { e.preventDefault(); zeige(n - 1, 'vor', true); }
+    });
+    root.querySelectorAll<HTMLButtonElement>('.ps__pfeil').forEach((b) =>
+      b.addEventListener('click', () => {
+        const vor = b.dataset.richtung === 'vor';
+        zeige(aktiv + (vor ? 1 : -1), vor ? 'vor' : 'zurueck', false);
+      }),
+    );
+
+    // Wischen: nur Touch/Stift, waagrecht ≥ 48 px und deutlich waagrechter als senkrecht.
+    // Die Bühne hat touch-action: pan-y – senkrechtes Scrollen bleibt beim Browser.
+    let pid: number | null = null;
+    let x0 = 0;
+    let y0 = 0;
+    buehne.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      pid = e.pointerId;
+      x0 = e.clientX;
+      y0 = e.clientY;
+    });
+    buehne.addEventListener('pointerup', (e) => {
+      if (e.pointerId !== pid) return;
+      pid = null;
+      const dx = e.clientX - x0;
+      const dy = e.clientY - y0;
+      if (Math.abs(dx) >= 48 && Math.abs(dx) > 1.5 * Math.abs(dy)) {
+        zeige(aktiv + (dx < 0 ? 1 : -1), dx < 0 ? 'vor' : 'zurueck', false);
+      }
+    });
+    buehne.addEventListener('pointercancel', () => { pid = null; });
+  }
+</script>

@@ -1,0 +1,26 @@
+---
+/**
+ * Reveal-Beobachter (design-blocks animasyon--reveal.js, K1, unverändert) – eine Quelle für alle Seiten.
+ * Beobachtet jedes .db-anim-reveal der Seite: Kurzprofil-Zeilen (Startseite) und Projektzeilen
+ * (Projekte-Seite). Früher steckte das Skript in ProjectList; seit die Liste auf /projekte/ steht
+ * (specs/001-projekt-slider), binden Facts und ProjectList diese Komponente ein. Astro bündelt das Skript
+ * je Seite nur einmal.
+ * Reduced-Motion oder kein IntersectionObserver: Klasse wird nie gesetzt, alles bleibt sichtbar.
+ */
+---
+
+<script>
+  (() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) return;
+    document.documentElement.classList.add('db-anim-js');
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add('is-visible');
+        io.unobserve(e.target);
+      }
+    }, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.db-anim-reveal').forEach((el) => io.observe(el));
+  })();
+</script>

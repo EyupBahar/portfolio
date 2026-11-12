@@ -1,44 +1,45 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import ProjectRow from './ProjectRow.astro';
+import Showreel from './Showreel.astro';
+import Reveal from './Reveal.astro';
 import { t, anchors, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
+  /** 1 auf der eigenen Projekte-Seite (/projekte/), sonst 2 */
+  headingLevel?: 1 | 2;
+  /** Überschrift; Standard „Ausgewählte Projekte" */
+  title?: string;
+  /** Projekte in Anzeigereihenfolge; ohne Angabe alle der Sprache nach `order` (ProjectsPage übergibt
+   *  dieselbe Liste, die auch ihr JSON-LD speist – eine Quelle für Reihenfolge und Auswahl) */
+  items?: CollectionEntry<'projects'>[];
 }
 
-const { lang } = Astro.props;
-const projects = (await getCollection('projects', (p) => p.id.startsWith(`${lang}/`))).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const { lang, headingLevel = 2, title = t(lang, 'projects.title'), items } = Astro.props;
+const Heading = headingLevel === 1 ? 'h1' : 'h2';
+const projects =
+  items ??
+  (await getCollection('projects', (p) => p.id.startsWith(`${lang}/`))).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <section class="projects" id={anchors[lang].projects} aria-labelledby="projects-title">
+  <!-- Zemin geçişi (futuristic-design A-Liste): der Grund dunkelt zum „Bildschirmraum" ab, solange die
+       Projekte im Bild sind. Fest, aria-hidden, nur opacity. -->
+  <div class="projects__zemin" aria-hidden="true"><span></span></div>
+  <!-- Keine Messspur: die Liste steht seit specs/001-projekt-slider auf /projekte/, die Skala ist die
+       Signatur der Startseite (Segment 3 trägt dort der Projekt-Slider). -->
   <div class="container">
-    <h2 class="projects__title" id="projects-title">{t(lang, 'projects.title')}</h2>
+    <Heading class="projects__title" id="projects-title">{title}</Heading>
+    <Showreel items={projects} />
     <ul class="projects__list" role="list">
-      {projects.map((project) => <ProjectRow project={project} lang={lang} />)}
+      {projects.map((project) => <ProjectRow project={project} lang={lang} titleLevel={headingLevel === 1 ? 2 : 3} />)}
     </ul>
   </div>
 </section>
 
-<script>
-  // design-blocks animasyon--reveal.js (K1), unverändert. Einziger Scroll-Moment der Seite.
-  // Reduced-Motion oder kein IntersectionObserver: Klasse wird nie gesetzt, alles bleibt sichtbar.
-  (() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce || !('IntersectionObserver' in window)) return;
-    document.documentElement.classList.add('db-anim-js');
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        e.target.classList.add('is-visible');
-        io.unobserve(e.target);
-      }
-    }, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
-    document.querySelectorAll('.db-anim-reveal').forEach((el) => io.observe(el));
-  })();
-</script>
+<!-- Reveal der Projektzeilen (design-blocks animasyon--reveal, K1) -->
+<Reveal />
 
 <style>
   .projects { padding-bottom: var(--section-y); }
@@ -49,4 +50,44 @@ const projects = (await getCollection('projects', (p) => p.id.startsWith(`${lang
     letter-spacing: -0.03em;
   }
   .projects__list { border-bottom: 1px solid var(--hairline-strong); }
+
+  /* — Zemin geçişi — Grund --paper → --grund-tief → --paper. Äusserer Layer blendet beim Eintreten der
+   * Sektion ein, innerer beim Austreten aus (zwei Elemente, weil zwei Animationen auf derselben
+   * Eigenschaft sich überschreiben würden). Ohne Scroll-Timeline / mit Reduce: kein Wechsel. */
+  .projects__zemin { display: none; }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .projects {
+        view-timeline-name: --projekte;
+        view-timeline-axis: block;
+      }
+      .projects__zemin {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        pointer-events: none;
+        animation-name: zemin-ein;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --projekte;
+        animation-range: entry 30% entry 90%;
+      }
+      .projects__zemin > span {
+        position: absolute;
+        inset: 0;
+        background: var(--grund-tief);
+        animation-name: zemin-aus;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --projekte;
+        animation-range: exit 0% exit 40%;
+      }
+    }
+  }
+  @keyframes zemin-ein { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes zemin-aus { from { opacity: 1; } to { opacity: 0; } }
 </style>

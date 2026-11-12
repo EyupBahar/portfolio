@@ -1,0 +1,201 @@
+---
+/**
+ * Vitrine (Joker 2026-11-12, futuristic-design; DESIGN.md → Signatur 8) – der eine Höhepunkt der Startseite:
+ * ein Bildschirm steht still, und die vier Live-Sites laufen nacheinander darin durch (die ersten ~3
+ * Bildschirme jeder Site, Aufnahmen `screenFull`/`screenFullMobile`). Technik design-blocks
+ * `animasyon--kamera` (K0, höchstens eine pro Seite): `__yol` mit benannter view-timeline, `__sahne`
+ * sticky, Ebenen auf `contain 0% → 100%`.
+ *
+ * Choreografie (für genau vier Sites gestimmt; mehr oder weniger → Keyframes unten anpassen):
+ *   die vier Aufnahmen bilden einen durchgehenden Streifen. Jede Site steht kurz oben (Kopf und Logo
+ *   sichtbar), läuft bis zu ihrem Ende, dann schiebt die nächste sie in ±6 % nach oben hinaus – beide
+ *   bewegen sich um genau eine Bildschirmhöhe, die Kanten berühren sich. Nur transform: eine
+ *   Überblendung zeigte zwei Seiten übereinander (Review 2026-11-12: „Doppelbelichtung").
+ *
+ * Nur ab 1024 px, mit Scroll-Timeline und ohne Reduced Motion – sonst gibt es die Vitrine nicht und ihre
+ * Strecke auch nicht (kamera-Regel: keine leere Scroll-Strecke). Komplett `aria-hidden`: dieselben
+ * Projekte stehen darunter in der Liste mit allen Angaben und Links.
+ */
+import type { CollectionEntry } from 'astro:content';
+import DeviceFrames from './DeviceFrames.astro';
+
+interface Props {
+  items: CollectionEntry<'projects'>[];
+}
+
+const { items } = Astro.props;
+const sites = items.filter((p) => p.data.screenFull && p.data.screenFullMobile && p.data.liveUrl);
+const pad = (n: number) => String(n).padStart(2, '0');
+const host = (url: string) => new URL(url).hostname.replace(/^www\./, '');
+---
+
+{sites.length > 0 && (
+  <div class="vitrine" aria-hidden="true">
+    <div class="vitrine__yol">
+      <div class="vitrine__sahne">
+        <div class="vitrine__etiketten">
+          {sites.map((p, i) => (
+            <div class={`vitrine__etikett vitrine__etikett--${i + 1}`}>
+              <p class="vitrine__zahl mono">{pad(i + 1)} / {pad(sites.length)}</p>
+              <p class="vitrine__titel">{p.data.title}</p>
+              <p class="vitrine__kontext">{p.data.context}</p>
+              <p class="vitrine__host mono">{host(p.data.liveUrl!)}</p>
+            </div>
+          ))}
+        </div>
+        <div class="vitrine__geraete">
+          <DeviceFrames
+            desktopLayers={sites.map((p) => p.data.screenFull!)}
+            mobileLayers={sites.map((p) => p.data.screenFullMobile!)}
+            layerSizes={{ desktop: 'min(58vw, 62rem)', mobile: 'min(13vw, 12rem)' }}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .vitrine { display: none; }
+
+  @supports (animation-timeline: view()) {
+    @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+      .vitrine {
+        display: block;
+        margin-bottom: var(--section-y);
+      }
+
+      /* Strecke: 320svh → die Szene steht ~2.2 Bildschirme (Höhepunkt = längste Strecke der Seite) */
+      .vitrine__yol {
+        height: 320svh;
+        view-timeline-name: --vitrine;
+        view-timeline-axis: block;
+      }
+
+      /* Szene klebt unter der Kopfzeile (4rem + 1px Hairline) – kein zweites sticky top:0 */
+      .vitrine__sahne {
+        position: sticky;
+        top: 4rem;
+        height: calc(100svh - 4rem);
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        column-gap: var(--gap);
+        align-items: center;
+      }
+
+      /* Etikett auf Höhe des Bildschirms, nicht der ganzen Gerätegruppe (Fuss senkt deren Mitte) */
+      .vitrine__etiketten {
+        grid-column: 1 / span 3;
+        align-self: start;
+        margin-top: 18svh;
+        display: grid;
+      }
+      .vitrine__etikett { grid-area: 1 / 1; }
+      .vitrine__zahl {
+        margin-bottom: 1rem;
+        color: var(--ink-soft);
+      }
+      /* --step-3 statt --step-2: der Bildschirm ist das Ereignis, nicht der Name (Review); passt auch
+       * „Münsingen" bei 1024 px in drei Spalten */
+      .vitrine__titel {
+        font-family: var(--font-display);
+        font-size: var(--step-3);
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+      }
+      .vitrine__kontext {
+        margin-top: 0.75rem;
+        color: var(--ink-soft);
+      }
+      .vitrine__host {
+        margin-top: 1.5rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--hairline);
+        color: var(--ink-soft);
+      }
+
+      /* Geräte so gross, dass iMac + Fuss in die Szenenhöhe passen (Komposition ≈ 0.74 × Breite hoch);
+       * neun Spalten statt acht → Bildschirm ~800 statt ~700 px bei 1440 (Review: Sites unlesbar) */
+      .vitrine__geraete {
+        grid-column: 4 / -1;
+        justify-self: end;
+        width: min(100%, (100svh - 4rem - 6rem) / 0.74);
+      }
+      /* iPhone etwas aus dem iMac heraus: deckte sonst ~4 % des Bildschirms ab */
+      .vitrine :global(.iphone) { transform: translate(10%, 5%); }
+
+      /* — Ebenen: Bildschirminhalt — */
+      .vitrine :global(.screen-layer) {
+        animation-duration: 1ms; /* von der Timeline überschrieben; Chrome braucht einen Wert */
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --vitrine;
+        animation-range: contain 0% contain 100%;
+      }
+      .vitrine :global(.screen-layer--1) { animation-name: vitrine-1; }
+      .vitrine :global(.screen-layer--2) { animation-name: vitrine-2; }
+      .vitrine :global(.screen-layer--3) { animation-name: vitrine-3; }
+      .vitrine :global(.screen-layer--4) { animation-name: vitrine-4; }
+
+      /* — Etiketten: nur Deckkraft (Text bewegt sich nicht), aus → ein mit kleiner Lücke — */
+      .vitrine__etikett {
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --vitrine;
+        animation-range: contain 0% contain 100%;
+      }
+      .vitrine__etikett--1 { animation-name: etikett-1; }
+      .vitrine__etikett--2 { animation-name: etikett-2; }
+      .vitrine__etikett--3 { animation-name: etikett-3; }
+      .vitrine__etikett--4 { animation-name: etikett-4; }
+    }
+  }
+
+  /* Streifen: unten bereit (+100cqh, abgeschnitten) → Übergabe ±3 % um 25/50/75 → oben stehen (Kopf)
+   * → laufen bis Ende (-100% + 100cqh) → nächste Übergabe hinaus (-100%). */
+  @keyframes vitrine-1 {
+    0%, 8% { transform: translateY(0); }
+    22% { transform: translateY(calc(-100% + 100cqh)); }
+    28%, 100% { transform: translateY(-100%); }
+  }
+  @keyframes vitrine-2 {
+    0%, 22% { transform: translateY(100cqh); }
+    28%, 33% { transform: translateY(0); }
+    47% { transform: translateY(calc(-100% + 100cqh)); }
+    53%, 100% { transform: translateY(-100%); }
+  }
+  @keyframes vitrine-3 {
+    0%, 47% { transform: translateY(100cqh); }
+    53%, 58% { transform: translateY(0); }
+    72% { transform: translateY(calc(-100% + 100cqh)); }
+    78%, 100% { transform: translateY(-100%); }
+  }
+  @keyframes vitrine-4 {
+    0%, 72% { transform: translateY(100cqh); }
+    78%, 83% { transform: translateY(0); }
+    97%, 100% { transform: translateY(calc(-100% + 100cqh)); }
+  }
+
+  /* Etiketten wechseln in der Mitte der Übergabe; kurz aus, dann ein – nie zwei Namen übereinander */
+  @keyframes etikett-1 {
+    0%, 23.5% { opacity: 1; }
+    25%, 100% { opacity: 0; }
+  }
+  @keyframes etikett-2 {
+    0%, 25% { opacity: 0; }
+    26.5%, 48.5% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+  @keyframes etikett-3 {
+    0%, 50% { opacity: 0; }
+    51.5%, 73.5% { opacity: 1; }
+    75%, 100% { opacity: 0; }
+  }
+  @keyframes etikett-4 {
+    0%, 75% { opacity: 0; }
+    76.5%, 100% { opacity: 1; }
+  }
+</style>

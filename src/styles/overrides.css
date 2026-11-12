@@ -16,13 +16,30 @@ button.db-btn:active { transform: scale(0.97); }
 
 /* 2 · Lade-Moment im Hero: gleiche Staffel wie animasyon--giris, aber leiser.
  *     Block: −32px / 1s → hier −12px / 0.7s. Ein Panel „fällt" nicht, es sitzt. */
+/*     fill-mode backwards statt both (Block): eine stehengebliebene transform-Animation – auch auf Null –
+ *     macht den Titel zum Bezugsrahmen für `background-attachment: fixed`, der Krom-Stahl (Signatur 10)
+ *     hinge dann an der Schrift statt am Bildschirm (gemessen 2026-11-12: matrix(1,0,0,1,0,0) am h1).
+ *     Endzustand = Grundzustand, optisch identisch. */
 .hero .db-anim-giris > * {
   animation-name: hero-settle;
   animation-duration: 0.7s;
+  animation-fill-mode: backwards;
 }
 @keyframes hero-settle {
   from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: none; }
+}
+/*     Porträt nur gleiten, nicht einblenden: startet es bei opacity 0, zählt Chrome das schnell geladene
+ *     Bild nicht als LCP (gemessen 2026-11-12: mit Fade nur H1, ohne Fade IMG @64 ms). Das Erscheinen
+ *     übernimmt der Vorhang des Fugen-Rasters (Hero.astro, eine Bahn je Rasterspalte; v2: IMG @112–152 ms).
+ *     Das Bild ist ab 1024 px der Grund des ganzen Hero (absolut), das Gleiten bleibt. In no-preference gekapselt, weil
+ *     0-3-0 sonst die Reduce-Regel unten (0-2-0) überstimmen würde. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero .db-anim-giris > .hero__visual { animation-name: hero-settle-bild; }
+}
+@keyframes hero-settle-bild {
+  from { transform: translateY(-12px); }
+  to   { transform: translateY(0); }
 }
 
 /* 3 · Scroll-Moment Projektliste: Block 40px / 0.8s → 24px / 0.6s */
@@ -39,49 +56,35 @@ button.db-btn:active { transform: scale(0.97); }
 .db-btn__icon--lead { width: 1.35em; height: 1.35em; }
 .db-btn:hover .db-btn__icon--lead { transform: none; }
 
-/* 5 · Gefüllte Taste (buton--dolu) auf dunklem Grund: Hover kehrt um – Fläche weg, Text und Rahmen
- *     in Stahlblau (6.95:1, lesbar). Der Block macht genau das; die frühere Override für Rot
- *     (Text hell statt rot, 3.46:1) ist mit dem Akzentwechsel überflüssig und entfernt. */
-
-/* 6 · Schwerpunkte (card--numarali) als statische Panels: keine Links, also kein Hover-Lift
- *     (ein Element, das sich hebt, verspricht einen Klick). Nummernzeile fehlt im Markup, weil
- *     die drei Punkte keine Reihenfolge haben (card README). Flächen: Panel --band, Icon-Kachel
- *     --paper (eine Stufe tiefer, wie ein eingelassener Schalter) – ersetzt den color-mix-Ton
- *     des Blocks, deshalb braucht es hier keinen @supports-Fallback. */
-.db-card-num {
-  --db-soft: var(--paper);
-  background: var(--band);
+/* 5 · Tasten silber statt Stahlblau (Joker 2026-11-12: „Silber als Material, Blau nur als Indikator").
+ *     Block-Vorgabe --db-b = --accent → hier --ink (Silber), Text --paper. Hover der gefüllten Taste kehrt
+ *     wie im Block um (Fläche weg), Text und Rahmen gehen dabei in den Indikator Stahlblau (6.95:1);
+ *     der Fokusring ebenfalls Stahlblau. a.db-btn (0-1-1) schlägt die Block-Basis (0-1-0); Komponenten,
+ *     die --db-b selbst setzen, bleiben unberührt. */
+a.db-btn,
+button.db-btn {
+  --db-b: var(--ink);
+  --db-fg: var(--paper);
 }
-/* Icon frei statt in der Kachel (Joker 2026-11-09 nachts: „büyüt, çerçeve ve bg yok"): kein Grund, kein
- * Rahmen, Icon 3.25rem – Jokers 512er-Zeichnungen stehen direkt auf dem Panel. Hover füllt deshalb nichts
- * mehr, das Icon wechselt nur in den Akzent (Indikator-Logik). */
-.db-card-num__tile { width: auto; height: auto; background: transparent; }
-.db-card-num__tile svg { width: 4rem; height: 4rem; } /* 4rem statt 3.25rem: Joker 2026-11-10 „boyutunu büyüt" */
+a.db-btn:focus-visible,
+button.db-btn:focus-visible { outline-color: var(--accent); }
 @media (hover: hover) {
-  .db-card-num:hover {
-    transform: none;
-    background: var(--band);
+  .db-btn--dolu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
-  .db-card-num:hover .db-card-num__tile { background: transparent; color: var(--accent); }
 }
 
-/* 7 · Ablauf (zeitstrahl--yatay-ray): Der Knoten trägt Jokers eigenes Icon statt der Zahl (2026-11-09);
- *     die Zahl steht als Mono-Präfix im Titel (Process.astro), damit die Reihenfolge sichtbar bleibt.
- *     Knoten ohne Rahmen und ohne Grund (Joker: „çerçeve ve bg yok") – deshalb endet die Verbindungslinie am
- *     Knotenrand statt in der Knotenmitte, sonst liefe sie durch die Zeichnung. Icon-Mass in Process.astro. */
-.db-zs-ray__node { background: transparent; border: 0; }
-.db-zs-ray__step:not(:last-child)::before {
-  left: var(--db-node);
-  width: calc(100% + var(--db-gap) - var(--db-node));
-}
-@media (max-width: 56rem) {
-  .db-zs-ray__step:not(:last-child)::before {
-    top: var(--db-node);
-    left: calc(var(--db-node) / 2);
-    width: 1px;
-    height: calc(100% + 1.5rem - var(--db-node));
-  }
-}
+/* 6 · Schwerpunkte: seit 2026-11-12 Wendekarten (Joker) – Mechanik und Fläche in Focus.astro. Vom Block
+ *     card--numarali bleiben nur __title, __desc und __bar; die Karte ist keine .db-card-num mehr (deren
+ *     :hover-Regeln würden die gedrehte Rückseite zurückdrehen), deshalb hier keine Überschreibung mehr. */
+
+/* 7/8 · Ablauf: seit 2026-11-12 Karten-Szene statt zeitstrahl--yatay-ray (Joker) – Mechanik, Messlinie und
+ *     Stapel in Process.astro; der Block wird nicht mehr geladen, deshalb hier keine Überschreibung mehr. */
+
+/* 9 · Kurzprofil liest sich ein (futuristic-design): die Zeilen nutzen dasselbe Reveal wie die
+ *     Projektliste (animasyon--reveal, §3); die rechte Spalte kommt 90 ms später – Zeile für Zeile. */
+.db-anim-js .facts__item.db-anim-reveal:nth-child(even) { transition-delay: 90ms; }
 
 @media (prefers-reduced-motion: reduce) {
   a.db-btn:active,

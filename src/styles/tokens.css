@@ -40,6 +40,22 @@
   --device-glass: #0b0c0f; /* schwarzer Glasrand um den Bildschirm */
   --device-body: #262a32;  /* eloxiertes Gehäuse: iMac-Kinn, Standfuss, iPhone-Rahmen */
 
+  /* — Messfeld (futuristic-design, Joker 2026-11-12) — Grund des „Bildschirmraums" (Projekte) zwischen
+   *   --paper und --device-glass: dunkler als die Seite, aber heller als der Glasrand, damit Geräte ihre
+   *   Silhouette behalten (Review: auf --device-glass verschwand der Rand). Messfeld-Linien halb so stark
+   *   wie --hairline. */
+  --grund-tief: #0f1116;   /* ink 13.73:1, ink-soft 6.95:1, accent 7.32:1 */
+  --hairline-faint: rgba(216, 220, 227, 0.06);
+
+  /* — Glas (Joker 2026-11-12, Referenz „Leafora"): Panels als halbtransparentes Weiss statt der
+   *   Flächenstufe --band – das Messfeld scheint durch. Kein Blur (der Grund ist flach, Blur hätte nichts
+   *   zu verwischen und kostet beim Scrollen), Ecken bleiben 0. Oben heller als unten, die Oberkante ist die
+   *   Lichtkante. Knappste Stelle (Panel oben über einer Messfeld-Linie): ink 9.3:1, ink-soft 4.7:1,
+   *   accent 5.0:1 – deshalb oben 7 %, nicht mehr (8 % = ink-soft 4.56:1, zu knapp). */
+  --glass: linear-gradient(to bottom, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  --glass-edge: rgba(255, 255, 255, 0.2);   /* der Rand trägt das Glas – die Fläche darf wegen ink-soft nicht heller */
+  --glass-light: rgba(255, 255, 255, 0.45);
+
   /* — Masse (frontend-design §2 „Responsive sizing") */
   --container: 87.5rem;
   --container-narrow: 52rem;
@@ -59,6 +75,24 @@
   --font-body: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Fragment Mono', ui-monospace, 'SFMono-Regular', monospace;
+  /* Krom-Titel (Joker 2026-11-12, Referenz „Digital Designer"): nur Hero-Rolle und Kontakt-Titel, Archivo
+   * auf 62 % Breite (wdth-Achse), 800. Import in Hero.astro + Contact.astro, nicht global. */
+  --font-krom: 'Archivo Variable', 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* — Krom (Signatur 10 „Sabit ışık"): gebürsteter Stahl, am Bildschirm festgemacht (background-attachment:
+   *   fixed in .krom) – die Schrift gleitet unter dem Licht durch. Das Licht sitzt beim Stern des Hero-Bogens
+   *   (bei 1440×900 gemessen); darunter schräge Stahlbänder, hell–dunkel im Wechsel. Im ersten Bild liegt der
+   *   Titel (≈ 20–35 % der Höhe) in der hellen Zone 12–36 %, die erste dunkle Stufe erst bei 44 % (vorher bei
+   *   35 % – ENTWICKLER lag stumpf darin, Review 2026-11-12). Dunkelste Stelle #8f95a0: 5.9:1 auf --paper
+   *   (≥ 3:1 Pflicht, Grossschrift), über dem Hero-Foto gemessen (DESIGN.md).
+   *   --krom-ruhe: dasselbe Metall ohne Wandern – für Reduced Motion und Touch (iOS ignoriert `fixed`; dort
+   *   würden sonst alle Bänder in den kleinen Schriftkasten gestaucht). */
+  --krom:
+    radial-gradient(ellipse 90% 60% at 70% 11%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(168deg, #b4bac4 0%, #f6f7f9 12%, #e4e7ec 26%, #f1f3f6 36%, #aab0ba 44%, #eef0f3 54%, #9aa0aa 66%, #e6e9ed 80%, #8f95a0 100%);
+  /* Fuss nicht dunkler als #b4bac4: mobil liegt der Fuss von ENTWICKLER auf dem Anfang des Foto-Bands
+   * (blaue LED-Leiste) – mit #9aa0aa 2.91:1 bei 390, gemessen 2026-11-12. */
+  --krom-ruhe: linear-gradient(176deg, #f6f7f9 0%, #e9ecf0 40%, #c4c9d1 75%, #b4bac4 100%);
 
   /* — Typo-Skala 390 → 1440 px (frontend-design §2, rem-Term Pflicht) */
   --step-display: clamp(2.5rem, 1.386rem + 4.571vw, 5.5rem);

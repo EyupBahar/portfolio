@@ -25,6 +25,16 @@ interface Props {
   screenSizes?: string;
   /** Fallstudie: erster Screen eager + fetchpriority high (LCP) */
   priority?: boolean;
+  /** Vitrine (Showreel.astro): mehrere Sites übereinander im selben Gerät, je `.screen-layer--n`, alt="".
+   *  Ersetzt `desktop`/`mobile`; die Bewegung schreibt die Vitrine. */
+  desktopLayers?: ImageMetadata[];
+  mobileLayers?: ImageMetadata[];
+  layerSizes?: { desktop: string; mobile: string };
+  /** Projektliste < 1024 px: lange Aufnahme der Site (`.screen-scroll`), standardmässig ausgeblendet –
+   *  ProjectRow blendet sie ein und lässt sie beim Durchscrollen der Zeile laufen. Lazy + display:none
+   *  → wird nur geladen, wo sie sichtbar ist. */
+  desktopScroll?: ImageMetadata;
+  mobileScroll?: ImageMetadata;
 }
 
 const {
@@ -36,7 +46,14 @@ const {
   screensAlt = [],
   screenSizes = '(max-width: 767px) calc((100vw - 2rem) * 0.31), (max-width: 1439px) 12vw, 160px',
   priority = false,
+  desktopLayers,
+  mobileLayers,
+  layerSizes = { desktop: '50vw', mobile: '12vw' },
+  desktopScroll,
+  mobileScroll,
 } = Astro.props;
+const hasDesktop = !!(desktop || desktopLayers?.length);
+const hasMobile = !!(mobile || mobileLayers?.length);
 ---
 
 {!desktop && screens && (
@@ -65,21 +82,46 @@ const {
   </div>
 )}
 
-{desktop && (
-<div class:list={['devices', { 'devices--solo': !mobile }]}>
+{hasDesktop && (
+<div class:list={['devices', { 'devices--solo': !hasMobile }]}>
   <div class="imac">
     <div class="imac__body">
       <div class="imac__glass">
-        <div class="imac__screen">
-          <Image
-            src={desktop}
-            alt={desktopAlt}
-            widths={[400, 560, 840, 1120, 1440]}
-            sizes="(max-width: 767px) calc((100vw - 2rem) * 0.8), (max-width: 1439px) 31vw, 450px"
-            loading="lazy"
-            decoding="async"
-            quality={78}
-          />
+        <div class:list={['imac__screen', { 'screen--lauf': desktopLayers || desktopScroll }]}>
+          {desktopLayers ? desktopLayers.map((img, i) => (
+            <Image
+              src={img}
+              alt=""
+              class={`screen-layer screen-layer--${i + 1}`}
+              widths={[720, 1080, 1440]}
+              sizes={layerSizes.desktop}
+              loading="lazy"
+              decoding="async"
+              quality={78}
+            />
+          )) : desktop && (
+            <Image
+              src={desktop}
+              alt={desktopAlt}
+              widths={[400, 560, 840, 1120, 1440]}
+              sizes="(max-width: 767px) calc((100vw - 2rem) * 0.8), (max-width: 1439px) 31vw, 450px"
+              loading="lazy"
+              decoding="async"
+              quality={78}
+            />
+          )}
+          {desktopScroll && (
+            <Image
+              src={desktopScroll}
+              alt=""
+              class="screen-scroll"
+              widths={[400, 720, 1080]}
+              sizes="calc((100vw - 2rem) * 0.8)"
+              loading="lazy"
+              decoding="async"
+              quality={78}
+            />
+          )}
         </div>
       </div>
       <div class="imac__chin"></div>
@@ -88,20 +130,45 @@ const {
     <div class="imac__foot"></div>
   </div>
 
-  {mobile && (
+  {hasMobile && (
     <div class="iphone">
       <div class="iphone__frame">
         <div class="iphone__glass">
-          <div class="iphone__screen">
-            <Image
-              src={mobile}
-              alt={mobileAlt}
-              widths={[160, 240, 360, 480]}
-              sizes="(max-width: 767px) calc((100vw - 2rem) * 0.2), (max-width: 1439px) 8vw, 110px"
-              loading="lazy"
-              decoding="async"
-              quality={78}
-            />
+          <div class:list={['iphone__screen', { 'screen--lauf': mobileLayers || mobileScroll }]}>
+            {mobileLayers ? mobileLayers.map((img, i) => (
+              <Image
+                src={img}
+                alt=""
+                class={`screen-layer screen-layer--${i + 1}`}
+                widths={[220, 440]}
+                sizes={layerSizes.mobile}
+                loading="lazy"
+                decoding="async"
+                quality={78}
+              />
+            )) : mobile && (
+              <Image
+                src={mobile}
+                alt={mobileAlt}
+                widths={[160, 240, 360, 480]}
+                sizes="(max-width: 767px) calc((100vw - 2rem) * 0.2), (max-width: 1439px) 8vw, 110px"
+                loading="lazy"
+                decoding="async"
+                quality={78}
+              />
+            )}
+            {mobileScroll && (
+              <Image
+                src={mobileScroll}
+                alt=""
+                class="screen-scroll"
+                widths={[220, 440]}
+                sizes="calc((100vw - 2rem) * 0.2)"
+                loading="lazy"
+                decoding="async"
+                quality={78}
+              />
+            )}
             <span class="iphone__island" aria-hidden="true"></span>
           </div>
         </div>
@@ -124,6 +191,23 @@ const {
     object-fit: cover;
     object-position: top center;
   }
+
+  /* Laufende Bildschirme (Vitrine, Projektliste mobil): die lange Aufnahme liegt oben bündig in voller
+   * Breite und wird per transform verschoben; der Bildschirm ist Container (cqh = seine Höhe), damit
+   * „bis zum Ende laufen" translateY(-100% + 100cqh) heisst. Die Bewegung schreiben die Aufrufer. */
+  .screen--lauf {
+    position: relative;
+    container-type: size;
+  }
+  .screen--lauf :global(.screen-layer),
+  .screen--lauf :global(.screen-scroll) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: auto;
+    object-fit: fill;
+  }
+  .screen--lauf :global(.screen-scroll) { display: none; }
 
   /* — iMac — */
   .imac { width: 84%; }

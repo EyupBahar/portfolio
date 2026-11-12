@@ -1,0 +1,233 @@
+---
+/**
+ * Messspur (Joker 2026-11-12, futuristic-design; DESIGN.md → Signatur 7) – die Signatur der Startseite.
+ * Wer scrollt, ist der Lesekopf eines Messgeräts: unten im Bild liegt eine feste Skala aus sechs
+ * Segmenten (je zwei Rasterspalten, Ticks an den Spaltenanfängen – dieselben Fugen wie im Hero). Jede
+ * Sektion füllt beim Durchlaufen IHR Segment mit einer 2-px-Stahlblau-Linie; gelesene Sektionen
+ * hinterlassen ihre Spur. Am Seitenende blendet die feste Skala aus, und dieselbe Skala steht als
+ * „Messprotokoll" im Fluss: alle Segmente voll, beschriftet mit den Sektionstiteln, als Navigation.
+ *
+ * Drei Teile, ein Bauteil:
+ *   teil="schiene"   – feste Grundskala (Hairline + Ticks), einmal pro Seite, aria-hidden
+ *   teil="segment"   – Füllung, als direktes Kind JEDER Sektion; die Sektion trägt die Klasse
+ *                      `mess-bereich` (view-timeline --mess). Projekte nutzen ihre eigene Timeline
+ *                      `--projekte` (modifier `projekte`). Kontakt = `letztes`: füllt beim Eintreten.
+ *   teil="protokoll" – das Protokoll am Ende, echte Links (nav)
+ *
+ * K0: nur CSS-Scroll-Timelines, nur transform/opacity. Ohne Scroll-Timeline oder mit Reduced Motion gibt
+ * es Schiene und Segmente nicht; das Protokoll steht immer da (statisch, voll).
+ * Segmente liegen `position: fixed` IN ihrer Sektion, damit sie deren benannte Timeline über die
+ * Vorfahrenkette finden (kein timeline-scope nötig) – keine Vorfahren mit transform dazwischen setzen.
+ */
+import { t, anchors, type Lang, type UiKey } from '../i18n/ui';
+
+interface Props {
+  teil: 'schiene' | 'segment' | 'protokoll';
+  /** segment: Position 0–5 auf der Skala */
+  index?: number;
+  /** segment: Timeline der Projekt-Sektion statt --mess */
+  projekte?: boolean;
+  /** segment: letzte Sektion – füllt beim Eintreten (ihr Ende erreicht die Bildmitte nie) */
+  letztes?: boolean;
+  lang?: Lang;
+}
+
+const { teil, index = 0, projekte = false, letztes = false, lang = 'de' } = Astro.props;
+
+const eintraege: { anchor: keyof (typeof anchors)['de']; key: UiKey }[] = [
+  { anchor: 'profile', key: 'facts.label' },
+  { anchor: 'focus', key: 'focus.title' },
+  { anchor: 'stack', key: 'stack.title' },
+  { anchor: 'projects', key: 'projects.title' },
+  { anchor: 'process', key: 'process.title' },
+  { anchor: 'contact', key: 'contact.title' },
+];
+---
+
+{teil === 'schiene' && (
+  <div class="mess-schiene" aria-hidden="true">
+    <div class="mess-schiene__flaeche"><span class="mess-schiene__skala"></span></div>
+  </div>
+)}
+
+{teil === 'segment' && (
+  <span
+    class:list={['mess-segment', `mess-segment--${index}`, { 'mess-segment--projekte': projekte, 'mess-segment--letztes': letztes }]}
+    aria-hidden="true"
+  ></span>
+)}
+
+{teil === 'protokoll' && (
+  <nav class="mess-protokoll" aria-label={t(lang, 'protocol.label')}>
+    <ol class="mess-protokoll__liste" role="list">
+      {eintraege.map((e, i) => (
+        <li>
+          <a href={`#${anchors[lang][e.anchor]}`}>
+            <span class="mono mess-protokoll__nr">{String(i + 1).padStart(2, '0')}</span>
+            <span class="mess-protokoll__titel">{t(lang, e.key)}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  /* — Skala-Geometrie: sechs Schritte à zwei Rasterspalten (Spalte + Gap), Segment = Schritt − Gap.
+   *   In festen Elementen ist 100 % = Breite des Viewports ohne Scrollleiste, wie beim .container. */
+  .mess-schiene,
+  .mess-segment {
+    --W: min(100% - 2 * var(--gutter), var(--container));
+    --schritt: calc((var(--W) + var(--gap)) / 6);
+    --unten: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    display: none;
+  }
+  /* Mobil gibt es kein 12-Spalten-Raster: engere Fugen, sonst lesen sich 46-px-Segmente als Strichlinie */
+  @media (max-width: 767px) {
+    .mess-schiene,
+    .mess-segment { --gap: 0.5rem; }
+  }
+  .mess-segment--0 { --i: 0; }
+  .mess-segment--1 { --i: 1; }
+  .mess-segment--2 { --i: 2; }
+  .mess-segment--3 { --i: 3; }
+  .mess-segment--4 { --i: 4; }
+  .mess-segment--5 { --i: 5; }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      :global(.mess-bereich) {
+        view-timeline-name: --mess;
+        view-timeline-axis: block;
+      }
+
+      /* Grundskala auf einer schmalen Fläche in Seitengrund (Gegenstück zur Kopfzeile): ohne sie lief Text
+       * beim Scrollen unter der 2-px-Linie durch und las sich durchgestrichen (Review 2026-11-12, 390 px).
+       * Erscheint, wenn das Hero geht; die Fläche verschwindet, bevor das Messprotokoll ins Bild kommt
+       * (sonst zwei Skalen zugleich). Hairline je Segment + 7-px-Tick am Segmentanfang. */
+      .mess-schiene {
+        display: block;
+        position: fixed;
+        z-index: 4;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: calc(var(--unten) + 7px + 0.5rem);
+        pointer-events: none;
+        animation-name: mess-ein;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root);
+        animation-range: 30svh 90svh;
+      }
+      .mess-schiene__flaeche {
+        position: absolute;
+        inset: 0;
+        background: var(--paper);
+        border-top: 1px solid var(--hairline);
+        animation-name: mess-aus;
+        animation-duration: 1ms;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root);
+        animation-range: calc(100% - 60svh) calc(100% - 25svh);
+      }
+      .mess-schiene__skala {
+        position: absolute;
+        left: calc((100% - var(--W)) / 2);
+        bottom: var(--unten);
+        width: var(--W);
+        height: 7px;
+        background-image:
+          linear-gradient(to right, var(--hairline-strong) calc(100% - var(--gap)), transparent 0),
+          linear-gradient(to right, var(--hairline-strong) 1px, transparent 1px);
+        /* hier ist 100 % die Skalenbreite (= --W), nicht der Viewport → Schritt neu aus 100 % */
+        background-size: calc((100% + var(--gap)) / 6) 1px, calc((100% + var(--gap)) / 6) 100%;
+        background-position: 0 100%, 0 0;
+        background-repeat: repeat-x;
+      }
+
+      /* Füllung: 2 px Stahlblau auf der Segment-Hairline; wächst von links, solange die Sektion
+       * vollständig im Bild ist und weiterläuft (contain), blendet am Seitenende mit der Schiene aus */
+      .mess-segment {
+        display: block;
+        position: fixed;
+        z-index: 4;
+        left: calc((100% - var(--W)) / 2 + var(--i) * var(--schritt));
+        bottom: var(--unten);
+        width: calc(var(--schritt) - var(--gap));
+        height: 2px;
+        background: var(--accent);
+        transform-origin: 0 50%;
+        pointer-events: none;
+        animation-name: mess-fuellen, mess-aus;
+        animation-duration: 1ms, 1ms;
+        animation-timing-function: linear, linear;
+        animation-fill-mode: both, both;
+        animation-timeline: --mess, scroll(root);
+        animation-range: contain, calc(100% - 60svh) calc(100% - 25svh);
+      }
+      .mess-segment--projekte {
+        animation-timeline: --projekte, scroll(root);
+      }
+      .mess-segment--letztes {
+        animation-range: entry, calc(100% - 60svh) calc(100% - 25svh);
+      }
+    }
+  }
+
+  @keyframes mess-ein { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes mess-aus { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes mess-fuellen { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* — Messprotokoll — dieselbe Skala im Fluss, alle Segmente voll; mobil 2, ab 768 px 6 Spalten
+   *   (= je zwei Rasterspalten wie die Schiene). Hover/Fokus: Titel in den Akzent (Indikator-Logik). */
+  .mess-protokoll {
+    margin-top: var(--section-y);
+  }
+  .mess-protokoll__liste {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: 1.75rem;
+  }
+  .mess-protokoll__liste a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 2.75rem;
+    padding-top: 0.9rem;
+    border-top: 2px solid var(--accent);
+    text-decoration: none;
+  }
+  /* Tick am Segmentanfang wie auf der Schiene */
+  .mess-protokoll__liste a::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 0;
+    width: 1px;
+    height: 7px;
+    background: var(--hairline-strong);
+  }
+  .mess-protokoll__nr { color: var(--ink-soft); }
+  /* Als Links erkennbar auch ohne Hover (Touch): Grundgrösse + leise Unterstreichung (Review) */
+  .mess-protokoll__titel {
+    font-size: var(--step-body);
+    line-height: 1.3;
+    text-decoration: underline;
+    text-decoration-color: var(--hairline-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    transition: color var(--dur) var(--ease);
+  }
+  @media (hover: hover) {
+    .mess-protokoll__liste a:hover .mess-protokoll__titel { color: var(--accent); }
+  }
+  .mess-protokoll__liste a:focus-visible .mess-protokoll__titel { color: var(--accent); }
+  @media (min-width: 768px) {
+    .mess-protokoll__liste { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+</style>

@@ -2,6 +2,13 @@
 
 I build websites and web applications with Astro, Next.js, Angular and React, AI-assisted with Claude Code. Experience from four companies – from micro-frontends for a super-app with millions of users to client projects with their own CMS.
 
+## Key figures
+
+- 4 Years of practice since 2021
+- 4 Companies
+- 7 Case studies
+- 3 Languages
+
 ## At a glance
 
 - Location: Bern area, Switzerland
@@ -33,15 +40,17 @@ Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, Postgre
 - [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin/): Rebuild of the website for a bicycle, e-bike and motorbike shop – with a custom product CMS where the shop manages vehicles, images and announcements on its own.
 - [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen/): Self-managed website for a tennis centre – publish tournaments, take online registrations for tournaments and the tennis school, edit every text and image in the admin.
 - [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita/): Rebuild of a language school website with a lean file-based CMS – the school manages images, courses, prices and contact details on its own, without a database.
-- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/en/projects/kent-ormani/): Mini app for the Kemerburgaz urban forest inside «İstanbul Senin», the super-app of the City of Istanbul: interactive map with places by category, search, events, payments and contact – a micro-frontend in the native app.
 - [Euphrat Reinigung](https://eyupbahar.com/en/projects/euphrat-reinigung/): Website for a cleaning company in the Bern region – five service pages, eight local pages for local search, quote requests through a form and quick contact via WhatsApp and phone on mobile.
-- [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine/): Full-stack catalogue for machinery, spare parts and service – an ASP.NET Core API with a Next.js front end and an admin area for managing categories, subcategories and image galleries.
-- [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop/): Multilingual online shop as a React app – product catalogue, cart, checkout, customer account with Google sign-in and admin pages for products and orders.
+
+[All projects](https://eyupbahar.com/en/projects/)
 
 ## Contact
+
+Let's talk. Email or LinkedIn is the quickest way to reach me.
 
 - Email: eyupbhr24@gmail.com
 - LinkedIn: https://www.linkedin.com/in/eyup-bahar/
 - GitHub: https://github.com/EyupBahar
+- Location: Bern area, Switzerland
 
 Quelle/Source: https://eyupbahar.com/en/

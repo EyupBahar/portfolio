@@ -2,6 +2,13 @@
 
 Ich entwickle Websites und Web-Applikationen mit Astro, Next.js, Angular und React, KI-gestützt mit Claude Code. Praxis aus vier Unternehmen – von Micro-Frontends für eine Super-App mit Millionen Nutzern bis zu Kundenprojekten mit eigenem CMS.
 
+## Kennzahlen
+
+- 4 Jahre Praxis seit 2021
+- 4 Unternehmen
+- 7 Fallstudien
+- 3 Sprachen
+
 ## Kurzprofil
 
 - Standort: Raum Bern, Schweiz
@@ -33,18 +40,88 @@ Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, Postgre
 - [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin/): Neubau der Website eines Fachgeschäfts für Velos, E-Bikes und Motorräder – mit eigenem Produkt-CMS, in dem das Geschäft Fahrzeuge, Bilder und Ankündigungen selbst pflegt.
 - [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen/): Website mit Selbstverwaltung für ein Tenniscenter – Turniere veröffentlichen, Online-Anmeldungen für Turniere und Tennisschule, alle Texte und Bilder im Admin bearbeitbar.
 - [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita/): Neubau einer Sprachschul-Website mit schlankem Datei-CMS – die Schule pflegt Bilder, Kurse, Preise und Kontaktdaten selbst, ohne Datenbank.
-- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/projekte/kent-ormani/): Mini-App für den Stadtwald Kemerburgaz in «İstanbul Senin», der Super-App der Stadt Istanbul: interaktive Karte mit Orten nach Kategorie, Suche, Veranstaltungen, Zahlungen und Kontakt – als Micro-Frontend in der nativen App.
 - [Euphrat Reinigung](https://eyupbahar.com/projekte/euphrat-reinigung/): Website einer Reinigungsfirma für die Region Bern – fünf Leistungsseiten, acht Ortsseiten für die lokale Suche, Offertanfrage per Formular und Schnellkontakt über WhatsApp und Telefon auf dem Handy.
-- [Helvetia Machine](https://eyupbahar.com/projekte/helvetia-machine/): Full-Stack-Katalog für Maschinen, Ersatzteile und Service – eine ASP.NET-Core-API mit Next.js-Frontend und einem Admin-Bereich, in dem Kategorien, Unterkategorien und Bildergalerien gepflegt werden.
-- [Pinocchio Shop](https://eyupbahar.com/projekte/pinocchio-shop/): Mehrsprachiger Online-Shop als React-App – Produktkatalog, Warenkorb, Checkout, Kundenkonto mit Google-Login und Admin-Seiten für Produkte und Bestellungen.
+
+[Alle Projekte](https://eyupbahar.com/projekte/)
 
 ## Kontakt
+
+Sprechen wir. Am einfachsten per E-Mail oder über LinkedIn.
 
 - E-Mail: eyupbhr24@gmail.com
 - LinkedIn: https://www.linkedin.com/in/eyup-bahar/
 - GitHub: https://github.com/EyupBahar
+- Standort: Raum Bern, Schweiz
 
 Quelle/Source: https://eyupbahar.com/
+
+---
+
+# Projekte
+
+## [Zweirad Gisin](https://eyupbahar.com/projekte/zweirad-gisin/)
+
+2026 · Kundenprojekt · Zweiradgeschäft, Roggwil BE
+
+Neubau der Website eines Fachgeschäfts für Velos, E-Bikes und Motorräder – mit eigenem Produkt-CMS, in dem das Geschäft Fahrzeuge, Bilder und Ankündigungen selbst pflegt.
+
+Stack: Astro, TypeScript, Neon Postgres, Drizzle, Vercel Blob, Resend, Vitest
+Website: https://www.zweiradgisin.ch
+
+## [SMASH Münsingen](https://eyupbahar.com/projekte/smash-muensingen/)
+
+2026 · Kundenprojekt · Tennis- und Padelcenter, Münsingen BE
+
+Website mit Selbstverwaltung für ein Tenniscenter – Turniere veröffentlichen, Online-Anmeldungen für Turniere und Tennisschule, alle Texte und Bilder im Admin bearbeitbar.
+
+Stack: Astro, TypeScript, Vercel Blob, Resend, Vitest
+Website: https://smash-muensingen.vercel.app
+
+## [Norsk med Rita](https://eyupbahar.com/projekte/norskmedrita/)
+
+2026 · Kundenprojekt · Sprachschule für Norwegisch
+
+Neubau einer Sprachschul-Website mit schlankem Datei-CMS – die Schule pflegt Bilder, Kurse, Preise und Kontaktdaten selbst, ohne Datenbank.
+
+Stack: Astro, TypeScript, Vercel Blob, Zod, Vitest
+Website: https://www.norskmedrita.ch
+
+## [Kemerburgaz Kent Ormanı](https://eyupbahar.com/projekte/kent-ormani/)
+
+2022 · Kundenprojekt · Mini-App in «İstanbul Senin», der Super-App der Stadt Istanbul
+
+Mini-App für den Stadtwald Kemerburgaz in «İstanbul Senin», der Super-App der Stadt Istanbul: interaktive Karte mit Orten nach Kategorie, Suche, Veranstaltungen, Zahlungen und Kontakt – als Micro-Frontend in der nativen App.
+
+Stack: React, React Leaflet, Material UI, Figma, Nifty
+
+## [Euphrat Reinigung](https://eyupbahar.com/projekte/euphrat-reinigung/)
+
+2026 · Kundenprojekt · Reinigungsfirma, Kaufdorf BE
+
+Website einer Reinigungsfirma für die Region Bern – fünf Leistungsseiten, acht Ortsseiten für die lokale Suche, Offertanfrage per Formular und Schnellkontakt über WhatsApp und Telefon auf dem Handy.
+
+Stack: Astro, TypeScript, Web3Forms, Vercel
+Website: https://euphratreinigung.ch
+
+## [Helvetia Machine](https://eyupbahar.com/projekte/helvetia-machine/)
+
+2026 · Eigenes Projekt · Produktkatalog mit Admin-CMS, Demo
+
+Full-Stack-Katalog für Maschinen, Ersatzteile und Service – eine ASP.NET-Core-API mit Next.js-Frontend und einem Admin-Bereich, in dem Kategorien, Unterkategorien und Bildergalerien gepflegt werden.
+
+Stack: ASP.NET Core 9, C#, Entity Framework Core, PostgreSQL, Next.js 16, TypeScript, Tailwind CSS, Docker, Cloudinary
+Repository: https://github.com/EyupBahar/helvetia_machine
+
+## [Pinocchio Shop](https://eyupbahar.com/projekte/pinocchio-shop/)
+
+2025 · Eigenes Projekt · Online-Shop für Saucen und Feinkost, Frontend
+
+Mehrsprachiger Online-Shop als React-App – Produktkatalog, Warenkorb, Checkout, Kundenkonto mit Google-Login und Admin-Seiten für Produkte und Bestellungen.
+
+Stack: React 19, Vite, React Router, TanStack Query, Axios, Tailwind CSS, Google OAuth
+Repository: https://github.com/EyupBahar/pinocchio_shop_fe
+
+Quelle/Source: https://eyupbahar.com/projekte/
 
 ---
 
@@ -292,6 +369,13 @@ Quelle/Source: https://eyupbahar.com/projekte/pinocchio-shop/
 
 I build websites and web applications with Astro, Next.js, Angular and React, AI-assisted with Claude Code. Experience from four companies – from micro-frontends for a super-app with millions of users to client projects with their own CMS.
 
+## Key figures
+
+- 4 Years of practice since 2021
+- 4 Companies
+- 7 Case studies
+- 3 Languages
+
 ## At a glance
 
 - Location: Bern area, Switzerland
@@ -323,18 +407,88 @@ Astro, Next.js, Angular, React, TypeScript, Node.js, Supabase, Firebase, Postgre
 - [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin/): Rebuild of the website for a bicycle, e-bike and motorbike shop – with a custom product CMS where the shop manages vehicles, images and announcements on its own.
 - [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen/): Self-managed website for a tennis centre – publish tournaments, take online registrations for tournaments and the tennis school, edit every text and image in the admin.
 - [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita/): Rebuild of a language school website with a lean file-based CMS – the school manages images, courses, prices and contact details on its own, without a database.
-- [Kemerburgaz Kent Ormanı](https://eyupbahar.com/en/projects/kent-ormani/): Mini app for the Kemerburgaz urban forest inside «İstanbul Senin», the super-app of the City of Istanbul: interactive map with places by category, search, events, payments and contact – a micro-frontend in the native app.
 - [Euphrat Reinigung](https://eyupbahar.com/en/projects/euphrat-reinigung/): Website for a cleaning company in the Bern region – five service pages, eight local pages for local search, quote requests through a form and quick contact via WhatsApp and phone on mobile.
-- [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine/): Full-stack catalogue for machinery, spare parts and service – an ASP.NET Core API with a Next.js front end and an admin area for managing categories, subcategories and image galleries.
-- [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop/): Multilingual online shop as a React app – product catalogue, cart, checkout, customer account with Google sign-in and admin pages for products and orders.
+
+[All projects](https://eyupbahar.com/en/projects/)
 
 ## Contact
+
+Let's talk. Email or LinkedIn is the quickest way to reach me.
 
 - Email: eyupbhr24@gmail.com
 - LinkedIn: https://www.linkedin.com/in/eyup-bahar/
 - GitHub: https://github.com/EyupBahar
+- Location: Bern area, Switzerland
 
 Quelle/Source: https://eyupbahar.com/en/
+
+---
+
+# Projects
+
+## [Zweirad Gisin](https://eyupbahar.com/en/projects/zweirad-gisin/)
+
+2026 · Client project · Bicycle and motorbike shop, Roggwil BE
+
+Rebuild of the website for a bicycle, e-bike and motorbike shop – with a custom product CMS where the shop manages vehicles, images and announcements on its own.
+
+Stack: Astro, TypeScript, Neon Postgres, Drizzle, Vercel Blob, Resend, Vitest
+Website: https://www.zweiradgisin.ch
+
+## [SMASH Münsingen](https://eyupbahar.com/en/projects/smash-muensingen/)
+
+2026 · Client project · Tennis and padel centre, Münsingen BE
+
+Self-managed website for a tennis centre – publish tournaments, take online registrations for tournaments and the tennis school, edit every text and image in the admin.
+
+Stack: Astro, TypeScript, Vercel Blob, Resend, Vitest
+Website: https://smash-muensingen.vercel.app
+
+## [Norsk med Rita](https://eyupbahar.com/en/projects/norskmedrita/)
+
+2026 · Client project · Norwegian language school
+
+Rebuild of a language school website with a lean file-based CMS – the school manages images, courses, prices and contact details on its own, without a database.
+
+Stack: Astro, TypeScript, Vercel Blob, Zod, Vitest
+Website: https://www.norskmedrita.ch
+
+## [Kemerburgaz Kent Ormanı](https://eyupbahar.com/en/projects/kent-ormani/)
+
+2022 · Client project · Mini app in «İstanbul Senin», the super-app of the City of Istanbul
+
+Mini app for the Kemerburgaz urban forest inside «İstanbul Senin», the super-app of the City of Istanbul: interactive map with places by category, search, events, payments and contact – a micro-frontend in the native app.
+
+Stack: React, React Leaflet, Material UI, Figma, Nifty
+
+## [Euphrat Reinigung](https://eyupbahar.com/en/projects/euphrat-reinigung/)
+
+2026 · Client project · Cleaning company, Kaufdorf BE
+
+Website for a cleaning company in the Bern region – five service pages, eight local pages for local search, quote requests through a form and quick contact via WhatsApp and phone on mobile.
+
+Stack: Astro, TypeScript, Web3Forms, Vercel
+Website: https://euphratreinigung.ch
+
+## [Helvetia Machine](https://eyupbahar.com/en/projects/helvetia-machine/)
+
+2026 · Own project · Product catalogue with admin CMS, demo
+
+Full-stack catalogue for machinery, spare parts and service – an ASP.NET Core API with a Next.js front end and an admin area for managing categories, subcategories and image galleries.
+
+Stack: ASP.NET Core 9, C#, Entity Framework Core, PostgreSQL, Next.js 16, TypeScript, Tailwind CSS, Docker, Cloudinary
+Repository: https://github.com/EyupBahar/helvetia_machine
+
+## [Pinocchio Shop](https://eyupbahar.com/en/projects/pinocchio-shop/)
+
+2025 · Own project · Online shop for sauces and delicacies, front end
+
+Multilingual online shop as a React app – product catalogue, cart, checkout, customer account with Google sign-in and admin pages for products and orders.
+
+Stack: React 19, Vite, React Router, TanStack Query, Axios, Tailwind CSS, Google OAuth
+Repository: https://github.com/EyupBahar/pinocchio_shop_fe
+
+Quelle/Source: https://eyupbahar.com/en/projects/
 
 ---
 

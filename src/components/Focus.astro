@@ -1,13 +1,19 @@
 ---
 /**
- * Schwerpunkte: drei statische Panels auf dem Block card--numarali (ohne Nummernzeile – die drei
- * Punkte haben keine Reihenfolge, siehe card README). Raster asymmetrisch 2fr 1fr 1fr, damit keine
- * Reihe aus drei gleichen Karten entsteht (frontend-design §1); Panels mit Abstand (Joker 2026-11-09:
- * „gap ver" – vorher Fugen-Raster). Keine Links, deshalb kein Hover-Lift (overrides.css §6) – nur die
- * Indikatorlinie oben, das Icon wechselt in den Akzent.
+ * Schwerpunkte als Wendekarten (Joker 2026-11-12: „kartların hepsini eşit yap, kartta sadece logo ortada,
+ * hover'da arka tarafına dönsün, açıklamalar arkada"): drei gleich breite, gleich hohe Karten. Vorderseite nur
+ * das Icon, gross und mittig; Rückseite Titel, Text und Stack-Zeile. Titel/Text/Indikatorlinie aus dem Block
+ * card--numarali (Klassen einzeln, die Karte selbst ist keine .db-card-num mehr – deren :hover-Regeln
+ * würden die gedrehte Rückseite zurückdrehen). Kein Block in design-blocks hat eine Wendekarte.
+ *
+ * Dreht bei: Maus-Hover, Tastaturfokus (Tab, deshalb tabindex) und Antippen auf Touch-Geräten (:focus,
+ * nur bei hover: none). Reines CSS, kein JS. Reduce: keine Drehung, die Seiten wechseln ohne Bewegung.
+ * Screenreader lesen die Rückseite immer (backface-visibility verbirgt nur das Bild); die Vorderseite ist
+ * reine Grafik und aria-hidden.
  */
 import { Icon } from 'astro-icon/components';
-import { t, type Lang, type UiKey } from '../i18n/ui';
+import { t, anchors, type Lang, type UiKey } from '../i18n/ui';
+import Messspur from './Messspur.astro';
 import { focus } from '../data/focus';
 
 interface Props {
@@ -17,21 +23,26 @@ interface Props {
 const { lang } = Astro.props;
 ---
 
-<section class="focus section" aria-labelledby="focus-title">
+<section class="focus section mess-bereich" id={anchors[lang].focus} aria-labelledby="focus-title">
+  <Messspur teil="segment" index={1} />
   <div class="container">
     <h2 class="section-title" id="focus-title">{t(lang, 'focus.title')}</h2>
-    <div class="db-card-num-grid focus__grid">
+    <div class="focus__grid">
       {focus.map((f) => (
-        <article class="db-card-num">
-          <span class="db-card-num__bar" aria-hidden="true"></span>
-          <div class="db-card-num__head">
-            <span class="db-card-num__tile" aria-hidden="true"><Icon name={f.icon} /></span>
+        <article class="focus-karte" tabindex="0" aria-labelledby={`focus-${f.key}`}>
+          <div class="focus-karte__dreh">
+            <div class="focus-karte__seite focus-karte__seite--vorn" aria-hidden="true">
+              <Icon name={f.icon} class="focus-karte__logo" />
+            </div>
+            <div class="focus-karte__seite focus-karte__seite--hinten">
+              <span class="db-card-num__bar" aria-hidden="true"></span>
+              <h3 class="db-card-num__title" id={`focus-${f.key}`}>{t(lang, `focus.${f.key}.title` as UiKey)}</h3>
+              <p class="db-card-num__desc">{t(lang, `focus.${f.key}.text` as UiKey)}</p>
+              <ul class="mono focus__stack" role="list" aria-label={t(lang, 'stack.title')}>
+                {f.stack.map((s) => <li>{s}</li>)}
+              </ul>
+            </div>
           </div>
-          <h3 class="db-card-num__title">{t(lang, `focus.${f.key}.title` as UiKey)}</h3>
-          <p class="db-card-num__desc">{t(lang, `focus.${f.key}.text` as UiKey)}</p>
-          <ul class="mono focus__stack" role="list" aria-label={t(lang, 'stack.title')}>
-            {f.stack.map((s) => <li>{s}</li>)}
-          </ul>
         </article>
       ))}
     </div>
@@ -39,10 +50,101 @@ const { lang } = Astro.props;
 </section>
 
 <style>
+  /* Raster: alle Karten gleich breit und gleich hoch (1fr-Zeilen = höchste Rückseite).
+   * Drei Spalten erst ab 1024 px – bei 768 px bliebe für den Text der Rückseite ~160 px Breite. */
   .focus__grid {
+    display: grid;
     grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: 1fr;
     gap: var(--panel-gap);
   }
+  @media (min-width: 1024px) {
+    .focus__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  /* Zustand „gedreht" an EINER Stelle, als Variablen: Maus-Hover, Tastaturfokus, Antippen (Touch).
+   * Die Karte selbst dreht sich nie – nur .focus-karte__dreh –, so bleibt die Hover-Fläche stabil,
+   * auch wenn die drehende Fläche bei 90° zur Linie wird (sonst Flackern). */
+  .focus-karte {
+    --gedreht: 0;
+    --rand: var(--glass-edge);
+    --rand-oben: var(--glass-light);
+    display: grid;
+    perspective: 1400px;
+  }
+  @media (hover: hover) {
+    .focus-karte:hover {
+      --gedreht: 1;
+      --rand: var(--accent);
+      --rand-oben: var(--accent);
+    }
+  }
+  .focus-karte:focus-visible {
+    --gedreht: 1;
+    --rand: var(--accent);
+    --rand-oben: var(--accent);
+  }
+  @media (hover: none) {
+    .focus-karte:focus {
+      --gedreht: 1;
+      --rand: var(--accent);
+      --rand-oben: var(--accent);
+    }
+  }
+
+  .focus-karte__dreh {
+    display: grid;
+    transform-style: preserve-3d;
+    transform: rotateY(calc(var(--gedreht) * 180deg));
+    transition: transform 0.6s var(--ease);
+  }
+
+  /* Beide Seiten liegen in derselben Rasterzelle; die höhere bestimmt die Kartenhöhe.
+   * Fläche wie .panel (Glas, Joker 2026-11-12); Ecken 0. */
+  .focus-karte__seite {
+    grid-area: 1 / 1;
+    position: relative; /* für die Indikatorlinie */
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-height: 17rem;
+    padding: 2rem;
+    border: 1px solid var(--rand);
+    border-top-color: var(--rand-oben);
+    border-radius: 0;
+    background: var(--glass);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: border-color var(--dur) var(--ease);
+  }
+  /* Vorderseite: nur das Icon, in beiden Achsen mittig. Eigenes rotateY(0), damit WebKit die
+   * Rückseite der Vorderseite sicher ausblendet. */
+  .focus-karte__seite--vorn {
+    align-items: center;
+    justify-content: center;
+    transform: rotateY(0deg);
+  }
+  .focus-karte__seite--hinten { transform: rotateY(180deg); }
+
+  /* Icon: Jokers Zeichnungen, 6–8rem (vorher 4rem; Joker 2026-11-12 „logoları büyüt"), Silber (Joker 2026-11-12
+   * „kartlar gümüş olsun"; wie die Tasten: Silber als Material, Stahlblau nur als Indikator beim Drehen) */
+  .focus-karte__logo {
+    display: block;
+    width: clamp(6rem, 4.5rem + 4vw, 8rem);
+    height: clamp(6rem, 4.5rem + 4vw, 8rem);
+    color: var(--ink);
+  }
+
+  /* Indikatorlinie oben auf der Rückseite: zieht sich nach der Drehung auf (Block: bei Hover).
+   * Eigenes backface-visibility: Safari legt ein transformiertes Kind in eine eigene Ebene, die das
+   * hidden der Seite nicht erbt – sonst blitzt die Linie beim Zurückdrehen gespiegelt auf. */
+  .focus-karte .db-card-num__bar {
+    transform: scaleX(var(--gedreht));
+    transition-delay: calc(var(--gedreht) * 0.3s);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
   .focus__stack {
     display: flex;
     flex-wrap: wrap;
@@ -52,12 +154,42 @@ const { lang } = Astro.props;
     color: var(--ink-soft);
   }
 
-  @media (min-width: 768px) {
-    .focus__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .focus__grid > :first-child { grid-column: 1 / -1; }
-  }
-  @media (min-width: 1280px) {
-    .focus__grid { grid-template-columns: 2fr 1fr 1fr; }
-    .focus__grid > :first-child { grid-column: auto; }
+  /* Reduce: keine Drehung – die Rückseite liegt ungedreht obenauf und wird nur sichtbar geschaltet */
+  @media (prefers-reduced-motion: reduce) {
+    .focus-karte__dreh {
+      transform: none;
+      transition: none;
+    }
+    .focus-karte__seite { transition: none; }
+    .focus-karte__seite--vorn { opacity: calc(1 - var(--gedreht)); }
+    .focus-karte__seite--hinten {
+      transform: none;
+      opacity: var(--gedreht);
+    }
+    .focus-karte .db-card-num__bar { transition: none; }
   }
 </style>
+
+<script>
+  // K1: Touch dreht per :focus (CSS, geht auch ohne JS). Ohne Hilfe bliebe die Karte gedreht, bis eine
+  // andere den Fokus nimmt – Antippen daneben fokussiert in WebKit nichts. Deshalb: zweites Antippen
+  // derselben Karte oder Antippen ausserhalb dreht zurück (blur). Maus und Tastatur bleiben unberührt.
+  let gedrehtBeimDruck: HTMLElement | null = null;
+  document.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (e.pointerType === 'mouse') return;
+      const aktiv = document.activeElement;
+      const offen = aktiv instanceof HTMLElement && aktiv.matches('.focus-karte') ? aktiv : null;
+      const karte = e.target instanceof Element ? e.target.closest<HTMLElement>('.focus-karte') : null;
+      gedrehtBeimDruck = offen && karte === offen ? offen : null;
+      if (offen && !karte) offen.blur();
+    },
+    { passive: true },
+  );
+  document.addEventListener('click', (e) => {
+    const karte = e.target instanceof Element ? e.target.closest<HTMLElement>('.focus-karte') : null;
+    if (karte && karte === gedrehtBeimDruck) karte.blur();
+    gedrehtBeimDruck = null;
+  });
+</script>

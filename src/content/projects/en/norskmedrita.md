@@ -11,6 +11,8 @@ liveUrl: https://www.norskmedrita.ch
 cover: ../../../assets/projects/norskmedrita.webp
 coverAlt: norskmedrita.ch home page with a harbour view of Bergen
 coverMobile: ../../../assets/projects/norskmedrita-mobile.webp
+screenFull: ../../../assets/projects/norskmedrita-full.webp
+screenFullMobile: ../../../assets/projects/norskmedrita-full-mobile.webp
 order: 3
 ---
 

@@ -59,6 +59,16 @@ export const ui = {
     'stack.bandLabel': 'Technologien, Laufband',
     'stack.pause': 'Laufband anhalten',
 
+    // Krom-Umbau (Joker 2026-11-12, Referenz „Digital Designer") – Entwürfe, Freigabe Joker.
+    // Kennzahlen: Jahre = Angabe Joker (4, 2026-11-12; Lebenslauf „rund drei Jahre" seit 10/2021, siehe stats.ts) und hero.lead („vier Unternehmen");
+    // Fallstudien werden aus der Content-Collection gezählt.
+    'stats.label': 'Kennzahlen',
+    'stats.years': 'Jahre Praxis seit 2021',
+    'stats.companies': 'Unternehmen',
+    'stats.cases': 'Fallstudien',
+    'stats.languages': 'Sprachen',
+    'contact.headline': 'Sprechen wir.',
+
     // Ablauf (Entwurf: beschreibt die tatsächliche Arbeitsweise mit automatisierten Prüfungen)
     'process.title': 'Wie ich arbeite',
     'process.analysis.title': 'Analyse',
@@ -84,14 +94,29 @@ export const ui = {
     'projects.repo': 'Code auf GitHub',
     'projects.stack': 'Stack',
     'projects.mobileAlt': 'Dieselbe Startseite in der mobilen Ansicht',
+    'projects.all': 'Alle Projekte',
+    // Projekte-Seite /projekte/ (specs/001-projekt-slider). Beschreibung nur aus den Projektdaten.
+    'projects.page.title': 'Projekte',
+    'projects.page.metaTitle': 'Projekte: Websites und Web-Applikationen',
+    'projects.page.description':
+      'Alle Projekte von Eyüp Bahar: Kundenwebsites, eine Mini-App in der Super-App der Stadt Istanbul und eigene Projekte wie Produktkatalog und Online-Shop.',
+    // Projekt-Slider der Startseite. slider.label = aria-roledescription des Karussells.
+    'slider.label': 'Karussell',
+    'slider.tabs': 'Projekt wählen',
+    'slider.prev': 'Vorheriges Projekt',
+    'slider.next': 'Nächstes Projekt',
+    'slider.case': 'Fallstudie ansehen',
 
     'contact.title': 'Kontakt',
     'contact.lead': 'Am einfachsten per E-Mail oder über LinkedIn.',
     'contact.email': 'E-Mail',
     'contact.cvDe': 'Lebenslauf, Deutsch (PDF)',
     'contact.cvEn': 'CV, English (PDF)',
+    /** Messprotokoll am Seitenende (Messspur, DESIGN.md → Signatur 7): Name der Navigation */
+    'protocol.label': 'Seitenübersicht',
 
     'case.back': 'Alle Projekte',
+    'case.backHome': 'Zurück zur Startseite',
     'case.facts': 'Projektdaten',
     'case.kind': 'Art',
     'case.period': 'Zeitraum',
@@ -150,6 +175,13 @@ export const ui = {
     'stack.bandLabel': 'Technologies, moving strip',
     'stack.pause': 'Pause the strip',
 
+    'stats.label': 'Key figures',
+    'stats.years': 'Years of practice since 2021',
+    'stats.companies': 'Companies',
+    'stats.cases': 'Case studies',
+    'stats.languages': 'Languages',
+    'contact.headline': "Let's talk.",
+
     'process.title': 'How I work',
     'process.analysis.title': 'Analysis',
     'process.analysis.text':
@@ -173,14 +205,26 @@ export const ui = {
     'projects.repo': 'Code on GitHub',
     'projects.stack': 'Stack',
     'projects.mobileAlt': 'The same home page in the mobile view',
+    'projects.all': 'All projects',
+    'projects.page.title': 'Projects',
+    'projects.page.metaTitle': 'Projects: websites and web applications',
+    'projects.page.description':
+      'All projects by Eyüp Bahar: client websites, a mini app in the super-app of the City of Istanbul and own projects like a product catalogue and an online shop.',
+    'slider.label': 'carousel',
+    'slider.tabs': 'Choose a project',
+    'slider.prev': 'Previous project',
+    'slider.next': 'Next project',
+    'slider.case': 'View case study',
 
     'contact.title': 'Contact',
     'contact.lead': 'Email or LinkedIn is the quickest way to reach me.',
     'contact.email': 'Email',
     'contact.cvDe': 'Lebenslauf, German (PDF)',
     'contact.cvEn': 'CV, English (PDF)',
+    'protocol.label': 'Page overview',
 
     'case.back': 'All projects',
+    'case.backHome': 'Back to home',
     'case.facts': 'Project details',
     'case.kind': 'Type',
     'case.period': 'Period',
@@ -204,6 +248,7 @@ export function t(lang: Lang, key: UiKey): string {
 export const routes = {
   home: { de: '/', en: '/en/' },
   privacy: { de: '/datenschutz/', en: '/en/privacy/' },
+  projects: { de: '/projekte/', en: '/en/projects/' },
   project: (slug: string) => ({ de: `/projekte/${slug}/`, en: `/en/projects/${slug}/` }),
 } as const;
 
@@ -211,6 +256,6 @@ export type Alternates = { de: string; en: string };
 
 /** Sprungmarken der Startseite – lesbar in der jeweiligen Sprache. */
 export const anchors = {
-  de: { projects: 'projekte', contact: 'kontakt' },
-  en: { projects: 'projects', contact: 'contact' },
+  de: { profile: 'kurzprofil', focus: 'schwerpunkte', stack: 'stack', projects: 'projekte', process: 'ablauf', contact: 'kontakt' },
+  en: { profile: 'profile', focus: 'focus', stack: 'stack', projects: 'projects', process: 'process', contact: 'contact' },
 } as const;

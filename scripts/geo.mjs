@@ -12,6 +12,7 @@ import { profile } from '../src/data/profile.ts';
 import { focus } from '../src/data/focus.ts';
 import { stack } from '../src/data/stack.ts';
 import { process } from '../src/data/process.ts';
+import { stats } from '../src/data/stats.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -55,6 +56,14 @@ for (const lang of ['de', 'en']) {
     '',
     u['hero.lead'],
     '',
+    // Kennzahlen (Krom-Umbau 2026-11-12) – Fallstudien gezählt wie in Kennzahlen.astro
+    `## ${u['stats.label']}`,
+    '',
+    `- ${stats.years} ${u['stats.years']}`,
+    `- ${stats.companies} ${u['stats.companies']}`,
+    `- ${projects.length} ${u['stats.cases']}`,
+    `- ${stats.languages} ${u['stats.languages']}`,
+    '',
     `## ${u['facts.label']}`,
     '',
     `- ${u['facts.location']}: ${profile.region[lang]}`,
@@ -77,22 +86,52 @@ for (const lang of ['de', 'en']) {
     '',
     ...process.map((p, i) => `${i + 1}. ${u[`process.${p.key}.title`]}: ${u[`process.${p.key}.text`]}`),
     '',
-    // Vorerst ausgeblendet wie in CtaBand.astro (Joker 2026-11-09):
-    // u['cta.text'],
-    // '',
+    // cta.text bleibt ausgeblendet (Joker 2026-11-09); das CTA-Band ist seit 2026-11-12 Teil des Kontakts.
+    // Projekt-Slider der Startseite: nur Projekte mit Live-Website und Screenshot – derselbe Filter wie in
+    // HomePage.astro (specs/001-projekt-slider); die vollständige Liste spiegelt projekte.md.
     `## ${u['projects.title']}`,
     '',
-    ...projects.map((p) => `- [${p.title}](${SITE}${routes.project(p.slug)[lang]}): ${p.summary}`),
+    ...projects
+      .filter((p) => p.liveUrl && p.cover)
+      .map((p) => `- [${p.title}](${SITE}${routes.project(p.slug)[lang]}): ${p.summary}`),
+    '',
+    `[${u['projects.all']}](${SITE}${routes.projects[lang]})`,
     '',
     `## ${u['contact.title']}`,
+    '',
+    `${u['contact.headline']} ${u['contact.lead']}`,
     '',
     `- ${u['contact.email']}: ${profile.email}`,
     `- LinkedIn: ${profile.linkedin.url}`,
     `- GitHub: ${profile.github.url}`,
+    `- ${u['facts.location']}: ${profile.region[lang]}`,
     '',
     `Quelle/Source: ${SITE}${routes.home[lang]}`,
   ].join('\n');
   mirrors[lang].push({ file: write(homeFile, home), title: `${profile.name} – ${u['hero.role']}`, text: home });
+
+  // Projekte-Seite (/projekte/, /en/projects/): alle Projekte wie in den Zeilen der Seite – Jahr, Art, Titel,
+  // Kontext, Kurztext, Stack. Datei liegt NEBEN dem Ordner der Fallstudien-Spiegel (projekte.md), damit das
+  // Leeren oben sie nicht erfasst.
+  const projectsPage = [
+    `# ${u['projects.page.title']}`,
+    '',
+    ...projects.flatMap((p) => [
+      `## [${p.title}](${SITE}${routes.project(p.slug)[lang]})`,
+      '',
+      `${p.year} · ${u[p.kind === 'client' ? 'projects.kind.client' : 'projects.kind.own']} · ${p.context}`,
+      '',
+      p.summary,
+      '',
+      `${u['projects.stack']}: ${p.stack.join(', ')}`,
+      ...(p.liveUrl ? [`Website: ${p.liveUrl}`] : []),
+      ...(p.repoUrl ? [`Repository: ${p.repoUrl}`] : []),
+      '',
+    ]),
+    `Quelle/Source: ${SITE}${routes.projects[lang]}`,
+  ].join('\n');
+  const projectsFile = `${routes.projects[lang].replace(/^\/|\/$/g, '')}.md`;
+  mirrors[lang].push({ file: write(projectsFile, projectsPage), title: u['projects.page.title'], text: projectsPage });
 
   for (const p of projects) {
     const path = routes.project(p.slug)[lang].replace(/^\/|\/$/g, '');

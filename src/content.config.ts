@@ -31,6 +31,11 @@ const projects = defineCollection({
       coverAlt: z.string().optional(),
       /** Mobile Startseite, 440 × 956 pt (iPhone 17 Pro Max) inkl. 62-pt-Statusleiste – für den iPhone-Rahmen */
       coverMobile: image().optional(),
+      /** Startseiten-Vitrine (DESIGN.md → Signatur 8): die ersten ~3 Bildschirme der Live-Site, Desktop 1440 × 2700 px
+       *  bzw. mobil 440 × 2868 px, Aufnahme 2026-11-12 (Reduced Motion, Consent-Banner und schwebende Tasten
+       *  ausgeblendet). Nur Projekte mit Live-Site; ohne Feld erscheint das Projekt nicht in der Vitrine. */
+      screenFull: image().optional(),
+      screenFullMobile: image().optional(),
       /** Nur Projekte ohne Desktop-Ansicht (Mini-App in einer nativen App): 1–3 iPhone-Screens im Hochformat
        *  (≈ 440 × 956 pt inkl. Statusleiste). Ohne `cover` zeigen Projektliste und Fallstudie die Screens
        *  als Reihe von iPhones (DeviceFrames). `screensAlt` beschreibt jeden Screen, gleiche Reihenfolge. */
