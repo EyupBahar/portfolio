@@ -5,6 +5,13 @@ Wege zu GitHub, LinkedIn und Lebenslauf. Live unter eyupbahar.com.
 
 ## Stand
 
+2026-11-13 — Neues Logo + Favicon (Joker, Vorlage als Bild): Figur mit Kappe/Brille/Laptop, Grund per macOS Vision
+freigestellt → `src/assets/logo.png` (512², Alpha); Favicon dieselbe Figur (`public/favicon.ico` 16–64,
+`public/apple-touch-icon.png` 180² auf `--paper`); altes `favicon.svg` entfernt; Original `docs/logo-original.jpg`
+(Katze in der Git-Historie). `DESIGN.md` → Logo/Favicon. Gemessen (dev): `/favicon.ico` + Touch-Icon 200, Kopfzeile
+1440/390 ohne Konsolenfehler; `astro check` 0, Build ok, `verify-perf` + `verify-design` grün. Vor dem Ship: `verify-build`
+grün (20 Routen 200, kein Überlauf 390/768/1440, Render sauber), GEO ok, SEO 0 fail / 85 warn. Commit + Push GitHub +
+Vercel-Prod (Joker „bunu github ve vercel a deploy et").
 2026-11-12 (nachts) — Commit + Push GitHub + Vercel-Prod (Joker „github ve vercel'i güncelle"): alle Einträge
 unten bis einschliesslich „Messfeld" gehen damit live (die „Nicht committet, nicht deployt"-Vermerke darunter sind
 damit erledigt). Gates vorher: `verify-build` grün (Routen, Überlauf 390/768/1440, Reduce, Render), GEO ok, SEO
@@ -197,6 +204,7 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 | `src/content/projects/{de,en}/` | ein Markdown pro Projekt, Schema in `src/content.config.ts`; ohne Desktop-Ansicht `screens` (1–3 iPhone-Screens) statt `cover` |
 | `src/assets/projects/` | Screenshots (Kundenprojekte live, eigene lokal), WebP: Desktop 1440×900, `-mobile` 880×1912 (Ablauf: `DESIGN.md` → Geräte); Kent Ormanı `kent-ormani-{1,2,3}.webp` 738×1600 aus Jokers App-Screenshots, Statusleiste geflutet |
 | `src/assets/logo.png` · `portrait.jpg` | Logo der Kopfzeile (Original `docs/logo-original.jpg`) · Porträt 1254² (Original `docs/portrait-original.jpg`) |
+| `public/favicon.ico` · `apple-touch-icon.png` | Favicon = Logo-Figur (16/32/48/64, transparent) · iOS-Icon 180² auf `--paper`; eingebunden in `BaseLayout` |
 | `src/i18n/ui.ts` | UI-Texte DE/EN (auch Schwerpunkte, Ablauf, CTA), Routen-Paare, Sprungmarken |
 | `src/styles/` | `tokens.css`, `global.css` (+ `.panel`, `.section`, `.section-title`), `blocks/` (buton, animasyon, card – design-blocks unverändert), `overrides.css` (Abweichungen) |
 | Seitenübergänge | `src/styles/uebergang.css` (Namen `projekt-bild`/`projekt-flaeche`/`site-kopf`, Richtung), `src/scripts/uebergang.ts` (Namen beim `pageswap` an der angeklickten Quelle `[data-vt-quelle]`), `public/vt-ziel.js` (Rückweg: hält das erste Rendern bis `#projekt-<slug>`); eingebunden von HomePage, ProjectsPage, CasePage; Slot `head` in BaseLayout |
