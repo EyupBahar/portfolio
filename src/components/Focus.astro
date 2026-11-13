@@ -6,8 +6,10 @@
  * card--numarali (Klassen einzeln, die Karte selbst ist keine .db-card-num mehr – deren :hover-Regeln
  * würden die gedrehte Rückseite zurückdrehen). Kein Block in design-blocks hat eine Wendekarte.
  *
- * Dreht bei: Maus-Hover, Tastaturfokus (Tab, deshalb tabindex) und Antippen auf Touch-Geräten (:focus,
- * nur bei hover: none). Reines CSS, kein JS. Reduce: keine Drehung, die Seiten wechseln ohne Bewegung.
+ * Dreht bei: Maus-Hover (nur ab 1024 px), Tastaturfokus (Tab, deshalb tabindex) und in der Mobil-Ansicht
+ * (hover: none oder < 1024 px) nur per Antippen/Klick (:focus; Joker 2026-11-13 „mobilde kartın arkasına dönmesi
+ * için tıklanması gereksin" – vorher drehte < 1024 px schon das Überfahren mit der Maus). Reines CSS, das Zurückdrehen
+ * per K1-Skript unten. Reduce: keine Drehung, die Seiten wechseln ohne Bewegung.
  * Screenreader lesen die Rückseite immer (backface-visibility verbirgt nur das Bild); die Vorderseite ist
  * reine Grafik und aria-hidden.
  */
@@ -43,6 +45,9 @@ const { lang } = Astro.props;
               </ul>
             </div>
           </div>
+          <span class="focus-karte__hinweis" aria-hidden="true">
+            <Icon name="ph:arrow-clockwise-light" class="focus-karte__hinweis-icon" />
+          </span>
         </article>
       ))}
     </div>
@@ -72,7 +77,8 @@ const { lang } = Astro.props;
     display: grid;
     perspective: 1400px;
   }
-  @media (hover: hover) {
+  /* Mobil-Ansicht = dieselbe Bedingung wie der Dreh-Hinweis: dort dreht nur Antippen/Klick (:focus), nie Hover */
+  @media (hover: hover) and (min-width: 1024px) {
     .focus-karte:hover {
       --gedreht: 1;
       --rand: var(--accent);
@@ -84,7 +90,8 @@ const { lang } = Astro.props;
     --rand: var(--accent);
     --rand-oben: var(--accent);
   }
-  @media (hover: none) {
+  @media (hover: none), not all and (min-width: 1024px) {
+    .focus-karte { cursor: pointer; }
     .focus-karte:focus {
       --gedreht: 1;
       --rand: var(--accent);
@@ -93,6 +100,7 @@ const { lang } = Astro.props;
   }
 
   .focus-karte__dreh {
+    grid-area: 1 / 1; /* explizit: sonst setzt das Auto-Placement es unter den Dreh-Hinweis in Zeile 2 */
     display: grid;
     transform-style: preserve-3d;
     transform: rotateY(calc(var(--gedreht) * 180deg));
@@ -145,6 +153,49 @@ const { lang } = Astro.props;
     backface-visibility: hidden;
   }
 
+  /* Dreh-Hinweis (Joker 2026-11-13, futuristic-design): in der Mobil-Ansicht – ohne Maus-Hover ODER unter 1024 px –
+   * zeigt ein ↻ oben rechts, dass die Karte sich dreht. Er liegt AUSSERHALB von .focus-karte__dreh: so dreht er
+   * nicht mit, und Safari zeichnet ihn nicht durch das backface-visibility der Seite hindurch (animiertes Kind =
+   * eigene Ebene, vgl. Indikatorlinie). Bewegung: langsame volle Drehung in der Ebene (360°), dann Ruhe;
+   * Farbe `--ink` wie das Logo (Joker 2026-11-13 „beyaz olsun ve 360 derece dönsün"; vorher Stahlblau + Y-Achse).
+   * Gedreht: blendet sofort aus; zurück: erscheint erst gegen Ende der Rückdrehung (0.6 s). */
+  .focus-karte__hinweis {
+    display: none;
+  }
+  @media (hover: none), not all and (min-width: 1024px) {
+    .focus-karte__hinweis {
+      grid-area: 1 / 1;
+      justify-self: end;
+      align-self: start;
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin: 1rem;
+      color: var(--ink);
+      pointer-events: none;
+      opacity: calc(1 - var(--gedreht));
+      transition: opacity var(--dur) var(--ease);
+      transition-delay: calc((1 - var(--gedreht)) * 0.45s);
+    }
+  }
+  .focus-karte__hinweis-icon {
+    display: block;
+    width: 1.75rem;
+    height: 1.75rem;
+    animation: focus-hinweis-drehen 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  /* 6 s je Runde: 1.8 s Ruhe, 2.4 s Drehung, 1.8 s Ruhe */
+  @keyframes focus-hinweis-drehen {
+    0%,
+    30% {
+      transform: rotate(0deg);
+    }
+    70%,
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
   .focus__stack {
     display: flex;
     flex-wrap: wrap;
@@ -167,18 +218,23 @@ const { lang } = Astro.props;
       opacity: var(--gedreht);
     }
     .focus-karte .db-card-num__bar { transition: none; }
+    /* Hinweis bleibt als ruhendes Zeichen stehen */
+    .focus-karte__hinweis { transition: none; }
+    .focus-karte__hinweis-icon { animation: none; }
   }
 </style>
 
 <script>
   // K1: Touch dreht per :focus (CSS, geht auch ohne JS). Ohne Hilfe bliebe die Karte gedreht, bis eine
   // andere den Fokus nimmt – Antippen daneben fokussiert in WebKit nichts. Deshalb: zweites Antippen
-  // derselben Karte oder Antippen ausserhalb dreht zurück (blur). Maus und Tastatur bleiben unberührt.
+  // derselben Karte oder Antippen ausserhalb dreht zurück (blur). In der Mobil-Ansicht (< 1024 px) gilt dasselbe
+  // für Mausklicks; ab 1024 px bleiben Maus (Hover) und Tastatur unberührt.
+  const mobil = window.matchMedia('(hover: none), not all and (min-width: 1024px)');
   let gedrehtBeimDruck: HTMLElement | null = null;
   document.addEventListener(
     'pointerdown',
     (e) => {
-      if (e.pointerType === 'mouse') return;
+      if (e.pointerType === 'mouse' && !mobil.matches) return;
       const aktiv = document.activeElement;
       const offen = aktiv instanceof HTMLElement && aktiv.matches('.focus-karte') ? aktiv : null;
       const karte = e.target instanceof Element ? e.target.closest<HTMLElement>('.focus-karte') : null;

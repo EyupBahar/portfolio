@@ -5,6 +5,30 @@ Wege zu GitHub, LinkedIn und Lebenslauf. Live unter eyupbahar.com.
 
 ## Stand
 
+2026-11-13 (abends) — Commit + Push GitHub + Vercel-Prod (Joker „değişiklikleri deploy et"): die drei Einträge darunter
+(Gemini-Logo, Dreh-Hinweis, Mobil nur per Klick) gehen live, ihre „Nicht committet"-Vermerke sind damit erledigt.
+Gates vorher: `verify-build` grün (20 Routen 200, kein Überlauf 390/768/1440, Reduce, Render), GEO ok (Spiegel
+unverändert), SEO ok, Perf ok, `astro check` 0. Frischer Review (Commit-Kapi) eingearbeitet: doppelte Tabellenzelle in
+`DESIGN.md`, „und" → „oder" bei der Mobil-Bedingung, Lücke 1023.98–1024 px (jetzt `not all and (min-width: 1024px)`),
+`gemini-`-Präfix wirkungslos (astro-icon vergibt IDs selbst). Offen: Dreh-Hinweis läuft endlos ohne Pause-Taste
+(WCAG 2.2.2) – wie die Fugen-Signale im Hero nur per Reduce still; Joker entscheidet.
+2026-11-13 (abends) — Kurzprofil KI-Zeile: Gemini im Original-Logo (Joker): farbiges Sparkle 2025 (`src/icons/gemini.svg`,
+devicon MIT, Rohdatei `docs/icons-original/gemini-devicon.svg`) statt simple-icons `googlegemini` in #8e75b2; Claude/OpenAI
+unverändert. Gemessen (dev, Chromium 1440/390): 40 px wie die Nachbarn, 10 Filter + Maske gerendert, keine toten
+Referenzen, keine doppelten IDs, keine Konsolenfehler, kein Überlauf. WebKit nicht angesehen. Nicht committet, nicht deployt.
+2026-11-13 (abends) — Schwerpunkte: Dreh-Hinweis (Joker, futuristic-design; `DESIGN.md` → Abweichungen card--numarali):
+in der Mobil-Ansicht (Touch oder < 1024 px) oben rechts ein ↻ (`ph:arrow-clockwise-light`, `--ink`), dreht langsam einmal 360° in der
+Ebene (6 s je Runde; Joker danach „beyaz olsun ve 360 derece dönsün", vorher Stahlblau + Y-Achse), blendet gedreht
+aus, Reduce still; nur `Focus.astro`, kein JS. Gemessen (dist, Chromium): 390 Touch/320
+Touch/800 Maus sichtbar, 1440 Maus nicht; Abstand 16 px oben/rechts, kein Überlauf, kein Überdecken des Logos,
+Kartenhöhe unverändert; Antippen → Hinweis 0, zweites Antippen → 1; Reduce ohne Animation; `astro check` 0,
+Detector 0, Perf ok. Echtes iPhone nicht angesehen. Danach (Joker „mobilde tıklanması gereksin"): in der Mobil-Ansicht
+(Touch oder < 1024 px) dreht nur Antippen/Klick, Hover nur noch ab 1024 px; Skript dreht < 1024 px auch Mausklicks
+zurück. Gemessen (dev): 800 Maus Hover 0 / Klick 1 / Klick 0 / daneben 0; 390 Touch Wischen über die Karte 0, Tap 1,
+Tap 0; 1440 Hover 1 (unverändert); Tab-Fokus 1. Nicht committet, nicht deployt.
+Favicon in Google (Joker-Frage): Site erst seit 2026-11-10/11 unter der Domain, Favicon heute von `/favicon.svg` auf
+`/favicon.ico` gewechselt (svg jetzt 404); Googles Favicon-Dienst kennt die Domain noch nicht (404 = Globus). Technisch
+ok (200, `image/vnd.microsoft.icon`, 48 px enthalten, robots erlaubt) → Search Console + warten; siehe Offene Punkte.
 2026-11-13 — Neues Logo + Favicon (Joker, Vorlage als Bild): Figur mit Kappe/Brille/Laptop, Grund per macOS Vision
 freigestellt → `src/assets/logo.png` (512², Alpha); Favicon dieselbe Figur (`public/favicon.ico` 16–64,
 `public/apple-touch-icon.png` 180² auf `--paper`); altes `favicon.svg` entfernt; Original `docs/logo-original.jpg`
@@ -149,7 +173,7 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 
 - Stack: Astro 7.4 (statisch, SSG), TypeScript strict, scoped CSS + Custom Properties (kein Tailwind).
   Schriften `@fontsource`: Schibsted Grotesk Variable + Fragment Mono; Archivo Variable (`wdth.css`) nur für die
-  Krom-Titel, Import in `Hero.astro` + `Contact.astro`. JS nur der Reveal (`Reveal.astro`), das Zurückdrehen der Schwerpunkt-Wendekarten auf Touch,
+  Krom-Titel, Import in `Hero.astro` + `Contact.astro`. JS nur der Reveal (`Reveal.astro`), das Zurückdrehen der Schwerpunkt-Wendekarten in der Mobil-Ansicht (Touch; < 1024 px auch Maus),
   der Projekt-Slider (`ProjectSlider.astro`), die Pause-Taste des Stack-Laufbands, der Kennzahlen-Zähler (`src/scripts/sayac.js`, design-blocks `animasyon--sayac`) und die Seitenübergänge
   (`src/scripts/uebergang.ts`, klassisch `public/vt-ziel.js`) (alle K1; ohne JS bleibt alles sichtbar, die Slider-Karten stehen untereinander).
   Icons: `astro-icon` + `@iconify-json/ph` (Phosphor) + `@iconify-json/simple-icons` (Stack-Marken) + eigene in
@@ -197,7 +221,7 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 | `src/pages/` | `index`, `projekte/index` (alle Projekte), `projekte/[slug]`, `datenschutz`, `404` (DE) · `en/index`, `en/projects/index`, `en/projects/[slug]`, `en/privacy` |
 | `src/components/` | Header, Footer, Hero (Porträt + Fugen-Raster + Krom-Titel, Bogen/Stern), Kennzahlen (Zahlen-Panel), Facts (+ KantonBern = Standort-Karte), Focus, Stack (Laufband), ProjectSlider (Startseite), ProjectsPage → ProjectList/ProjectRow (+ DeviceFrames, Showreel = Vitrine; /projekte/), Reveal (Reveal-Skript), Process, Contact (CTA + Kanäle, ein Panel), Messspur (Skala/Segment/Protokoll), CasePage, LegalPage; Reihenfolge + Messfeld in `HomePage` |
 | `src/data/` | `profile.ts` (Name, E-Mail, Links, CV-Pfade), `portrait.ts` (Glob auf `assets/portrait.*`), `stack.ts`, `focus.ts`, `process.ts`, `stats.ts` (Kennzahlen, Quellen im Kopf) – einzige Quellen, auch für GEO |
-| `src/icons/` | eigene Icons (location, now, frontend, backend, sprache, pdf, webseite, mobile-applikation, monitor, implementierung, testen, ki) + kanonisches email; Originale `docs/icons-original/` |
+| `src/icons/` | eigene Icons (location, now, frontend, backend, sprache, pdf, webseite, mobile-applikation, monitor, implementierung, testen, ki) + kanonisches email + Gemini-Logo (`gemini`, devicon MIT, Original-Farben); Originale `docs/icons-original/` |
 | `scripts/geo.mjs` | erzeugt `public/llms*.txt` + `.md`-Spiegel (Startseite = `startseite.md`, nie `index.md`; Projekte-Seite = `projekte.md` / `en/projects.md`); leert Projekt-Spiegel vorher |
 | `public/og/` | OG-Bilder 1200×630 (DE/EN), aus Seiten-Fonts und Tokens gerendert |
 | `public/cv/` | `Eyup_Bahar_CV_DE.pdf`, `Eyup_Bahar_CV_EN.pdf` – erzeugt von `scripts/cv-web.mjs`, nie von Hand |
@@ -234,6 +258,9 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
   `vercel git connect https://github.com/EyupBahar/portfolio.git --yes --scope eyupbahars-projects` — Joker
 - [offen] Helvetia auf Render: neue `Jwt__Key`, `Admin__Username`, `Admin__Password` setzen (alte stehen in der
   Git-Historie); Render-Postgres nicht erreichbar, `/health/db` 503 — Joker
+- [offen] Google-Favicon: Search Console (Domain-Property `eyupbahar.com`; TXT `google-site-verification` bei Infomaniak
+  gesetzt, 2026-11-13 öffentlich sichtbar) → URL-Prüfung Startseite → „Indexierung beantragen"; Googles Favicon-Dienst
+  am 2026-11-13 abends noch 404; optional ein grösseres PNG-Icon (192², Google empfiehlt > 48 px) zusätzlich einbinden — Joker
 - [offen] Pinocchio-Screenshots zeigen Logo und Glas „Pinocchio Ristorante-Pizzeria" — Nutzungsrecht klären — Joker
 
 ## Pflege

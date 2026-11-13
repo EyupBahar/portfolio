@@ -36,6 +36,10 @@ const facts = [
   // Markenzeichen der genutzten Modelle (Joker 2026-11-12), simple-icons via Iconify. OpenAI ist seit
   // simple-icons 16 aus der Sammlung entfernt (keine Freigabe von OpenAI, Issue #13944) – Iconify führt das
   // Zeichen weiter; Joker 2026-11-12 in Kenntnis davon: Zeichen bleibt.
+  // Gemini im Original (Joker 2026-11-13 „gemini orijinal logoyla değiştir"): das farbige Sparkle von 2025 statt
+  // des einfarbigen simple-icons-Zeichens, als `src/icons/gemini.svg` (Quelle devicon `gemini`, MIT, über Iconify;
+  // Rohdatei `docs/icons-original/gemini-devicon.svg`; eindeutige IDs für Filter/Maske vergibt astro-icon beim
+  // Rendern). Bringt eigene Farben mit.
   {
     icon: 'ph:sparkle-light',
     label: t(lang, 'facts.ai'),
@@ -44,7 +48,7 @@ const facts = [
     marken: [
       { slug: 'claude', name: 'Claude' },
       { slug: 'openai', name: 'OpenAI' },
-      { slug: 'googlegemini', name: 'Gemini' },
+      { slug: 'gemini', name: 'Gemini', icon: 'gemini' },
     ],
   },
 ];
@@ -73,7 +77,7 @@ const facts = [
               <ul class="facts__marken" role="list">
                 {f.marken.map((m) => (
                   <li class={`facts__marke facts__marke--${m.slug}`}>
-                    <Icon name={`simple-icons:${m.slug}`} aria-hidden="true" /><span class="visually-hidden">{m.name}</span>
+                    <Icon name={m.icon ?? `simple-icons:${m.slug}`} aria-hidden="true" /><span class="visually-hidden">{m.name}</span>
                   </li>
                 ))}
               </ul>
@@ -195,10 +199,10 @@ const facts = [
     height: 2.5rem;
   }
   /* Markenfarben wie im Stack-Laufband (simple-icons `hex` 16.37); OpenAI zeichnet schwarz/weiss → --ink.
-   * Kontrast auf dem Glas-Panel: Claude 5.2:1, Gemini 4.1:1 (Grafik, Schwelle 3:1). */
+   * Gemini bringt als Original-Logo eigene Farben mit (keine Regel). Kontrast auf dem Glas-Panel: Claude 5.2:1
+   * (Grafik, Schwelle 3:1). */
   .facts__marke--claude { color: #d97757; }
   .facts__marke--openai { color: var(--ink); }
-  .facts__marke--googlegemini { color: #8e75b2; }
 
   @media (max-width: 479px) {
     /* Schmale Telefone: Label über dem Wert, sonst bleibt dem Wert zu wenig Breite */
