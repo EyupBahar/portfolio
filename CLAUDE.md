@@ -5,6 +5,12 @@ Wege zu GitHub, LinkedIn und Lebenslauf. Live unter eyupbahar.com.
 
 ## Stand
 
+2026-11-19 — Web-CV: Önlisans Computer Programming Ende 06/2022 → 06/2023 (Joker; Diplom datiert 07.06.2023) in
+`public/cv/Eyup_Bahar_CV_{DE,EN}.pdf`. Von Hand im PDF gepatcht (eine Glyphe 0x15 → 0x16), weil die HTML-Quelle
+`~/Desktop/Coding/ai-job-search/cv/` nicht mehr existiert → `cv-web.mjs` läuft mit Standardquelle nicht (Offene
+Punkte). Geprüft: Text-Diff nur diese Zeile, Seite 1 pixelgleich, Seite 2 nur 7×11 px (die Ziffer), Seitenzahl 2.
+Commit + Push GitHub + Vercel-Prod (Joker „portfolyoyu canlıda da düzelt"). Keine Code-Änderung, daher kein
+verify-build.
 2026-11-13 (abends) — Commit + Push GitHub + Vercel-Prod (Joker „değişiklikleri deploy et"): die drei Einträge darunter
 (Gemini-Logo, Dreh-Hinweis, Mobil nur per Klick) gehen live, ihre „Nicht committet"-Vermerke sind damit erledigt.
 Gates vorher: `verify-build` grün (20 Routen 200, kein Überlauf 390/768/1440, Reduce, Render), GEO ok (Spiegel
@@ -187,7 +193,8 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 - Web-CV: `node scripts/cv-web.mjs` druckt `public/cv/Eyup_Bahar_CV_{DE,EN}.pdf` aus Jokers Bewerbungs-CVs
   (`~/Desktop/Coding/ai-job-search/cv/Eyup_Bahar_{Lebenslauf,CV}.html`, unverändert): Kontaktblock aus `profile.ts`,
   Kopfzeile = `hero.role`, Foto bleibt. Prüft: keine entfernte Kontaktzeile im PDF, Seitenzahl wie Quelle.
-  Nach jeder CV-Änderung neu laufen lassen.
+  Nach jeder CV-Änderung neu laufen lassen. **Quelle fehlt seit 2026-11-19** (Ordner gelöscht) – vor dem nächsten
+  Lauf HTML-Quellen von Joker holen; die PDFs von 2026-11-19 sind von Hand gepatcht (Stand).
 - Befehle (Projektwurzel): `npm run dev` · `npm run build` (= `astro check && astro build`) · `npm run preview`
   · `npm run geo` (GEO-Spiegel aus Content + ui.ts + data/ neu erzeugen – vor jedem Ship, dann verify-geo)
 - Gates ausserhalb `antigravity/projekte`: `verify-build/-geo/-seo/-perf.sh .` (Pfad statt Name); `verify-design.sh`
@@ -224,7 +231,7 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 | `src/icons/` | eigene Icons (location, now, frontend, backend, sprache, pdf, webseite, mobile-applikation, monitor, implementierung, testen, ki) + kanonisches email + Gemini-Logo (`gemini`, devicon MIT, Original-Farben); Originale `docs/icons-original/` |
 | `scripts/geo.mjs` | erzeugt `public/llms*.txt` + `.md`-Spiegel (Startseite = `startseite.md`, nie `index.md`; Projekte-Seite = `projekte.md` / `en/projects.md`); leert Projekt-Spiegel vorher |
 | `public/og/` | OG-Bilder 1200×630 (DE/EN), aus Seiten-Fonts und Tokens gerendert |
-| `public/cv/` | `Eyup_Bahar_CV_DE.pdf`, `Eyup_Bahar_CV_EN.pdf` – erzeugt von `scripts/cv-web.mjs`, nie von Hand |
+| `public/cv/` | `Eyup_Bahar_CV_DE.pdf`, `Eyup_Bahar_CV_EN.pdf` – erzeugt von `scripts/cv-web.mjs` (Ausnahme 2026-11-19: Datum von Hand gepatcht, Quelle fehlt) |
 | `src/content/projects/{de,en}/` | ein Markdown pro Projekt, Schema in `src/content.config.ts`; ohne Desktop-Ansicht `screens` (1–3 iPhone-Screens) statt `cover` |
 | `src/assets/projects/` | Screenshots (Kundenprojekte live, eigene lokal), WebP: Desktop 1440×900, `-mobile` 880×1912 (Ablauf: `DESIGN.md` → Geräte); Kent Ormanı `kent-ormani-{1,2,3}.webp` 738×1600 aus Jokers App-Screenshots, Statusleiste geflutet |
 | `src/assets/logo.png` · `portrait.jpg` | Logo der Kopfzeile (Original `docs/logo-original.jpg`) · Porträt 1254² (Original `docs/portrait-original.jpg`) |
@@ -240,6 +247,8 @@ KI-Erfahrung im Lead und Kurzprofil (Angaben Joker), gleiche Punkte im CV.
 
 ## Offene Punkte
 
+- [offen] Web-CV-Quelle: `~/Desktop/Coding/ai-job-search/cv/Eyup_Bahar_{Lebenslauf,CV}.html` existiert nicht mehr
+  (2026-11-19) → `cv-web.mjs` hat keine Quelle; HTML-Dateien wiederfinden oder neu aufsetzen — Joker
 - [offen] Texte Schwerpunkte, Ablauf, CTA-Band (DE+EN, Entwürfe in `ui.ts`) — Freigabe Joker
 - [offen] Krom-Umbau-Texte (DE+EN, `ui.ts`): Kontakt-Satz „Sprechen wir." / „Let's talk.", Kennzahl-Labels
   („Jahre Praxis seit 2021" = CV „rund drei Jahre") — Freigabe Joker (Ausbildungszeilen entfallen, Panel entfernt 2026-11-12)
